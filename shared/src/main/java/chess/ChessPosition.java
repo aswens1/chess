@@ -1,5 +1,4 @@
 package chess;
-
 /**
  * Represents a single square position on a chess board
  * <p>
@@ -8,7 +7,11 @@ package chess;
  */
 public class ChessPosition {
 
+    public int row;
+    public int col;
+
     public ChessPosition(int row, int col) {
+
     }
 
     /**
@@ -16,7 +19,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        throw new RuntimeException("Not implemented");
+        return row;
     }
 
     /**
@@ -24,6 +27,6 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        throw new RuntimeException("Not implemented");
+        return col;
     }
 }
