@@ -7,11 +7,12 @@ package chess;
  */
 public class ChessPosition {
 
-    public int row;
-    public int col;
+    private final int row;
+    private final int col;
 
     public ChessPosition(int row, int col) {
-
+        this.row = row;
+        this.col = col;
     }
 
     /**
