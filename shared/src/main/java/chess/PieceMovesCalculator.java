@@ -1,43 +1,14 @@
 package chess;
 
+import java.util.List;
+
 public interface PieceMovesCalculator {
-    public void king();
-    public void queen();
-    public void knight();
-    public void bishop();
-    public void rook();
-    public void pawn();
-}
+    /**
+    An interface to calculate the possible moves each piece can make
 
-class Calculator implements PieceMovesCalculator {
-
-    @Override
-    public void king() {
-
-    }
-
-    @Override
-    public void queen() {
-
-    }
-
-    @Override
-    public void knight() {
-
-    }
-
-    @Override
-    public void bishop() {
-
-    }
-
-    @Override
-    public void rook() {
-
-    }
-
-    @Override
-    public void pawn() {
-
-    }
+    @param position = the position of the piece in question
+    @param board = the board and where all the pieces are
+    @return where the piece can go
+    */
+    List<ChessPosition> possibleMoves (ChessPosition position, ChessBoard board);
 }
