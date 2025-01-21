@@ -26,9 +26,9 @@ public class Bishop implements PieceMovesCalculator {
 
         while(zeroRow >= 0 && zeroRow < 8 && zeroColumn >= 0 && zeroColumn < 8) {
             ChessPosition zeroPosition = new ChessPosition(zeroRow, zeroColumn);
-            ChessPosition newPosition = new ChessPosition(upRightRow, upRightColumn);
+            ChessPosition upRightPosition = new ChessPosition(upRightRow, upRightColumn);
             ChessPiece occupiedPiece = board.getPiece(zeroPosition);
-            ChessMove newMove = new ChessMove(position, newPosition, null);
+            ChessMove newMove = new ChessMove(position, upRightPosition, null);
 
             if (occupiedPiece == null) {
                 moves.add(newMove);
@@ -47,7 +47,39 @@ public class Bishop implements PieceMovesCalculator {
                 break;
             }
             System.out.println("Moves: " + moves);
+        }
+
+        // checks all the moves going down and to the right
+        int zeroRow1 = position.getRow() - 1;
+        int zeroColumn1 = position.getColumn() - 1;
+
+        int downRightRow = position.getRow() - 1;
+        int downRightColumn = position.getColumn() + 1;
+
+        while(zeroRow1 > 0 && zeroRow1 < 8 && zeroColumn1 > 0 && zeroColumn1 < 8) {
+            ChessPosition zeroPosition = new ChessPosition(zeroRow1, zeroColumn1);
+            ChessPosition downRightPosition = new ChessPosition(downRightRow, downRightColumn);
+            ChessPiece occupiedPiece = board.getPiece(zeroPosition);
+            ChessMove newMove = new ChessMove(position, downRightPosition, null);
+
+            if (occupiedPiece == null) {
+                moves.add(newMove);
+                downRightRow--;
+                downRightColumn++;
+
+                zeroRow1--;
+                zeroColumn1++;
+            } else if (occupiedPiece == piece) {
+                zeroRow1++;
+                zeroColumn1++;
+            } else {
+                if (occupiedPiece.getTeamColor() != myColour) {
+                moves.add(newMove);
+                }
+            break;
             }
+        }
+        System.out.println("Moves: " + moves);
         return moves;
     }
 }
