@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface PieceMovesCalculator {
@@ -10,5 +11,7 @@ public interface PieceMovesCalculator {
     @param board = the board and where all the pieces are
     @return where the piece can go
     */
-    List<ChessPosition> possibleMoves (ChessPosition position, ChessBoard board);
+    static List<ChessMove> possibleMoves (ChessPosition position, ChessBoard board){
+        return null;
+    };
 }
