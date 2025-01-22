@@ -79,6 +79,10 @@ public class ChessPiece {
         if (pieceType == PieceType.BISHOP) {
             return Bishop.possibleMoves(myPosition, board);
         }
+
+        if (pieceType == PieceType.ROOK) {
+            return Rook.possibleMoves(myPosition, board);
+        }
         return null;
     }
 }
