@@ -12,8 +12,8 @@ public class Bishop implements PieceMovesCalculator {
 
         ChessGame.TeamColor myColour = board.getPiece(position).getTeamColor();
 
-        if (piece == null || piece.getPieceType() != ChessPiece.PieceType.BISHOP) {
-            // checks the spot is empty or if it's not a bishop
+        // checks the spot is empty
+        if (piece == null) {
             return moves;
         }
 

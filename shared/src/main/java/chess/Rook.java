@@ -9,8 +9,8 @@ public class Rook implements PieceMovesCalculator{
         ChessPiece piece = board.getPiece(position);
         ChessGame.TeamColor myColour = board.getPiece(position).getTeamColor();
 
-        // checks the spot is empty or if it's not a rook
-        if (piece == null || piece.getPieceType() != ChessPiece.PieceType.ROOK) {
+        // checks the spot is empty
+        if (piece == null) {
             return moves;
         }
 
