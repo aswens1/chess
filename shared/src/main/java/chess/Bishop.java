@@ -22,7 +22,7 @@ public class Bishop implements PieceMovesCalculator {
         int upRightRow = position.getRow() + 1;
         int upRightColumn = position.getColumn() + 1;
 
-        while(upRightRow >= 0 && upRightRow <= 8 && upRightColumn >= 0 && upRightColumn <= 8) {
+        while(upRightRow > 0 && upRightRow <= 8 && upRightColumn > 0 && upRightColumn <= 8) {
             ChessPosition upRightPosition = new ChessPosition(upRightRow, upRightColumn);
             ChessPiece occupiedPieceUR = board.getPiece(upRightPosition);
             ChessMove newMoveUR = new ChessMove(position, upRightPosition, null);
