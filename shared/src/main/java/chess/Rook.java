@@ -26,8 +26,6 @@ public class Rook implements PieceMovesCalculator{
             if (occupiedPieceUp == null) {
                 moves.add(newMoveUp);
                 upRow++;
-            } else if (occupiedPieceUp == piece) {
-                upRow++;
             } else {
                 if (occupiedPieceUp.getTeamColor() != myColour) {
                     moves.add(newMoveUp);
@@ -47,8 +45,6 @@ public class Rook implements PieceMovesCalculator{
 
             if (occupiedPieceDown == null) {
                 moves.add(newMoveDown);
-                downRow--;
-            } else if (occupiedPieceDown == piece) {
                 downRow--;
             } else {
                 if (occupiedPieceDown.getTeamColor() != myColour) {
@@ -71,8 +67,6 @@ public class Rook implements PieceMovesCalculator{
             if (occupiedPieceLeft == null) {
                 moves.add(newMoveLeft);
                 leftColumn--;
-            } else if (occupiedPieceLeft == piece) {
-                leftColumn--;
             } else {
                 if (occupiedPieceLeft.getTeamColor() != myColour) {
                     moves.add(newMoveLeft);
@@ -93,8 +87,6 @@ public class Rook implements PieceMovesCalculator{
 
             if (occupiedPieceRight == null) {
                 moves.add(newMoveRight);
-                rightColumn++;
-            } else if (occupiedPieceRight == piece) {
                 rightColumn++;
             } else {
                 if (occupiedPieceRight.getTeamColor() != myColour) {

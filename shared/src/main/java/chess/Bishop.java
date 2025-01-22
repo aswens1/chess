@@ -31,10 +31,6 @@ public class Bishop implements PieceMovesCalculator {
                 moves.add(newMoveUR);
                 upRightRow++;
                 upRightColumn++;
-
-            } else if (occupiedPieceUR == piece) {
-                upRightRow++;
-                upRightColumn++;
             } else {
                 if (occupiedPieceUR.getTeamColor() != myColour) {
                     moves.add(newMoveUR);
@@ -55,9 +51,6 @@ public class Bishop implements PieceMovesCalculator {
 
             if (occupiedPieceDR == null) {
                 moves.add(newMoveDR);
-                downRightRow--;
-                downRightColumn++;
-            } else if (occupiedPieceDR == piece) {
                 downRightRow--;
                 downRightColumn++;
             } else {
@@ -81,9 +74,6 @@ public class Bishop implements PieceMovesCalculator {
                 moves.add(newMoveDL);
                 downLeftRow--;
                 downLeftColumn--;
-            } else if (occupiedPieceDL == piece) {
-                downLeftRow--;
-                downLeftColumn--;
             } else {
                 if (occupiedPieceDL.getTeamColor() != myColour) {
                     moves.add(newMoveDL);
@@ -103,9 +93,6 @@ public class Bishop implements PieceMovesCalculator {
 
             if (occupiedPieceUL == null) {
                 moves.add(newMoveUL);
-                upLeftRow++;
-                upLeftColumn--;
-            } else if (occupiedPieceUL == piece) {
                 upLeftRow++;
                 upLeftColumn--;
             } else {
