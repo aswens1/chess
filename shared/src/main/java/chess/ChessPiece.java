@@ -88,6 +88,10 @@ public class ChessPiece {
             return Knight.possibleMoves(myPosition, board);
         }
 
+        if (pieceType == PieceType.KING) {
+            return King.possibleMoves(myPosition, board);
+        }
+
         return null;
     }
 }
