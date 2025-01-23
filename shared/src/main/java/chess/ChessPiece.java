@@ -96,6 +96,10 @@ public class ChessPiece {
             return Queen.possibleMoves(myPosition, board);
         }
 
+        if (pieceType == PieceType.PAWN) {
+            return Pawn.possibleMoves(myPosition, board);
+        }
+
         return null;
     }
 }
