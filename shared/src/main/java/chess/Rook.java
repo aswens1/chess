@@ -32,7 +32,6 @@ public class Rook implements PieceMovesCalculator{
                 }
                 break;
             }
-            System.out.println("Moves: " + moves);
         }
 
         //checks all the moves going vertically down
@@ -52,7 +51,6 @@ public class Rook implements PieceMovesCalculator{
                 }
                 break;
             }
-            System.out.println("Moves: " + moves);
         }
 
         // checks all the moves going to the left
@@ -73,8 +71,6 @@ public class Rook implements PieceMovesCalculator{
                 }
                 break;
             }
-            System.out.println("Moves: " + moves);
-
         }
 
         // checks all the moves going right
@@ -94,8 +90,6 @@ public class Rook implements PieceMovesCalculator{
                 }
                 break;
             }
-            System.out.println("Moves: " + moves);
-
         }
 
     return moves;
