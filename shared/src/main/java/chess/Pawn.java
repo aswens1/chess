@@ -72,21 +72,41 @@ public class Pawn implements PieceMovesCalculator {
                     ChessMove captureLeft = new ChessMove(position, positionLeft, null);
                     ChessMove captureRight = new ChessMove(position, positionRight, null);
 
-
                     if (occupiedPiece == null) {
                         moves.add(moveOne);
                     }
 
-                    ChessPiece opLeft = board.getPiece(positionLeft);
-                    ChessPiece opRight = board.getPiece(positionRight);
-                    if (opLeft != null) {
-                        if (opLeft.getTeamColor() != myColour) {
-                            moves.add(captureLeft);
+                    if (column > 1 && column < 8) {
+                        ChessPiece opLeft = board.getPiece(positionLeft);
+                        ChessPiece opRight = board.getPiece(positionRight);
+
+                        if (opLeft != null) {
+                            if (opLeft.getTeamColor() != myColour) {
+                                moves.add(captureLeft);
+                            }
+                        }
+                        if (opRight != null) {
+                            if (opRight.getTeamColor() != myColour) {
+                                moves.add(captureRight);
+                            }
                         }
                     }
-                    if (opRight != null) {
-                        if (opRight.getTeamColor() != myColour) {
-                            moves.add(captureRight);
+
+                    if (column == 1) {
+                        ChessPiece opRight = board.getPiece(positionRight);
+                        if (opRight != null) {
+                            if (opRight.getTeamColor() != myColour) {
+                                moves.add(captureRight);
+                            }
+                        }
+                    }
+
+                    if (column == 8) {
+                        ChessPiece opLeft = board.getPiece(positionLeft);
+                        if (opLeft != null) {
+                            if (opLeft.getTeamColor() != myColour) {
+                                moves.add(captureLeft);
+                            }
                         }
                     }
                 }
@@ -146,26 +166,44 @@ public class Pawn implements PieceMovesCalculator {
                     if (occupiedPiece == null) {
                         moves.add(moveOne);
                     }
+                    if (column > 1 && column < 8) {
+                        ChessPiece opLeft = board.getPiece(positionLeft);
+                        ChessPiece opRight = board.getPiece(positionRight);
 
-                    ChessPiece opLeft = board.getPiece(positionLeft);
-                    ChessPiece opRight = board.getPiece(positionRight);
-                    if (opLeft != null) {
-                        if (opLeft.getTeamColor() != myColour) {
-                            moves.add(captureLeft);
+                        if (opLeft != null) {
+                            if (opLeft.getTeamColor() != myColour) {
+                                moves.add(captureLeft);
+                            }
+                        }
+                        if (opRight != null) {
+                            if (opRight.getTeamColor() != myColour) {
+                                moves.add(captureRight);
+                            }
                         }
                     }
-                    if (opRight != null) {
-                        if (opRight.getTeamColor() != myColour) {
-                           moves.add(captureRight);
+
+                    if (column == 1) {
+                        ChessPiece opRight = board.getPiece(positionRight);
+                        if (opRight != null) {
+                            if (opRight.getTeamColor() != myColour) {
+                                moves.add(captureRight);
+                            }
                         }
                     }
+
+                    if (column == 8) {
+                        ChessPiece opLeft = board.getPiece(positionLeft);
+                        if (opLeft != null) {
+                            if (opLeft.getTeamColor() != myColour) {
+                                moves.add(captureLeft);
+                            }
+                        }
+                    }
+
+
                 }
             }
         }
-
-
-
-
 
         return moves;
     }
