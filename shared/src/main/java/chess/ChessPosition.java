@@ -42,14 +42,6 @@ public class ChessPosition {
         return col;
     }
 
-    public int zeroRow(){
-        return row - 1;
-    }
-
-    public int zeroCol(){
-        return col - 1;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
