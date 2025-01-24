@@ -37,6 +37,7 @@ public class Bishop implements PieceMovesCalculator {
                 }
                 break;
             }
+            System.out.println("Moves: " + moves);
         }
 
 
@@ -59,6 +60,7 @@ public class Bishop implements PieceMovesCalculator {
                 }
                 break;
             }
+            System.out.println("Moves: " + moves);
         }
 
         // checks all the moves going down and to the left
@@ -80,6 +82,7 @@ public class Bishop implements PieceMovesCalculator {
                 }
                 break;
             }
+            System.out.println("Moves: " + moves);
         }
 
         // checks all the moves going up and to the left
@@ -102,6 +105,7 @@ public class Bishop implements PieceMovesCalculator {
                 break;
             }
         }
+        System.out.println("Moves: " + moves);
         return moves;
     }
 }
