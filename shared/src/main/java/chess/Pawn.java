@@ -4,7 +4,42 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * This class implements the PieceMovesCalculator interface. It compiles a list of all the possible moves a pawn
+ * can make on its turn.
+ * <p>
+ * Pawns are the most complicated piece of the lot. While they can only move one piece vertically, they have a lot
+ * of other things to look out for. When taking another piece, pawns can move to the spot kitty corner to their own.
+ * They can also be promoted to a queen, rook, knight, or bishop if the pawn makes it to the other side of the board.
+ */
 public class Pawn implements PieceMovesCalculator {
+    /**
+     * Here is where the moves are calculated.
+     * <p>
+     * It is important to know what team the piece being checked is on.
+     * <p>
+     * Pawns can only move forwards. White pawns can move up in their columns (0,+),
+     * and black pawns can move down in their columns (0,-). The best way to keep track of that is to implement two separate
+     * but mostly the same code after checking if the piece is black or white.
+     * <p>
+     * If it is a pawns first move, they are allowed to move one or two places. The easiest way to keep track of that is
+     * to keep track of what row the pawn is in. The pawns will start in row 2 on the white team, and row 7 on the black team.
+     * If the pawns are still in this row, it means it is their first move.
+     * <p>
+     * A pawn cannot move around a piece if it is blocked. If the spot directly in front of it is blocked, that pawn cannot move
+     * unless there is a piece to capture on the right or left of the piece right in front of them.
+     * <p>
+     * Be careful about the pawns in column 1 and 8. Checking out of bounds will result in an error, so the pawn in
+     * column 1 cannot check the left, and the pawn in column 8 cannot check the right.
+     * <p>
+     * Remember that the list of moves will only let you add a ChessMove type to it, and that a ChessMove
+     * needs a ChessPosition to be initialised.
+     * <p>
+     * Be sure to check every possible move a pawn can make.
+     * @param position
+     * @param board
+     * @return a list of all the possible moves a pawn can make
+     */
     public static List<ChessMove> possibleMoves(ChessPosition position, ChessBoard board) {
         List<ChessMove> moves = new ArrayList<>();
 
