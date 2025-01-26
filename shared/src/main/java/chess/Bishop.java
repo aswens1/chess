@@ -21,7 +21,7 @@ public class Bishop implements PieceMovesCalculator {
      * down and to the right (+,-), and down and to the left (-,-). It helps to imagine a chessboard as a coordinate plane.
      * <p>
      * Before any move is made, you want to see if that spot is empty or not. If it is, the bishop can keep moving until
-     * its stopped. If it is not empty, that means that piece is as far as it can go (if its not on its team).
+     * its stopped. If it is not empty, that means that piece is as far as it can go (if it's not on its team).
      * <p>
      * Remember that the list of moves will only let you add a ChessMove type to it, and that a ChessMove
      * needs a ChessPosition to be initialised.
