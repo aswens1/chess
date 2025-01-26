@@ -75,11 +75,13 @@ public class ChessPiece {
     }
 
     /**
+     * This method simply returns the team colour of the pieces team.
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() { return teamColor; }
 
     /**
+     * This method simply returns the type of piece that is being used.
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() { return pieceType; }

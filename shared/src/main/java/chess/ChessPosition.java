@@ -39,6 +39,7 @@ public class ChessPosition {
     }
 
     /**
+     * This method simply returns the row for this position.
      * @return which row this position is in
      * 1 codes for the bottom row
      */
@@ -47,6 +48,7 @@ public class ChessPosition {
     }
 
     /**
+     * This method simply returns the column for this method.
      * @return which column this position is in
      * 1 codes for the left row
      */

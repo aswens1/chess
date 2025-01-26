@@ -29,12 +29,15 @@ public class ChessMove {
     }
 
     /**
+     * This method simply returns the starting position for this move.
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
         return startPosition;
     }
+
     /**
+     * This method simply returns the end position for this move.
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
