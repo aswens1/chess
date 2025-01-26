@@ -3,7 +3,37 @@ package chess;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class implements the PieceMovesCalculator interface. It compiles a list of all the moves a knight can make on its turn.
+ * <p>
+ * Knight can move in any direction, but only in L shapes. They can take a piece by moving into its square. Knights
+ * are the only piece that can jump over other pieces that are in its way.
+ */
 public class Knight implements PieceMovesCalculator {
+
+    /**
+     * Here is where the moves are calculated.
+     * <p>
+     * It is important to know what team the piece being checked is on.
+     * <p>
+     * Knights can move in any direction, and they'll have two moves per direction. Two up and one right (+,+),
+     * two up and one left (-,+), two right and one up (+,+), two right and one down (+,-), two down and one right (+,-),
+     * two down and one left (-,-), two left and one up (-,+), two left and one down (-,-). If the knight is in the
+     * middle of an empty board, all the moves possible moves it can make will form a circle around it.
+     * <p>
+     * Before any move is made, you want to see if that spot is empty or not. If it is, the knight can move to that spot.
+     * If it is not empty, that means that the knight either cannot go there (if it's his team) or can take the piece's spot.
+     * It doesn't matter if there are pieces in between the knight and the spot. The knight is the only piece
+     * that can jump over other pieces.
+     * <p>
+     * Remember that the list of moves will only let you add a ChessMove type to it, and that a ChessMove
+     * needs a ChessPosition to be initialised.
+     * <p>
+     * Make sure to check every move the knight can make.
+     * @param position
+     * @param board
+     * @return a list of all the possible moves a knight can make
+     */
     public static List<ChessMove> possibleMoves(ChessPosition position, ChessBoard board) {
         List<ChessMove> moves = new ArrayList<>();
         ChessPiece piece = board.getPiece(position);
