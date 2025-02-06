@@ -162,8 +162,6 @@ public class Knight implements PieceMovesCalculator {
             }
         }
 
-
-        System.out.println("Moves: " + moves);
         return moves;
     }
 }
