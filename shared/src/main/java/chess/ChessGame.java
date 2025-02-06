@@ -14,8 +14,6 @@ public class ChessGame {
     private ChessBoard board;
     private ChessGame.TeamColor turn;
 
-    private ChessPiece piece;
-
     /**
      * Sets up a new game by creating a new board,
      * resetting it to put all the pieces where they belong,
@@ -68,11 +66,15 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> legalMoves = new ArrayList<>();
 
+        System.out.println("Raw moves before legality check: " + moves);
+
         for (ChessMove move : moves) {
             if (testMove(move)) {
                 legalMoves.add(move);
             }
         }
+
+        System.out.println("Final legal moves: " + legalMoves);
 
         return legalMoves;
     }
@@ -88,8 +90,10 @@ public class ChessGame {
 
         board.removePiece(end);
         board.addPiece(start, startPiece);
-        board.addPiece(end, endPiece);
-
+        if (endPiece == null) {
+            board.addPiece(end, endPiece);
+        }
+        System.out.println("Testing move: " + start + " -> " + end + " | Legal? " + legal);
         return legal;
     }
 
@@ -118,8 +122,12 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
-        ChessPiece startPiece = board.getPiece(move.getStartPosition());
-        Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
+        ChessPiece startPiece = board.getPiece(start);
+        Collection<ChessMove> legalMoves = validMoves(start);
+
+        if (startPiece == null) {
+            throw new InvalidMoveException("Starting Position is Empty");
+        }
 
         if (legalMoves.contains(move)) {
             movePiece(startPiece, start, end, move);
@@ -135,7 +143,25 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        for (int row = 1; row <= 8; row++) {
+            for (int column = 1; column <=8; column++) {
+                ChessPosition position = new ChessPosition(row, column);
+                ChessPiece currentPiece = board.getPiece(position);
+
+                if ((currentPiece != null) && (currentPiece.getTeamColor() != teamColor)) {
+                    Collection<ChessMove> moves = currentPiece.pieceMoves(board, position);
+                    for (ChessMove possibleMove : moves) {
+                        ChessPosition endPos = possibleMove.getEndPosition();
+                        ChessPiece endPiece = board.getPiece(endPos);
+                        if ((endPiece != null) && (endPiece.getPieceType() == ChessPiece.PieceType.KING)
+                                && (endPiece.getTeamColor() == teamColor)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
