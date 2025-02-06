@@ -10,17 +10,26 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    private ChessGame.TeamColor teamColour;
+    private ChessBoard board;
 
+    private ChessGame.TeamColor turn;
+
+    /**
+     * Sets up a new game by creating a new board,
+     * resetting it to put all the pieces where they belong,
+     * and setting the first turn as white.
+     */
     public ChessGame() {
-
+        board = new ChessBoard();
+        board.resetBoard();
+        turn = TeamColor.WHITE;
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return this.teamColour;
+        return turn;
     }
 
     /**
@@ -29,8 +38,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-
-        throw new RuntimeException("Not implemented");
+        this.turn = team;
     }
 
     /**
@@ -99,8 +107,9 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
+
 
     /**
      * Gets the current chessboard
@@ -108,6 +117,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
     }
 }
