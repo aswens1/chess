@@ -94,9 +94,8 @@ public class ChessGame {
 
         board.removePiece(end);
         board.addPiece(start, startPiece);
-        if (endPiece == null) {
-            board.addPiece(end, endPiece);
-        }
+        board.addPiece(end, endPiece);
+
         System.out.println("Testing move: " + start + " -> " + end + " | Legal? " + legal);
         return legal;
     }
