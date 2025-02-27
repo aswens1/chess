@@ -1,3 +1,3 @@
 package model;
 
-record userRecord(String username, String password) {}
+record userRecord(String username, String password, String email) {}
