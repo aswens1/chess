@@ -1,5 +1,5 @@
 package model;
 import chess.ChessGame;
 
-record gameDataRecord(int gameID, String whiteUsername, String blackUsername,
+record GameDataRecord(int gameID, String whiteUsername, String blackUsername,
                       String gameName, ChessGame game) {}
