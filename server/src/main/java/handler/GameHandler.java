@@ -11,8 +11,9 @@ public class GameHandler {
     GameService gameService;
     AuthTokenValidationHandler validAuthToken;
 
-    public GameHandler(GameService gameService) {
+    public GameHandler(GameService gameService, AuthTokenValidationHandler validAuthToken) {
         this.gameService = gameService;
+        this.validAuthToken = validAuthToken;
     }
 
     public Object listGames(Request request, Response response) {

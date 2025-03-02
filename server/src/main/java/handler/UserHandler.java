@@ -57,7 +57,6 @@ public class UserHandler {
 
     public Object logout(Request request, Response response) {
         String authToken = request.headers("Authorization");
-        System.out.println(authToken);
 
         if (validAuthToken.isValidToken(authToken)) {
             LogoutResult logoutResult = userService.logout(authToken);
