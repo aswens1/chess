@@ -2,8 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import service.GameService;
-import service.ListGamesResult;
+import service.*;
 import spark.Request;
 import spark.Response;
 
@@ -23,9 +22,23 @@ public class GameHandler {
             ListGamesResult listGamesResult = gameService.listGames();
             response.status(200);
             return new Gson().toJson(listGamesResult);
-        } else {
-            throw new ResponseException(401, "Error: unauthorized");
         }
+
+        return new Gson().toJson((new ResponseException(401, "Error: unauthorized")));
+
+    }
+
+    public Object createGame(Request request, Response response) {
+        String authToken = request.headers("Authorization");
+
+        if (validAuthToken.isValidToken(authToken)) {
+            CreateGameRequest createGameRequest = new Gson().fromJson(request.body(), CreateGameRequest.class);
+
+            CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+            response.status(200);
+            return new Gson().toJson(createGameResult);
+        }
+        return new Gson().toJson((new ResponseException(401, "Error: unauthorized")));
     }
 
 }

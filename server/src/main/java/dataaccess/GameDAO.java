@@ -21,7 +21,12 @@ public class GameDAO implements GameDAOInterface {
     @Override
     public int createGame(String gameName) {
         Random generateGameID = new Random();
-        int gameID = 1000 + generateGameID.nextInt(9000);
+        int gameID;
+
+        do {
+            gameID = 1000 + generateGameID.nextInt(9000);
+        } while (gameDataMap.containsKey(gameID));
+
 
         GameDataRecord newGame = new GameDataRecord(gameID, null, null,
                                                     gameName, new ChessGame());

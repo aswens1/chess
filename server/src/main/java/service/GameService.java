@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthDataDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import model.AuthDataRecord;
 
 public class GameService {
 
@@ -18,5 +19,9 @@ public class GameService {
 
     public ListGamesResult listGames() {
         return new ListGamesResult(gameDAO.listGames());
+    }
+
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) {
+        return new CreateGameResult(gameDAO.createGame(createGameRequest.gameName()));
     }
 }
