@@ -51,4 +51,11 @@ public class UserHandler {
             return new Gson().toJson(ex.getMessage());
         }
     }
+
+    public Object logout(Request request, Response response) {
+        String authToken = request.headers("Authorization");
+        LogoutResult logoutResult = userService.logout(authToken);
+        response.status(200);
+        return new Gson().toJson(logoutResult);
+    }
 }

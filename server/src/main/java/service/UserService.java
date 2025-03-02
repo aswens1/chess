@@ -47,10 +47,15 @@ public class UserService {
         } catch (Exception exception){
             throw new DataAccessException(exception.getMessage());
         }
-
-
-
     }
-//    public void logout(LogoutRequest logoutRequest) {}
+
+    public LogoutResult logout(String authToken) {
+
+//        if (logoutRequest == null || logoutRequest.authToken() == null) {
+//            throw new ResponseException(400, "Error: bad request");
+//        }
+        authDataDAO.deleteAuthData(authToken);
+        return new LogoutResult();
+    }
 
 }
