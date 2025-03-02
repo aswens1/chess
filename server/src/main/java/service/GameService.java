@@ -16,4 +16,7 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
+    public ListGamesResult listGames() {
+        return new ListGamesResult(gameDAO.listGames());
+    }
 }

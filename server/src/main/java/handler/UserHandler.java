@@ -8,11 +8,13 @@ import spark.*;
 
 public class UserHandler {
     UserService userService;
+    AuthDataRecord authDataRecord;
     AuthTokenValidationHandler validAuthToken;
 
 
-    public UserHandler(UserService userService) {
+    public UserHandler(UserService userService, AuthTokenValidationHandler validAuthToken) {
         this.userService = userService;
+        this.validAuthToken = validAuthToken;
     }
 
     public Object register(Request request, Response response) {
@@ -55,12 +57,13 @@ public class UserHandler {
 
     public Object logout(Request request, Response response) {
         String authToken = request.headers("Authorization");
+        System.out.println(authToken);
 
         if (validAuthToken.isValidToken(authToken)) {
             LogoutResult logoutResult = userService.logout(authToken);
             response.status(200);
             return new Gson().toJson(logoutResult);
         }
-        throw new ResponseException(401, "Error: unauthorized");
+        return new Gson().toJson((new ResponseException(401, "Error: unauthorized")));
     }
 }

@@ -50,10 +50,6 @@ public class UserService {
     }
 
     public LogoutResult logout(String authToken) {
-
-//        if (logoutRequest == null || logoutRequest.authToken() == null) {
-//            throw new ResponseException(400, "Error: bad request");
-//        }
         authDataDAO.deleteAuthData(authToken);
         return new LogoutResult();
     }

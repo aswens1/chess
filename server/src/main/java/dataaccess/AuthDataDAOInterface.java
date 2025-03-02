@@ -9,7 +9,7 @@ public interface AuthDataDAOInterface {
     AuthDataRecord getAuthData(String authToken);
 
     // delete an authorisation so its no longer valid
-    boolean deleteAuthData(String authToken);
+    void deleteAuthData(String authToken);
 
     // clear all stored auth data
     void clear();
