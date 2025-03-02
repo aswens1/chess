@@ -7,6 +7,4 @@ public interface UserDAOInterface {
     UserRecord getUser(String username);
     boolean doesUserExist(String username);
     void clear();
-
-
 }

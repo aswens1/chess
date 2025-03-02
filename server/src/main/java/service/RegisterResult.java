@@ -1,4 +1,3 @@
 package service;
 
-public record RegisterResult(boolean didItWork, String message, String authToken) {
-}
+public record RegisterResult(String username, String authToken) { }
