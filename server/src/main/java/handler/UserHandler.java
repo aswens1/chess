@@ -28,17 +28,27 @@ public class UserHandler {
             RegisterResult registerResult = userService.register(registerRequest);
 
             response.status(200);
-            response.type("application/json");
-
             return new Gson().toJson(registerResult);
 
         } catch (ResponseException ex) {
             response.status(ex.getStatusCode());
-            response.type("application/json");
-            return new Gson().toJson(Map.of("message", "Error: " + ex.getMessage()));
+            return new Gson().toJson(ex.getMessage());
         } catch (Exception ex) {
             response.status(500);
-            return new Gson().toJson(Map.of("message", "Error: " + ex.getMessage()));
+            return new Gson().toJson(ex.getMessage());
+        }
+    }
+
+    public Object login(Request request, Response response) {
+        try {
+            LoginRequest loginRequest = new Gson().fromJson(request.body(), LoginRequest.class);
+            LoginResult loginResult = userService.login(loginRequest);
+            response.status(200);
+            return new Gson().toJson(loginResult);
+
+        } catch (DataAccessException ex) {
+            response.status(500);
+            return new Gson().toJson(ex.getMessage());
         }
     }
 }

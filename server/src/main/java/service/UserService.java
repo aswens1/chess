@@ -16,7 +16,7 @@ public class UserService {
         this.authDataDAO = authDataDAO;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException{
+    public RegisterResult register(RegisterRequest registerRequest) {
 
         if (userDAO.getUser(registerRequest.username()) != null) {
             throw new ResponseException(403, "Error: already taken");
@@ -32,7 +32,25 @@ public class UserService {
         return new RegisterResult(registerRequest.username(), authToken);
     }
 
-//    public LoginResult login(LoginRequest loginRequest) {}
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        try {
+            UserRecord user = userDAO.getUser(loginRequest.username());
+            if (user == null || !user.password().equals(loginRequest.password())) {
+                throw new ResponseException(401, "Error: bad request");
+            }
+
+            AuthDataRecord authData = authDataDAO.createAuthData(user);
+            String authToken = authData.authToken();
+
+            return new LoginResult(user.username(), authToken);
+
+        } catch (Exception exception){
+            throw new DataAccessException(exception.getMessage());
+        }
+
+
+
+    }
 //    public void logout(LogoutRequest logoutRequest) {}
 
 }
