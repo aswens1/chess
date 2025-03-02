@@ -2,13 +2,14 @@ package handler;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import exception.ResponseException;
+import model.AuthDataRecord;
 import service.*;
 import spark.*;
 
-import java.util.Map;
-
 public class UserHandler {
     UserService userService;
+    AuthTokenValidationHandler validAuthToken;
+
 
     public UserHandler(UserService userService) {
         this.userService = userService;
@@ -54,8 +55,12 @@ public class UserHandler {
 
     public Object logout(Request request, Response response) {
         String authToken = request.headers("Authorization");
-        LogoutResult logoutResult = userService.logout(authToken);
-        response.status(200);
-        return new Gson().toJson(logoutResult);
+
+        if (validAuthToken.isValidToken(authToken)) {
+            LogoutResult logoutResult = userService.logout(authToken);
+            response.status(200);
+            return new Gson().toJson(logoutResult);
+        }
+        throw new ResponseException(401, "Error: unauthorized");
     }
 }

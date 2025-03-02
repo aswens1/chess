@@ -5,10 +5,7 @@ public class AuthTokenValidationHandler {
 
     AuthDataDAO authDataDAO;
 
-    boolean isValidToken(String authToken) {
-        if (authDataDAO.getAuthData(authToken) == null) {
-            return false;
-        }
-        return true;
+    public boolean isValidToken(String authToken) {
+        return authDataDAO.getAuthData(authToken) != null;
     }
 }
