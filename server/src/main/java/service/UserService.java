@@ -1,5 +1,5 @@
 package service;
-import dataaccess.DataAccessException;
+
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthDataRecord;
@@ -18,12 +18,23 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest registerRequest) {
 
+        if (registerRequest == null ||
+            registerRequest.username() == null || registerRequest.username().isBlank() ||
+            registerRequest.password() == null || registerRequest.password().isBlank() ||
+            registerRequest.email() == null || registerRequest.email().isBlank()) {
+
+            throw new ResponseException(400, "Error: bad request");
+        }
+
+
+
         if (userDAO.getUser(registerRequest.username()) != null) {
             throw new ResponseException(403, "Error: already taken");
         }
 
         UserRecord newUser = new UserRecord(registerRequest.username(),
                 registerRequest.password(), registerRequest.email());
+
         userDAO.registerUser(newUser);
 
         AuthDataRecord authData = authDataDAO.createAuthData(newUser);
@@ -32,25 +43,30 @@ public class UserService {
         return new RegisterResult(registerRequest.username(), authToken);
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
-        try {
+    public LoginResult login(LoginRequest loginRequest) {
             UserRecord user = userDAO.getUser(loginRequest.username());
-            if (user == null || !user.password().equals(loginRequest.password())) {
-                throw new ResponseException(401, "Error: bad request");
+
+            if (user == null) {
+                throw new ResponseException(401, "Error: unauthorized");
+            }
+
+            if (!user.password().equals(loginRequest.password())) {
+                throw new ResponseException(401, "Error: unauthorised");
             }
 
             AuthDataRecord authData = authDataDAO.createAuthData(user);
             String authToken = authData.authToken();
 
             return new LoginResult(user.username(), authToken);
-
-        } catch (Exception exception){
-            throw new DataAccessException(exception.getMessage());
-        }
     }
 
     public LogoutResult logout(String authToken) {
-        authDataDAO.deleteAuthData(authToken);
+        boolean wasAuthTokenRemoved = authDataDAO.deleteAuthData(authToken);
+
+        if (!wasAuthTokenRemoved) {
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+
         return new LogoutResult();
     }
 
