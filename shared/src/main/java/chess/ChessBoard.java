@@ -26,7 +26,7 @@ public class ChessBoard {
     /**
      * Before anything else, we need to declare the size of the board. This is done with an array.
      */
-    private ChessPiece[][] squares = new ChessPiece[8][8];
+    private final ChessPiece[][] squares = new ChessPiece[8][8];
     /** The chessboard method will ultimately be the one calling for the resetting of the board and the adding the pieces.
      * This isn't implemented yet. */
     public ChessBoard() {

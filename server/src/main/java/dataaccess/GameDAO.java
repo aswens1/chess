@@ -11,8 +11,7 @@ import java.util.Random;
 public class GameDAO implements GameDAOInterface {
 
     private final HashMap<Integer, GameDataRecord> gameDataMap = new HashMap<>();
-    private UserRecord userRecord;
-
+    UserRecord userRecord;
 
     @Override
     public HashMap<Integer, GameDataRecord> listGames() {
@@ -73,12 +72,10 @@ public class GameDAO implements GameDAOInterface {
             throw new ResponseException(403, "Error: already taken");
         }
 
-        String username = userRecord.username();
-
         if (playerColour == ChessGame.TeamColor.BLACK) {
-            updateGame(gameID, username, playerColour);
+            updateGame(gameID, userRecord.username(), playerColour);
         } else if (playerColour == ChessGame.TeamColor.WHITE) {
-            updateGame(gameID, username, playerColour);
+            updateGame(gameID, userRecord.username(), playerColour);
         }
     }
 

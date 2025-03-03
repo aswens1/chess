@@ -12,6 +12,34 @@ import java.util.List;
  */
 public class Bishop implements PieceMovesCalculator {
 
+    public static List<ChessMove> bishopMovesCalculator(ChessPosition startingPosition, int startRow, int startCol, int rowDirection,
+                                              int columnDirection, ChessBoard board, ChessGame.TeamColor myTeam) {
+        List<ChessMove> moves = new ArrayList<>();
+
+        int row = startRow;
+        int col = startCol;
+
+        while ((row > 0 && row <= 8) && (col > 0 && col <= 8)) {
+            ChessPosition newPosition = new ChessPosition(row, col);
+            ChessPiece occupiedPiece = board.getPiece(newPosition);
+            ChessMove newMove = new ChessMove(startingPosition, newPosition, null);
+
+            if (occupiedPiece == null) {
+                moves.add(newMove);
+                row += rowDirection;
+                col += columnDirection;
+            } else {
+                if (occupiedPiece.getTeamColor() != myTeam) {
+                    moves.add(newMove);
+                }
+                break;
+            }
+        }
+
+        return moves;
+    }
+
+
     /**
      * Here is where the actual list of moves is calculated.
      * <p>
@@ -33,100 +61,28 @@ public class Bishop implements PieceMovesCalculator {
      */
     public static List<ChessMove> possibleMoves(ChessPosition position, ChessBoard board) {
         List<ChessMove> moves = new ArrayList<>();
+
         ChessPiece piece = board.getPiece(position);
-
-        ChessGame.TeamColor myColour = board.getPiece(position).getTeamColor();
-
         // checks the spot is empty
-        if (piece == null) {
-            return moves;
-        }
 
+        if (piece == null) {return moves;}
 
-        // checks all the moves going up and to the right
-        int upRightRow = position.getRow() + 1;
-        int upRightColumn = position.getColumn() + 1;
+        ChessGame.TeamColor myColour = piece.getTeamColor();
 
-        while(upRightRow > 0 && upRightRow <= 8 && upRightColumn > 0 && upRightColumn <= 8) {
-            ChessPosition upRightPosition = new ChessPosition(upRightRow, upRightColumn);
-            ChessPiece occupiedPieceUR = board.getPiece(upRightPosition);
-            ChessMove newMoveUR = new ChessMove(position, upRightPosition, null);
+        // up right
+        moves.addAll(bishopMovesCalculator(position, position.getRow() + 1, position.getColumn() + 1,
+                1, 1, board, myColour));
+        // down left
+        moves.addAll(bishopMovesCalculator(position,position.getRow() - 1, position.getColumn() - 1,
+                -1, -1, board, myColour));
+        // up left
+        moves.addAll(bishopMovesCalculator(position,position.getRow() + 1, position.getColumn() - 1,
+                1, -1, board, myColour));
 
-            if (occupiedPieceUR == null) {
-                moves.add(newMoveUR);
-                upRightRow++;
-                upRightColumn++;
-            } else {
-                if (occupiedPieceUR.getTeamColor() != myColour) {
-                    moves.add(newMoveUR);
-                }
-                break;
-            }
-        }
+        // down right
+        moves.addAll(bishopMovesCalculator(position,position.getRow() - 1, position.getColumn() + 1,
+                -1, 1, board, myColour));
 
-
-        // checks all the moves going down and to the right
-        int downRightRow = position.getRow() - 1;
-        int downRightColumn = position.getColumn() + 1;
-
-        while(downRightRow > 0 && downRightRow <= 8 && downRightColumn > 0 && downRightColumn <= 8) {
-            ChessPosition downRightPosition = new ChessPosition(downRightRow, downRightColumn);
-            ChessPiece occupiedPieceDR = board.getPiece(downRightPosition);
-            ChessMove newMoveDR = new ChessMove(position, downRightPosition, null);
-
-            if (occupiedPieceDR == null) {
-                moves.add(newMoveDR);
-                downRightRow--;
-                downRightColumn++;
-            } else {
-                if (occupiedPieceDR.getTeamColor() != myColour) {
-                    moves.add(newMoveDR);
-                }
-                break;
-            }
-        }
-
-        // checks all the moves going down and to the left
-        int downLeftRow = position.getRow() - 1;
-        int downLeftColumn = position.getColumn() - 1;
-
-        while(downLeftRow > 0 && downLeftRow <= 8 && downLeftColumn > 0 && downLeftColumn <= 8) {
-            ChessPosition downLeftPosition = new ChessPosition(downLeftRow, downLeftColumn);
-            ChessPiece occupiedPieceDL = board.getPiece(downLeftPosition);
-            ChessMove newMoveDL = new ChessMove(position, downLeftPosition, null);
-
-            if (occupiedPieceDL == null) {
-                moves.add(newMoveDL);
-                downLeftRow--;
-                downLeftColumn--;
-            } else {
-                if (occupiedPieceDL.getTeamColor() != myColour) {
-                    moves.add(newMoveDL);
-                }
-                break;
-            }
-        }
-
-        // checks all the moves going up and to the left
-        int upLeftRow = position.getRow() + 1;
-        int upLeftColumn = position.getColumn() - 1;
-
-        while(upLeftRow > 0 && upLeftRow <= 8 && upLeftColumn > 0 && upLeftColumn <= 8) {
-            ChessPosition upLeftPosition = new ChessPosition(upLeftRow, upLeftColumn);
-            ChessPiece occupiedPieceUL = board.getPiece(upLeftPosition);
-            ChessMove newMoveUL = new ChessMove(position, upLeftPosition, null);
-
-            if (occupiedPieceUL == null) {
-                moves.add(newMoveUL);
-                upLeftRow++;
-                upLeftColumn--;
-            } else {
-                if (occupiedPieceUL.getTeamColor() != myColour) {
-                    moves.add(newMoveUL);
-                }
-                break;
-            }
-        }
         return moves;
     }
 }
