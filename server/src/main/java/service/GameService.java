@@ -7,9 +7,9 @@ import model.AuthDataRecord;
 
 public class GameService {
 
-    private final UserDAO userDAO;
-    private final AuthDataDAO authDataDAO;
-    private final GameDAO gameDAO;
+    final UserDAO userDAO;
+    final AuthDataDAO authDataDAO;
+    final GameDAO gameDAO;
 
     public GameService(UserDAO userDAO, AuthDataDAO authDataDAO, GameDAO gameDAO) {
         this.userDAO = userDAO;
@@ -23,5 +23,10 @@ public class GameService {
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) {
         return new CreateGameResult(gameDAO.createGame(createGameRequest.gameName()));
+    }
+
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) {
+        gameDAO.joinGame(joinGameRequest.playerColour(), joinGameRequest.gameID());
+        return new JoinGameResult();
     }
 }
