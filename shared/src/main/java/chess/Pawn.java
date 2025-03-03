@@ -13,6 +13,62 @@ import java.util.List;
  * They can also be promoted to a queen, rook, knight, or bishop if the pawn makes it to the other side of the board.
  */
 public class Pawn implements PieceMovesCalculator {
+//
+//    public static List<ChessMove> pawnMove(ChessPosition position, ChessBoard board, int rowDirection, ChessGame.TeamColor myTeam) {
+//
+//        List<ChessMove> pawnMove = new ArrayList<>();
+//
+//        int startOneRow = position.getRow() + rowDirection;
+//        int startOneCol = position.getColumn();
+//
+//        ChessPosition firstPosOne = new ChessPosition(startOneRow, startOneCol);
+//        ChessMove firstMoveOne = new ChessMove(position, firstPosOne, null);
+//
+//        if (board.getPiece(firstPosOne) == null) {
+//            pawnMove.add(firstMoveOne);
+//        }
+//
+//        if (position.getRow() == 2 || position.getRow() == 7) {
+//            pawnMove.add(pawnMoveTwoSpots(position, board, (2 * rowDirection), myTeam));
+//        }
+//
+//        if (position.getColumn() > 1 && position.getColumn() < 8) {
+//            pawnMove.add(pawnCaptureMove(position, startOneRow, startOneCol + 1, board, myTeam));
+//            pawnMove.add(pawnCaptureMove(position, startOneRow, startOneCol - 1, board, myTeam));
+//        } else if (position.getColumn() == 1) {
+//            pawnMove.add(pawnCaptureMove(position, startOneRow, startOneCol + 1, board, myTeam));
+//        } else if (position.getColumn() == 8) {
+//            pawnMove.add(pawnCaptureMove(position, startOneRow, startOneCol - 1, board, myTeam));
+//        }
+//
+//        return pawnMove;
+//    }
+//
+//    public static ChessMove pawnMoveTwoSpots(ChessPosition position, ChessBoard board, int rowDirection, ChessGame.TeamColor myTeam) {
+//        int startTwoRow = position.getRow() + rowDirection;
+//        int startTwoCol = position.getColumn();
+//
+//        ChessPosition firstPosTwo = new ChessPosition(startTwoRow, startTwoCol);
+//        ChessMove firstMoveTwo = new ChessMove(position, firstPosTwo, null);
+//
+//        if (board.getPiece(firstPosTwo) == null) {
+//            return firstMoveTwo;
+//        }
+//        return null;
+//    }
+//
+//    public static ChessMove pawnCaptureMove(ChessPosition startPosition, int startRow, int startCol,
+//                                                  ChessBoard board, ChessGame.TeamColor myTeam) {
+//        ChessPosition newPosition = new ChessPosition(startRow, startCol);
+//        ChessMove captureMove = new ChessMove(startPosition, newPosition, null);
+//        ChessPiece occupiedPiece = board.getPiece(newPosition);
+//
+//        if (occupiedPiece.getTeamColor() != myTeam) {
+//            return captureMove;
+//        }
+//        return null;
+//    }
+
     /**
      * Here is where the moves are calculated.
      * <p>
@@ -45,15 +101,23 @@ public class Pawn implements PieceMovesCalculator {
 
         ChessPiece piece = board.getPiece(position);
 
+        // checks the spot is empty
+        if (piece == null) {
+            return moves;
+        }
+
         ChessGame.TeamColor myColour = board.getPiece(position).getTeamColor();
 
         int row = position.getRow();
         int column = position.getColumn();
 
-        // checks the spot is empty
-        if (piece == null) {
-            return moves;
-        }
+//        if ((row > 0 && row <= 8) && myColour == ChessGame.TeamColor.WHITE) {
+//            moves.addAll(pawnMove(position, board, 1, myColour));
+//        } else if ((row > 0 && row <= 8)  && myColour == ChessGame.TeamColor.BLACK) {
+//            moves.addAll(pawnMove(position, board, -1, myColour));
+//        }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
         int checkLeft = column - 1;
         int checkRight = column + 1;
@@ -140,7 +204,7 @@ public class Pawn implements PieceMovesCalculator {
                 return moves;
             }
             // does the move only one space if the row is not 2
-            if (row != 2){
+            if (row != 2) {
                 if (row < 7) {
                     ChessPosition positionOne = new ChessPosition(whiteRow, column);
                     ChessPiece occupiedPiece = board.getPiece(positionOne);
@@ -343,7 +407,7 @@ public class Pawn implements PieceMovesCalculator {
                 return moves;
             }
             // does the move only one space if the row is not 2
-            if (row != 7){
+            if (row != 7) {
                 if (row > 2) {
                     ChessPosition positionOne = new ChessPosition(blackRow, column);
                     ChessPiece occupiedPiece = board.getPiece(positionOne);

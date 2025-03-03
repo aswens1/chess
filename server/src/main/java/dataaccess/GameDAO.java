@@ -2,20 +2,34 @@ package dataaccess;
 
 import chess.ChessGame;
 import exception.ResponseException;
+import model.AuthDataRecord;
+import model.CondensedGameData;
 import model.GameDataRecord;
 import model.UserRecord;
+import service.ListGamesResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public class GameDAO implements GameDAOInterface {
 
     private final HashMap<Integer, GameDataRecord> gameDataMap = new HashMap<>();
-    UserRecord userRecord;
+    private final AuthDataDAO authDataDAO = new AuthDataDAO();
+    private UserRecord userRecord;
 
     @Override
-    public HashMap<Integer, GameDataRecord> listGames() {
-        return gameDataMap;
+    public List<CondensedGameData> listGames() {
+        List<CondensedGameData> condensedGameDataList = new ArrayList<>();
+
+        for (GameDataRecord game : gameDataMap.values()) {
+            CondensedGameData condensedGame = new CondensedGameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName());
+
+            condensedGameDataList.add(condensedGame);
+        }
+        return condensedGameDataList;
+
     }
 
     @Override
@@ -40,15 +54,15 @@ public class GameDAO implements GameDAOInterface {
     }
 
     @Override
-    public void updateGame(Integer gameID, String username, ChessGame.TeamColor playerColour) {
+    public void updateGame(Integer gameID, String username, ChessGame.TeamColor playerColor) {
         GameDataRecord gameToUpdate = getGame(gameID);
 
         if (gameToUpdate != null) {
             GameDataRecord updatedGame = null;
-            if(playerColour == ChessGame.TeamColor.BLACK) {
+            if(playerColor == ChessGame.TeamColor.BLACK) {
                 updatedGame = new GameDataRecord(gameID, gameToUpdate.whiteUsername(), username,
                                                                         gameToUpdate.gameName(), gameToUpdate.game());
-            } else if (playerColour == ChessGame.TeamColor.WHITE) {
+            } else if (playerColor == ChessGame.TeamColor.WHITE) {
                 updatedGame = new GameDataRecord(gameID, username, gameToUpdate.blackUsername(),
                         gameToUpdate.gameName(), gameToUpdate.game());
             } else {
@@ -59,25 +73,26 @@ public class GameDAO implements GameDAOInterface {
     }
 
     @Override
-    public void joinGame(ChessGame.TeamColor playerColour, Integer gameID) {
+    public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
         GameDataRecord gameToJoin = getGame(gameID);
 
         if (gameToJoin == null) {
             throw new ResponseException(400, "Error: bad request");
         }
 
-        if (playerColour == ChessGame.TeamColor.BLACK && gameToJoin.blackUsername() != null) {
+        if (playerColor == ChessGame.TeamColor.BLACK && gameToJoin.blackUsername() != null) {
             throw new ResponseException(403, "Error: already taken");
-        } else if (playerColour == ChessGame.TeamColor.WHITE && gameToJoin.whiteUsername() != null) {
+        } else if (playerColor == ChessGame.TeamColor.WHITE && gameToJoin.whiteUsername() != null) {
             throw new ResponseException(403, "Error: already taken");
         }
 
-        if (playerColour == ChessGame.TeamColor.BLACK) {
-            updateGame(gameID, userRecord.username(), playerColour);
-        } else if (playerColour == ChessGame.TeamColor.WHITE) {
-            updateGame(gameID, userRecord.username(), playerColour);
+        if (playerColor == ChessGame.TeamColor.BLACK || playerColor == ChessGame.TeamColor.WHITE) {
+            updateGame(gameID, username, playerColor);
+        } else {
+            throw new ResponseException(400, "Error: bad request");
         }
     }
+
 
     @Override
     public void clear() {

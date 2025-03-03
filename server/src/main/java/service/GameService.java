@@ -3,7 +3,10 @@ package service;
 import dataaccess.AuthDataDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
-import model.AuthDataRecord;
+import model.CondensedGameData;
+import model.GameDataRecord;
+
+import java.util.HashMap;
 
 public class GameService {
 
@@ -25,8 +28,8 @@ public class GameService {
         return new CreateGameResult(gameDAO.createGame(createGameRequest.gameName()));
     }
 
-    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) {
-        gameDAO.joinGame(joinGameRequest.playerColour(), joinGameRequest.gameID());
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String username) {
+        gameDAO.joinGame(joinGameRequest.playerColor(), joinGameRequest.gameID(), username);
         return new JoinGameResult();
     }
 }

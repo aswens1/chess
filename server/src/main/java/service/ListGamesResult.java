@@ -1,7 +1,10 @@
 package service;
 
+import model.CondensedGameData;
 import model.GameDataRecord;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public record ListGamesResult(HashMap<Integer, GameDataRecord> listOfGames) {}
+public record ListGamesResult(List<CondensedGameData> games) { }
