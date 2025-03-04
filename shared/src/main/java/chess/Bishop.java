@@ -12,34 +12,6 @@ import java.util.List;
  */
 public class Bishop implements PieceMovesCalculator {
 
-    public static List<ChessMove> bishopMovesCalculator(ChessPosition startingPosition, int startRow, int startCol, int rowDirection,
-                                              int columnDirection, ChessBoard board, ChessGame.TeamColor myTeam) {
-        List<ChessMove> moves = new ArrayList<>();
-
-        int row = startRow;
-        int col = startCol;
-
-        while ((row > 0 && row <= 8) && (col > 0 && col <= 8)) {
-            ChessPosition newPosition = new ChessPosition(row, col);
-            ChessPiece occupiedPiece = board.getPiece(newPosition);
-            ChessMove newMove = new ChessMove(startingPosition, newPosition, null);
-
-            if (occupiedPiece == null) {
-                moves.add(newMove);
-                row += rowDirection;
-                col += columnDirection;
-            } else {
-                if (occupiedPiece.getTeamColor() != myTeam) {
-                    moves.add(newMove);
-                }
-                break;
-            }
-        }
-
-        return moves;
-    }
-
-
     /**
      * Here is where the actual list of moves is calculated.
      * <p>
@@ -70,17 +42,17 @@ public class Bishop implements PieceMovesCalculator {
         ChessGame.TeamColor myColour = piece.getTeamColor();
 
         // up right
-        moves.addAll(bishopMovesCalculator(position, position.getRow() + 1, position.getColumn() + 1,
+        moves.addAll(BishopRookCalc.moveCalculator(position, position.getRow() + 1, position.getColumn() + 1,
                 1, 1, board, myColour));
         // down left
-        moves.addAll(bishopMovesCalculator(position,position.getRow() - 1, position.getColumn() - 1,
+        moves.addAll(BishopRookCalc.moveCalculator(position,position.getRow() - 1, position.getColumn() - 1,
                 -1, -1, board, myColour));
         // up left
-        moves.addAll(bishopMovesCalculator(position,position.getRow() + 1, position.getColumn() - 1,
+        moves.addAll(BishopRookCalc.moveCalculator(position,position.getRow() + 1, position.getColumn() - 1,
                 1, -1, board, myColour));
 
         // down right
-        moves.addAll(bishopMovesCalculator(position,position.getRow() - 1, position.getColumn() + 1,
+        moves.addAll(BishopRookCalc.moveCalculator(position,position.getRow() - 1, position.getColumn() + 1,
                 -1, 1, board, myColour));
 
         return moves;

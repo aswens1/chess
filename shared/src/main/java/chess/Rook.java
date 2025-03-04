@@ -3,6 +3,8 @@ package chess;
 import java.util.ArrayList;
 import java.util.List;
 
+import static chess.BishopRookCalc.moveCalculator;
+
 /**
  * This class implements the PieceMovesCalculator interface. It compiles a list of all the moves a
  * rook can make during its turn.
@@ -10,34 +12,6 @@ import java.util.List;
  * Rooks can move until it's blocked in the up, down, right, and left directions.
  */
 public class Rook implements PieceMovesCalculator{
-
-    public static List<ChessMove> rookMoveCalculator(ChessPosition startingPosition, int startRow, int startCol, int rowDirection,
-                                                     int colDirection, ChessBoard board, ChessGame.TeamColor myTeam) {
-        List<ChessMove> moves = new ArrayList<>();
-
-        int row = startRow;
-        int col = startCol;
-
-        while ((row > 0 && row <= 8) && (col > 0 && col <= 8)) {
-            ChessPosition newPosition = new ChessPosition(row, col);
-            ChessPiece occupiedPiece = board.getPiece(newPosition);
-            ChessMove newMove = new ChessMove(startingPosition, newPosition, null);
-
-            if (occupiedPiece == null) {
-                moves.add(newMove);
-                row += rowDirection;
-                col += colDirection;
-            } else {
-                if (occupiedPiece.getTeamColor() != myTeam) {
-                    moves.add(newMove);
-                }
-                break;
-            }
-        }
-
-        return moves;
-    }
-
 
     /**
      * Here is where the actual list of moves is calculated.
@@ -71,13 +45,13 @@ public class Rook implements PieceMovesCalculator{
 
 
         // up
-        moves.addAll(rookMoveCalculator(position, position.getRow(), position.getColumn() + 1, 0, 1, board, myColour));
+        moves.addAll(BishopRookCalc.moveCalculator(position, position.getRow(), position.getColumn() + 1, 0, 1, board, myColour));
         // down
-        moves.addAll(rookMoveCalculator(position, position.getRow(), position.getColumn() - 1, 0, -1, board, myColour));
+        moves.addAll(BishopRookCalc.moveCalculator(position, position.getRow(), position.getColumn() - 1, 0, -1, board, myColour));
         // left
-        moves.addAll(rookMoveCalculator(position, position.getRow() - 1, position.getColumn(), -1, 0, board, myColour));
+        moves.addAll(BishopRookCalc.moveCalculator(position, position.getRow() - 1, position.getColumn(), -1, 0, board, myColour));
         // right
-        moves.addAll(rookMoveCalculator(position, position.getRow() + 1, position.getColumn(), 1, 0, board, myColour));
+        moves.addAll(BishopRookCalc.moveCalculator(position, position.getRow() + 1, position.getColumn(), 1, 0, board, myColour));
 
     return moves;
     }
