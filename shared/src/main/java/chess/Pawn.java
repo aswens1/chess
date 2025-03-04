@@ -115,8 +115,28 @@ public class Pawn implements PieceMovesCalculator {
             } else {
                 return null;
             }
-        }
+        } else if (startCol == 1) {
+            ChessPosition captureRightPos = new ChessPosition(startRow, colRight);
+            ChessMove captureRightMove = new ChessMove(startPosition, captureRightPos, null);
+            ChessPiece opRight = board.getPiece(captureRightPos);
 
+            if ((opRight != null) && (opRight.getTeamColor() != myTeam)) {
+                return captureRightMove;
+            } else {
+                return null;
+            }
+
+        } else if (startCol == 8) {
+            ChessPosition captureLeftPos = new ChessPosition(startRow, colLeft);
+            ChessMove captureLeftMove = new ChessMove(startPosition, captureLeftPos, null);
+            ChessPiece opLeft = board.getPiece(captureLeftPos);
+
+            if ((opLeft != null) && opLeft.getTeamColor() != myTeam) {
+                return captureLeftMove;
+            } else {
+                return null;
+            }
+        }
         return null;
     }
 
