@@ -25,6 +25,10 @@ public class GameService {
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) {
+        if (userDAO == null || authDataDAO == null || gameDAO == null) {
+            throw new NullPointerException("Cannot pass in null DAO");
+        }
+
         return new CreateGameResult(gameDAO.createGame(createGameRequest.gameName()));
     }
 

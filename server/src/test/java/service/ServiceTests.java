@@ -217,9 +217,21 @@ public class ServiceTests {
         assertNotNull(game);
     }
 
-    @Disabled
+    @Order(11)
+    @Test
     void createGameTestNegative() {
+        UserDAO testUserDao = new UserDAO();
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        GameDAO testGameDao = new GameDAO();
 
+        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+
+        int newGame = testGameDao.createGame("testGame");
+        GameDataRecord game = testGameDao.getGame(newGame);
+        assertNotNull(game);
+
+        GameService error = new GameService(testUserDao, testAuthDataDao, null);
+        assertThrows(NullPointerException.class, error::listGames);
     }
 
 
