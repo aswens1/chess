@@ -1,5 +1,6 @@
 package service;
 import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.AuthDataDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
@@ -63,13 +64,20 @@ public class ServiceTests {
     void registerUserTestPositive() {
         UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
-        testUserDao.registerUser(testUser);
+
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+
+        RegisterRequest registerRequest = new RegisterRequest("testUser", "testUserPassword", "testUserEmail");
+
+        userService = new UserService(testUserDao, testAuthDataDao);
+        userService.register(registerRequest);
 
         assertEquals(testUser, testUserDao.getUser("testUser"));
     }
 
-    @Disabled
+
     @Order(3)
+    @Test
     void registerUserTestNegative() {
 
     }
