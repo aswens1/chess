@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.AuthDataDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import exception.ResponseException;
 import handler.*;
 import model.AuthDataRecord;
 import model.GameDataRecord;
@@ -78,13 +79,38 @@ public class ServiceTests {
 
     @Order(3)
     @Test
-    void registerUserTestNegative() {
+    void registerUserNullUsernameTestNegative() {
+        UserDAO testUserDao = new UserDAO();
 
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+
+        RegisterRequest registerRequest = new RegisterRequest(null, "testUserPassword", "testUserEmail");
+
+        userService = new UserService(testUserDao, testAuthDataDao);
+
+        ResponseException ex = assertThrows(ResponseException.class, () -> userService.register(registerRequest));
+        assertEquals("Error: bad request", ex.getMessage());
     }
 
-    @Disabled
-    void loginUserTestPositive() {
 
+    @Order(4)
+    @Test
+    void loginUserTestPositive() {
+        UserDAO testUserDao = new UserDAO();
+        UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
+        testUserDao.registerUser(testUser);
+
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+
+        LoginRequest loginRequest = new LoginRequest("testUser", "testUserPassword");
+
+        userService = new UserService(testUserDao, testAuthDataDao);
+        LoginResult loginResult = userService.login(loginRequest);
+
+        String username = loginResult.username();
+        String authToken = loginResult.authToken();
+
+        assertEquals(username, testAuthDataDao.getAuthData(authToken).username());
     }
 
     @Disabled
