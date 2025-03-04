@@ -51,7 +51,7 @@ public class UserService {
             }
 
             if (!user.password().equals(loginRequest.password())) {
-                throw new ResponseException(401, "Error: unauthorised");
+                throw new ResponseException(401, "Error: unauthorized");
             }
 
             AuthDataRecord authData = authDataDAO.createAuthData(user);

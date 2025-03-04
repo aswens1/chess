@@ -113,9 +113,21 @@ public class ServiceTests {
         assertEquals(username, testAuthDataDao.getAuthData(authToken).username());
     }
 
-    @Disabled
-    void loginUserTestNegative() {
 
+    @Order(5)
+    @Test
+    void loginUserTestWrongPasswordNegative() {
+        UserDAO testUserDao = new UserDAO();
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+
+        testUserDao.registerUser(new UserRecord("testUser", "testUserPassword", "testEmailUser"));
+
+        LoginRequest loginRequest = new LoginRequest("testUser", "testUser");
+
+        userService = new UserService(testUserDao, testAuthDataDao);
+
+        ResponseException ex = assertThrows(ResponseException.class, () -> userService.login(loginRequest));
+        assertEquals("Error: unauthorized", ex.getMessage());
     }
 
     @Disabled
