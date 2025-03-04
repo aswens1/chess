@@ -164,7 +164,7 @@ public class ChessBoard {
                 if (piece == null) {
                     readableString.append("- ");
                 } else {
-                    readableString.append(ShorterString(piece)).append(" ");
+                    readableString.append(shorterString(piece)).append(" ");
                 }
             }
             readableString.append(row).append("\n");
@@ -182,7 +182,7 @@ public class ChessBoard {
      * @param piece
      * @return a symbol that represents the piece and what team it is on.
      */
-    public String ShorterString(ChessPiece piece) {
+    public String shorterString(ChessPiece piece) {
         String symbol = "";
         switch (piece.getPieceType()) {
             case KING -> symbol = "K";
