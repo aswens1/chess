@@ -51,10 +51,10 @@ public class Pawn implements PieceMovesCalculator {
         }
 
         if (startOneRow != 1 && startOneRow != 8) {
-            List<ChessMove> checkIfCanCapture = pawnCaptureMove(position, board, myTeam);
+            ChessMove checkIfCanCapture = pawnCaptureMove(position, board, myTeam);
 
-            if (!checkIfCanCapture.isEmpty()) {
-                pawnMove.addAll(checkIfCanCapture);
+            if (checkIfCanCapture != null) {
+                pawnMove.add(checkIfCanCapture);
             }
 
         }
@@ -83,9 +83,7 @@ public class Pawn implements PieceMovesCalculator {
         }
     }
 
-    public static List<ChessMove> pawnCaptureMove(ChessPosition startPosition, ChessBoard board, ChessGame.TeamColor myTeam) {
-
-        List<ChessMove> pawnCaptures = new ArrayList<>();
+    public static ChessMove pawnCaptureMove(ChessPosition startPosition, ChessBoard board, ChessGame.TeamColor myTeam) {
 
         int startRow = startPosition.getRow();
         int startCol = startPosition.getColumn();
@@ -109,9 +107,9 @@ public class Pawn implements PieceMovesCalculator {
             ChessPiece opLeft = board.getPiece(captureLeftPos);
 
             if ((opRight != null) && (opRight.getTeamColor() != myTeam)) {
-                pawnCaptures.add(captureRightMove);
+                return captureRightMove;
             } else if ((opLeft != null) && opLeft.getTeamColor() != myTeam) {
-                pawnCaptures.add(captureLeftMove);
+                return captureLeftMove;
             } else {
                 return null;
             }
@@ -121,7 +119,7 @@ public class Pawn implements PieceMovesCalculator {
             ChessPiece opRight = board.getPiece(captureRightPos);
 
             if ((opRight != null) && (opRight.getTeamColor() != myTeam)) {
-                pawnCaptures.add(captureRightMove);
+                return captureRightMove;
             } else {
                 return null;
             }
@@ -132,7 +130,7 @@ public class Pawn implements PieceMovesCalculator {
             ChessPiece opLeft = board.getPiece(captureLeftPos);
 
             if ((opLeft != null) && opLeft.getTeamColor() != myTeam) {
-                pawnCaptures.add(captureLeftMove);
+                return captureLeftMove;
             } else {
                 return null;
             }
