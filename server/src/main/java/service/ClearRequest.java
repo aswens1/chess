@@ -1,4 +1,3 @@
 package service;
 
-public record ClearRequest() {
-}
+public record ClearRequest() {}
