@@ -128,9 +128,27 @@ public class ServiceTests {
         assertNull(testAuthDataDao.getAuthData(authToken));
     }
 
-    @Disabled
-    void logoutUserTestNegative() {
 
+    @Order(7)
+    @Test
+    void logoutUserTestAuthDataNotRemovedNegative() {
+        UserDAO testUserDao = new UserDAO();
+        UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
+        testUserDao.registerUser(testUser);
+
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+
+        userService = new UserService(testUserDao, testAuthDataDao);
+
+        AuthDataRecord testAuth = testAuthDataDao.createAuthData(testUser);
+        String authToken = testAuth.authToken();
+
+        userService.logout(authToken);
+
+        assertNull(testAuthDataDao.getAuthData(authToken));
+
+        ResponseException ex = assertThrows(ResponseException.class, () -> userService.logout(authToken));
+        assertEquals("Error: unauthorized", ex.getMessage());
     }
 
     @Disabled
