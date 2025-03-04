@@ -1,4 +1,5 @@
 package service;
+import chess.ChessGame;
 import dataaccess.*;
 import exception.ResponseException;
 import model.*;
@@ -183,6 +184,7 @@ public class ServiceTests {
     @Disabled
     void listGamesTestNegative(){
         UserDAO testUserDao = new UserDAO();
+
         AuthDataDAO testAuthDataDao = new AuthDataDAO();
         GameDAO testGameDao = new GameDAO();
 
@@ -221,9 +223,29 @@ public class ServiceTests {
 
     }
 
-    @Disabled
-    void joinGameTestPositive() {
 
+    @Order(12)
+    @Test
+    void joinGameTestPositive() {
+        UserDAO testUserDao = new UserDAO();
+        UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
+
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        GameDAO testGameDao = new GameDAO();
+
+        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+
+        int newGame = testGameDao.createGame("testGame");
+        GameDataRecord game = testGameDao.getGame(newGame);
+
+        assertNotNull(game);
+
+        JoinGameRequest joinRequest = new JoinGameRequest(ChessGame.TeamColor.WHITE, game.gameID());
+        gameService.joinGame(joinRequest, testUser.username());
+
+        GameDataRecord updatedGame = testGameDao.getGame(game.gameID());
+
+        assertEquals(testUser.username(), updatedGame.whiteUsername());
     }
 
     @Disabled
