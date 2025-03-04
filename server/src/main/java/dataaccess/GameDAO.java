@@ -2,11 +2,9 @@ package dataaccess;
 
 import chess.ChessGame;
 import exception.ResponseException;
-import model.AuthDataRecord;
 import model.CondensedGameData;
 import model.GameDataRecord;
-import model.UserRecord;
-import service.ListGamesResult;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;

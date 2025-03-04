@@ -3,10 +3,6 @@ package service;
 import dataaccess.AuthDataDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
-import model.CondensedGameData;
-import model.GameDataRecord;
-
-import java.util.HashMap;
 
 public class GameService {
 

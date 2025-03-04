@@ -4,7 +4,7 @@ import exception.ResponseException;
 import model.*;
 import org.junit.jupiter.api.*;
 
-import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -151,13 +151,41 @@ public class ServiceTests {
         assertEquals("Error: unauthorized", ex.getMessage());
     }
 
-    @Disabled
-    void listGamesTestPositive(){
 
+    @Order(8)
+    @Test
+    void listGamesTestPositive(){
+        UserDAO testUserDao = new UserDAO();
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        GameDAO testGameDao = new GameDAO();
+
+        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+
+        int newGame = testGameDao.createGame("testGame");
+        GameDataRecord game = testGameDao.getGame(newGame);
+
+        List<CondensedGameData> listGamesResult = gameService.listGames().games();
+
+        boolean gameInList = false;
+        for (CondensedGameData g : listGamesResult) {
+            if (game.gameID() == g.gameID()) {
+                gameInList = true;
+                break;
+            }
+        }
+
+        assertNotNull(listGamesResult);
+        assertTrue(gameInList);
     }
 
     @Disabled
     void listGamesTestNegative(){
+        UserDAO testUserDao = new UserDAO();
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        GameDAO testGameDao = new GameDAO();
+
+        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+
 
     }
 
