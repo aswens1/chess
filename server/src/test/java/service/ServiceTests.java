@@ -248,8 +248,26 @@ public class ServiceTests {
         assertEquals(testUser.username(), updatedGame.whiteUsername());
     }
 
-    @Disabled
+    @Order(13)
+    @Test
     void joinGameTestNegative() {
+        UserDAO testUserDao = new UserDAO();
 
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        GameDAO testGameDao = new GameDAO();
+
+        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+
+        int newGame = testGameDao.createGame("testGame");
+        GameDataRecord game = testGameDao.getGame(newGame);
+
+        JoinGameRequest joinRequestWhite = new JoinGameRequest(ChessGame.TeamColor.WHITE, game.gameID());
+        gameService.joinGame(joinRequestWhite, "testUserName");
+
+        assertNotNull(game);
+
+
+        ResponseException ex = assertThrows(ResponseException.class, () -> gameService.joinGame(joinRequestWhite, "tryingToStealWhite"));
+        assertEquals("Error: already taken", ex.getMessage());
     }
 }
