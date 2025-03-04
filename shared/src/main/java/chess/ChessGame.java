@@ -153,8 +153,6 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
 
-        ChessPosition kingPosition = whereIsKing(teamColor);
-
         for (int row = 1; row <= 8; row++) {
             for (int column = 1; column <=8; column++) {
                 ChessPosition position = new ChessPosition(row, column);
@@ -176,20 +174,6 @@ public class ChessGame {
             }
         }
         return false;
-    }
-
-    private ChessPosition whereIsKing(TeamColor teamColor) {
-        for (int row = 1; row <= 8; row++) {
-            for (int column = 1; column <= 8; column++) {
-                ChessPosition position = new ChessPosition(row, column);
-                ChessPiece currentPiece = board.getPiece(position);
-
-                if ((currentPiece != null) && (currentPiece.getTeamColor() != teamColor)) {
-                    return position;
-                }
-            }
-        }
-        return null;
     }
 
 
