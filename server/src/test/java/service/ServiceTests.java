@@ -281,4 +281,5 @@ public class ServiceTests {
         ResponseException ex = assertThrows(ResponseException.class, () -> gameService.joinGame(joinRequestWhite, "tryingToStealWhite"));
         assertEquals("Error: already taken", ex.getMessage());
     }
+
 }
