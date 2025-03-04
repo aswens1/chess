@@ -1,14 +1,7 @@
 package service;
-import chess.ChessGame;
-import com.google.gson.Gson;
-import dataaccess.AuthDataDAO;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import exception.ResponseException;
-import handler.*;
-import model.AuthDataRecord;
-import model.GameDataRecord;
-import model.UserRecord;
+import model.*;
 import org.junit.jupiter.api.*;
 
 import java.util.HashMap;
@@ -18,23 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServiceTests {
 
     static UserService userService;
-//    private final UserHandler userHandler;
     static GameService gameService;
-//    private final GameHandler gameHandler;
     static ClearService clearService;
-//    private final ClearHandler clearHandler;
-
-
-//    @BeforeEach
-//    void setUp() {
-//        UserDAO testUserDao = new UserDAO();
-//        GameDAO testGameDao = new GameDAO();
-//        AuthDataDAO testAuthDataDao = new AuthDataDAO();
-//
-//        userService = new UserService(testUserDao, testAuthDataDao);
-//        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
-//        clearService = new ClearService(testUserDao, testAuthDataDao, testGameDao);
-//    }
 
 
     @Order(1)
@@ -130,9 +108,24 @@ public class ServiceTests {
         assertEquals("Error: unauthorized", ex.getMessage());
     }
 
-    @Disabled
-    void logoutUserTestPositive() {
 
+    @Order(6)
+    @Test
+    void logoutUserTestPositive() {
+        UserDAO testUserDao = new UserDAO();
+        UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
+        testUserDao.registerUser(testUser);
+
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+
+        userService = new UserService(testUserDao, testAuthDataDao);
+
+        AuthDataRecord testAuth = testAuthDataDao.createAuthData(testUser);
+        String authToken = testAuth.authToken();
+
+        userService.logout(authToken);
+
+        assertNull(testAuthDataDao.getAuthData(authToken));
     }
 
     @Disabled
