@@ -5,6 +5,7 @@ import exception.ErrorMessage;
 import exception.ResponseException;
 import model.AuthDataRecord;
 import service.*;
+import service.records.*;
 import spark.*;
 
 public class UserHandler {

@@ -5,6 +5,7 @@ import exception.ResponseException;
 import model.AuthDataRecord;
 import model.UserRecord;
 import dataaccess.AuthDataDAO;
+import service.records.*;
 
 public class UserService {
 

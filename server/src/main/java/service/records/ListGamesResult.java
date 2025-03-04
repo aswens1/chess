@@ -1,4 +1,4 @@
-package service;
+package service.records;
 
 import model.CondensedGameData;
 

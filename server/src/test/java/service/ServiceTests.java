@@ -4,6 +4,10 @@ import dataaccess.*;
 import exception.ResponseException;
 import model.*;
 import org.junit.jupiter.api.*;
+import service.records.JoinGameRequest;
+import service.records.LoginRequest;
+import service.records.LoginResult;
+import service.records.RegisterRequest;
 
 import java.util.List;
 

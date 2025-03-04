@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthDataDAO;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import service.records.*;
 
 public class GameService {
 

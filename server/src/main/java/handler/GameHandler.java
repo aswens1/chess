@@ -2,18 +2,13 @@ package handler;
 
 import com.google.gson.Gson;
 import dataaccess.AuthDataDAO;
-import dataaccess.GameDAO;
 import model.AuthDataRecord;
 import exception.ErrorMessage;
 import exception.ResponseException;
-import model.CondensedGameData;
-import model.UserRecord;
 import service.*;
+import service.records.*;
 import spark.Request;
 import spark.Response;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class GameHandler {
     private final GameService gameService;
