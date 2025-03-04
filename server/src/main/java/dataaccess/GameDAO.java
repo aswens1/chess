@@ -16,8 +16,7 @@ import java.util.Random;
 public class GameDAO implements GameDAOInterface {
 
     private final HashMap<Integer, GameDataRecord> gameDataMap = new HashMap<>();
-    private final AuthDataDAO authDataDAO = new AuthDataDAO();
-    private UserRecord userRecord;
+
 
     @Override
     public List<CondensedGameData> listGames() {
