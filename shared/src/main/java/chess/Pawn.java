@@ -56,7 +56,12 @@ public class Pawn implements PieceMovesCalculator {
             if (checkIfCanCapture != null) {
                 pawnMove.add(checkIfCanCapture);
             }
+        } else if (startOneRow == 1 || startOneRow == 8) {
+            List<ChessMove> promotionAndCaptureMove = promotionAndCapture(position, board, myTeam);
 
+            if (!promotionAndCaptureMove.isEmpty()) {
+                pawnMove.addAll(promotionAndCaptureMove);
+            }
         }
 
         return pawnMove;
@@ -151,13 +156,63 @@ public class Pawn implements PieceMovesCalculator {
                 promotions.add(promotionNoCaptureMove);
             }
         }
-
-
         return promotions;
     }
 
-    public static List<ChessMove> promotionMoveOnce(ChessPosition startPosition, ChessBoard board, ChessPiece promotionPiece) {
-        return null;
+    public static List<ChessMove> promotionAndCapture(ChessPosition startPosition, ChessBoard board, ChessGame.TeamColor myTeam) {
+        List<ChessMove> promotions = new ArrayList<>();
+
+
+
+        List<ChessPiece.PieceType> promotionOptions = new ArrayList<>(Arrays.asList(ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.ROOK));
+
+        int startRow = startPosition.getRow();
+        int startCol = startPosition.getColumn();
+        int colRight = startCol + 1;
+        int colLeft = startCol - 1;
+
+        if (myTeam == ChessGame.TeamColor.WHITE) {
+            startRow += 1;
+        } else if (myTeam == ChessGame.TeamColor.BLACK) {
+            startRow -= 1;
+        }
+
+        ChessPosition captureRightPos = new ChessPosition(startRow, colRight);
+        ChessPosition captureLeftPos = new ChessPosition(startRow, colLeft);
+
+        if (startCol != 1 && startCol != 8) {
+            if (board.getPiece(captureRightPos) != null && board.getPiece(captureRightPos).getTeamColor() != myTeam) {
+                for (ChessPiece.PieceType option : promotionOptions) {
+                    ChessMove promotionCaptureMove = new ChessMove(startPosition, captureRightPos, option);
+                    promotions.add(promotionCaptureMove);
+                }
+            } else if (board.getPiece(captureLeftPos) != null && board.getPiece(captureLeftPos).getTeamColor() != myTeam) {
+                for (ChessPiece.PieceType option : promotionOptions) {
+                    ChessMove promotionCaptureMove = new ChessMove(startPosition, captureLeftPos, option);
+                    promotions.add(promotionCaptureMove);
+                }
+            }
+        } else {
+            if ((startCol == 1) && ((board.getPiece(captureRightPos) != null) && (board.getPiece(captureRightPos).getTeamColor() != myTeam))) {
+                if (board.getPiece(captureRightPos) != null && board.getPiece(captureRightPos).getTeamColor() != myTeam) {
+                    for (ChessPiece.PieceType option : promotionOptions) {
+                        ChessMove promotionCaptureMove = new ChessMove(startPosition, captureRightPos, option);
+                        promotions.add(promotionCaptureMove);
+                    }
+                }
+            }
+
+            if ((startCol == 8) && ((board.getPiece(captureLeftPos) != null) && (board.getPiece(captureLeftPos).getTeamColor() != myTeam))) {
+                for (ChessPiece.PieceType option : promotionOptions) {
+                    ChessMove promotionCaptureMove = new ChessMove(startPosition, captureLeftPos, option);
+                    promotions.add(promotionCaptureMove);
+                }
+            }
+        }
+
+
+        return promotions;
     }
 
     /**
