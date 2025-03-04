@@ -178,6 +178,8 @@ public class ServiceTests {
         assertTrue(gameInList);
     }
 
+
+    @Order(9)
     @Disabled
     void listGamesTestNegative(){
         UserDAO testUserDao = new UserDAO();
@@ -186,12 +188,32 @@ public class ServiceTests {
 
         gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
 
+//        int newGame = testGameDao.createGame("testGame");
+//        GameDataRecord game = testGameDao.getGame(newGame);
+
+        List<CondensedGameData> listGamesResult = gameService.listGames().games();
+
+        assertNotNull(listGamesResult);
+        assertTrue(listGamesResult.isEmpty());
+
+        GameService error = new GameService(null, testAuthDataDao, testGameDao);
 
     }
 
-    @Disabled
-    void createGameTestPositive() {
 
+    @Order(10)
+    @Test
+    void createGameTestPositive() {
+        UserDAO testUserDao = new UserDAO();
+        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        GameDAO testGameDao = new GameDAO();
+
+        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+
+        int newGame = testGameDao.createGame("testGame");
+        GameDataRecord game = testGameDao.getGame(newGame);
+
+        assertNotNull(game);
     }
 
     @Disabled
