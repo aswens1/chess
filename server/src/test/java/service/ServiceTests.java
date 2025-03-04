@@ -22,6 +22,7 @@ public class ServiceTests {
     static ClearService clearService;
 //    private final ClearHandler clearHandler;
 
+
 //    @BeforeEach
 //    void setUp() {
 //        UserDAO testUserDao = new UserDAO();
@@ -56,9 +57,15 @@ public class ServiceTests {
         assertNull(testAuthDataDao.getAuthData(testAuth.authToken()));
     }
 
-    @Disabled
+
     @Order(2)
+    @Test
     void registerUserTestPositive() {
+        UserDAO testUserDao = new UserDAO();
+        UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
+        testUserDao.registerUser(testUser);
+
+        assertEquals(testUser, testUserDao.getUser("testUser"));
     }
 
     @Disabled
