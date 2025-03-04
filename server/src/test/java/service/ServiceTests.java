@@ -158,6 +158,7 @@ public class ServiceTests {
     void listGamesTestPositive(){
         UserDAO testUserDao = new UserDAO();
         AuthDataDAO testAuthDataDao = new AuthDataDAO();
+
         GameDAO testGameDao = new GameDAO();
 
         gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
@@ -181,7 +182,7 @@ public class ServiceTests {
 
 
     @Order(9)
-    @Disabled
+    @Test
     void listGamesTestNegative(){
         UserDAO testUserDao = new UserDAO();
 
@@ -190,9 +191,6 @@ public class ServiceTests {
 
         gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
 
-//        int newGame = testGameDao.createGame("testGame");
-//        GameDataRecord game = testGameDao.getGame(newGame);
-
         List<CondensedGameData> listGamesResult = gameService.listGames().games();
 
         assertNotNull(listGamesResult);
@@ -200,6 +198,7 @@ public class ServiceTests {
 
         GameService error = new GameService(null, testAuthDataDao, testGameDao);
 
+        assertThrows(NullPointerException.class, error::listGames);
     }
 
 
