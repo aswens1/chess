@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,11 +31,8 @@ public class Pawn implements PieceMovesCalculator {
         ChessPosition firstPosOne = new ChessPosition(startOneRow, startOneCol);
         ChessMove firstMoveOne = new ChessMove(position, firstPosOne, null);
 
-        if (board.getPiece(firstPosOne) == null) {
+        if ((board.getPiece(firstPosOne) == null) && (startOneRow != 1 && startOneRow != 8)) {
             pawnMove.add(firstMoveOne);
-
-            // if in promotion row
-            // promotion handler ?
 
             if ((position.getRow() == 2 && myTeam == ChessGame.TeamColor.WHITE) || (position.getRow() == 7 && myTeam == ChessGame.TeamColor.BLACK)) {
 
@@ -44,22 +42,22 @@ public class Pawn implements PieceMovesCalculator {
                     pawnMove.add(checkedMoveTwo);
                 }
             }
+        } else if (startOneRow == 1 || startOneRow == 8) {
+
+            List<ChessMove> promotions = promotionMovesCalculator(position, firstPosOne, board, myTeam);
+            if (!promotions.isEmpty()) {
+                pawnMove.addAll(promotions);
+            }
         }
 
-        ChessMove checkIfCanCapture = pawnCaptureMove(position, board, myTeam);
+        if (startOneRow != 1 && startOneRow != 8) {
+            ChessMove checkIfCanCapture = pawnCaptureMove(position, board, myTeam);
 
-        if (checkIfCanCapture != null) {
-            pawnMove.add(checkIfCanCapture);
+            if (checkIfCanCapture != null) {
+                pawnMove.add(checkIfCanCapture);
+            }
+
         }
-
-//        if (position.getColumn() > 1 && position.getColumn() < 8) {
-//            pawnMove.add(pawnCaptureMove(position, startOneRow, startOneCol + 1, board, myTeam));
-//            pawnMove.add(pawnCaptureMove(position, startOneRow, startOneCol - 1, board, myTeam));
-//        } else if (position.getColumn() == 1) {
-//            pawnMove.add(pawnCaptureMove(position, startOneRow, startOneCol + 1, board, myTeam));
-//        } else if (position.getColumn() == 8) {
-//            pawnMove.add(pawnCaptureMove(position, startOneRow, startOneCol - 1, board, myTeam));
-//        }
 
         return pawnMove;
     }
@@ -137,6 +135,28 @@ public class Pawn implements PieceMovesCalculator {
                 return null;
             }
         }
+        return null;
+    }
+
+    public static List<ChessMove> promotionMovesCalculator(ChessPosition startPosition, ChessPosition endPosition,
+                                                           ChessBoard board, ChessGame.TeamColor myTeam) {
+        List<ChessMove> promotions = new ArrayList<>();
+
+        List<ChessPiece.PieceType> promotionOptions = new ArrayList<>(Arrays.asList(ChessPiece.PieceType.KNIGHT,
+                                ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.ROOK));
+
+        if (board.getPiece(endPosition) == null) {
+            for (ChessPiece.PieceType option : promotionOptions) {
+                ChessMove promotionNoCaptureMove = new ChessMove(startPosition, endPosition, option);
+                promotions.add(promotionNoCaptureMove);
+            }
+        }
+
+
+        return promotions;
+    }
+
+    public static List<ChessMove> promotionMoveOnce(ChessPosition startPosition, ChessBoard board, ChessPiece promotionPiece) {
         return null;
     }
 
