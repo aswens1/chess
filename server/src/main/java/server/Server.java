@@ -2,7 +2,6 @@ package server;
 import dataaccess.*;
 import exception.ResponseException;
 import handler.*;
-import model.UserRecord;
 import service.*;
 import spark.*;
 
