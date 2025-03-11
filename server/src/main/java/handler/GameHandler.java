@@ -1,7 +1,6 @@
 package handler;
 
 import com.google.gson.Gson;
-import dataaccess.AuthDataDAO;
 import dataaccess.SQLAuthDataAccess;
 import model.AuthDataRecord;
 import exception.ErrorMessage;
@@ -14,7 +13,6 @@ import spark.Response;
 public class GameHandler {
     private final GameService gameService;
     private final AuthTokenValidationHandler validAuthToken;
-//    private final AuthDataDAO authDataDAO;
     private final SQLAuthDataAccess sqlAuth;
 
     public GameHandler(GameService gameService, AuthTokenValidationHandler validAuthToken, SQLAuthDataAccess sqlAuth) {

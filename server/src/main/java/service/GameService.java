@@ -10,12 +10,10 @@ public class GameService {
 
     final SQLAuthDataAccess sqlAuth;
     final UserDAO userDAO;
-    final AuthDataDAO authDataDAO;
     final GameDAO gameDAO;
 
-    public GameService(UserDAO userDAO, AuthDataDAO authDataDAO, SQLAuthDataAccess sqlAuth, GameDAO gameDAO) {
+    public GameService(UserDAO userDAO, SQLAuthDataAccess sqlAuth, GameDAO gameDAO) {
         this.userDAO = userDAO;
-        this.authDataDAO = authDataDAO;
         this.gameDAO = gameDAO;
         this.sqlAuth = sqlAuth;
     }

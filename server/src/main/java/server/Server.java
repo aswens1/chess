@@ -22,7 +22,7 @@ public class Server {
 
 
         userService = new UserService(userDAO, sqlAuthDataAccess);
-        gameService = new GameService(userDAO, authDataDAO, sqlAuthDataAccess, gameDAO);
+        gameService = new GameService(userDAO, sqlAuthDataAccess, gameDAO);
         clearService = new ClearService(userDAO, sqlAuthDataAccess, gameDAO);
 
 
