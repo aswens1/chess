@@ -19,9 +19,10 @@ public class Server {
         GameDAO gameDAO = new GameDAO();
 
         SQLAuthDataAccess sqlAuthDataAccess = new SQLAuthDataAccess();
+        SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
 
 
-        userService = new UserService(userDAO, sqlAuthDataAccess);
+        userService = new UserService(userDAO, sqlUserDataAccess, sqlAuthDataAccess);
         gameService = new GameService(userDAO, sqlAuthDataAccess, gameDAO);
         clearService = new ClearService(userDAO, sqlAuthDataAccess, gameDAO);
 

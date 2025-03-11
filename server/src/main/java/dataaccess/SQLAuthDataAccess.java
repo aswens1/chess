@@ -29,7 +29,7 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
             """
             CREATE TABLE IF NOT EXISTS  AuthData (
               `authToken` varchar(256) NOT NULL,
-              `userName` varchar(256) NOT NULL,
+              `username` varchar(256) NOT NULL,
               PRIMARY KEY (`authToken`),
               INDEX(userName)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
@@ -40,7 +40,7 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
     public AuthDataRecord createAuthData(UserRecord user) throws ResponseException {
         String authToken = java.util.UUID.randomUUID().toString();
         try (var conn = DatabaseManager.getConnection()) {
-            String sql = "INSERT INTO AuthData (authToken, userName) VALUES (?, ?)";
+            String sql = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
             try (var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, authToken);
                 ps.setString(2, user.username());
@@ -58,12 +58,12 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
     @Override
     public AuthDataRecord getAuthData(String authToken) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            String sql = "SELECT authToken, userName FROM AuthData WHERE authToken=?";
+            String sql = "SELECT authToken, username FROM AuthData WHERE authToken=?";
             try (var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return new AuthDataRecord(authToken, rs.getString("userName"));
+                        return new AuthDataRecord(authToken, rs.getString("username"));
                     }
                     return null;
                 }
@@ -88,8 +88,6 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
                     }
                 }
             }
-
-
             String sql = "DELETE FROM AuthData WHERE authToken=?";
             try (var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, authToken);

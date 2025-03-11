@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.SQLAuthDataAccess;
+import dataaccess.SQLUserDataAccess;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthDataRecord;
@@ -10,12 +11,14 @@ import service.records.*;
 
 public class UserService {
 
+    private final SQLUserDataAccess sqlUser;
     private final SQLAuthDataAccess sqlAuth;
     private final UserDAO userDAO;
 
-    public UserService(UserDAO userDAO, SQLAuthDataAccess sqlAuth) {
+    public UserService(UserDAO userDAO, SQLUserDataAccess sqlUser, SQLAuthDataAccess sqlAuth) {
         this.userDAO = userDAO;
         this.sqlAuth = sqlAuth;
+        this.sqlUser = sqlUser;
     }
 
     public RegisterResult register(RegisterRequest registerRequest) {
@@ -39,8 +42,6 @@ public class UserService {
 
         userDAO.registerUser(newUser);
 
-//        AuthDataRecord authData = authDataDAO.createAuthData(newUser);
-
         AuthDataRecord authData = sqlAuth.createAuthData(newUser);
 
         String authToken = authData.authToken();
@@ -58,8 +59,6 @@ public class UserService {
             if (!user.password().equals(loginRequest.password())) {
                 throw new ResponseException(401, "Error: unauthorized");
             }
-
-//            AuthDataRecord authData = authDataDAO.createAuthData(user);
 
         AuthDataRecord authData = sqlAuth.createAuthData(user);
         String authToken = authData.authToken();
