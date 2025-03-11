@@ -22,7 +22,7 @@ public class ServiceTests {
 
     @Order(1)
     @Test
-    void allDatabasesShouldBeClear() {
+    void allDatabasesShouldBeClear() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
         testUserDao.registerUser(testUser);
@@ -30,16 +30,16 @@ public class ServiceTests {
         GameDAO testGameDao = new GameDAO();
         testGameDao.createGame("testGame");
 
-        AuthDataDAO testAuthDataDao = new AuthDataDAO();
-        AuthDataRecord testAuth = testAuthDataDao.createAuthData(testUser);
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+        AuthDataRecord testAuth = testSQLAuth.createAuthData(testUser);
 
-        clearService = new ClearService(testUserDao, testAuthDataDao, testGameDao);
+        clearService = new ClearService(testUserDao, testSQLAuth, testGameDao);
 
         clearService.clearAllDatabases();
 
         assertTrue(testGameDao.listGames().isEmpty());
         assertFalse(testUserDao.doesUserExist(testUser.username()));
-        assertNull(testAuthDataDao.getAuthData(testAuth.authToken()));
+        assertNull(testSQLAuth.getAuthData(testAuth.authToken()));
     }
 
 
@@ -163,13 +163,15 @@ public class ServiceTests {
 
     @Order(8)
     @Test
-    void listGamesTestPositive(){
+    void listGamesTestPositive() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         AuthDataDAO testAuthDataDao = new AuthDataDAO();
 
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+        gameService = new GameService(testUserDao, testAuthDataDao, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);
@@ -191,20 +193,22 @@ public class ServiceTests {
 
     @Order(9)
     @Test
-    void listGamesTestNegative(){
+    void listGamesTestNegative() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
 
         AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+        gameService = new GameService(testUserDao, testAuthDataDao, testSQLAuth, testGameDao);
 
         List<CondensedGameData> listGamesResult = gameService.listGames().games();
 
         assertNotNull(listGamesResult);
         assertTrue(listGamesResult.isEmpty());
 
-        GameService error = new GameService(null, testAuthDataDao, testGameDao);
+        GameService error = new GameService(null, testAuthDataDao, testSQLAuth, testGameDao);
 
         assertThrows(NullPointerException.class, error::listGames);
     }
@@ -212,12 +216,14 @@ public class ServiceTests {
 
     @Order(10)
     @Test
-    void createGameTestPositive() {
+    void createGameTestPositive() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+        gameService = new GameService(testUserDao, testAuthDataDao, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);
@@ -227,32 +233,36 @@ public class ServiceTests {
 
     @Order(11)
     @Test
-    void createGameTestNegative() {
+    void createGameTestNegative() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+        gameService = new GameService(testUserDao, testAuthDataDao, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);
         assertNotNull(game);
 
-        GameService error = new GameService(testUserDao, testAuthDataDao, null);
+        GameService error = new GameService(testUserDao, testAuthDataDao, testSQLAuth, null);
         assertThrows(NullPointerException.class, error::listGames);
     }
 
 
     @Order(12)
     @Test
-    void joinGameTestPositive() {
+    void joinGameTestPositive() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
 
         AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+        gameService = new GameService(testUserDao, testAuthDataDao, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);
@@ -269,13 +279,15 @@ public class ServiceTests {
 
     @Order(13)
     @Test
-    void joinGameTestNegative() {
+    void joinGameTestNegative() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
 
         AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testAuthDataDao, testGameDao);
+        gameService = new GameService(testUserDao, testAuthDataDao, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);

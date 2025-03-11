@@ -1,15 +1,15 @@
 package handler;
-import dataaccess.AuthDataDAO;
+import dataaccess.SQLAuthDataAccess;
 
 public class AuthTokenValidationHandler {
 
-    private final AuthDataDAO authDataDAO;
+    private final SQLAuthDataAccess sqlAuth;
 
-    public AuthTokenValidationHandler(AuthDataDAO authDataDAO) {
-        this.authDataDAO = authDataDAO;
+    public AuthTokenValidationHandler(SQLAuthDataAccess sqlAuth) {
+        this.sqlAuth = sqlAuth;
     }
 
     public boolean isValidToken(String authToken) {
-        return authDataDAO.getAuthData(authToken) != null;
+        return sqlAuth.getAuthData(authToken) != null;
     }
 }

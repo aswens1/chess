@@ -22,13 +22,13 @@ public class Server {
 
 
         userService = new UserService(userDAO, sqlAuthDataAccess);
-        gameService = new GameService(userDAO, authDataDAO, gameDAO);
-        clearService = new ClearService(userDAO, authDataDAO, gameDAO);
+        gameService = new GameService(userDAO, authDataDAO, sqlAuthDataAccess, gameDAO);
+        clearService = new ClearService(userDAO, sqlAuthDataAccess, gameDAO);
 
 
-        AuthTokenValidationHandler validAuthToken = new AuthTokenValidationHandler(authDataDAO);
+        AuthTokenValidationHandler validAuthToken = new AuthTokenValidationHandler(sqlAuthDataAccess);
         userHandler = new UserHandler(userService, validAuthToken);
-        gameHandler = new GameHandler(gameService, validAuthToken, authDataDAO);
+        gameHandler = new GameHandler(gameService, validAuthToken, sqlAuthDataAccess);
         clearHandler = new ClearHandler(clearService);
     }
 

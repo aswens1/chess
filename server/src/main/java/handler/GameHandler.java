@@ -2,6 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import dataaccess.AuthDataDAO;
+import dataaccess.SQLAuthDataAccess;
 import model.AuthDataRecord;
 import exception.ErrorMessage;
 import exception.ResponseException;
@@ -13,12 +14,13 @@ import spark.Response;
 public class GameHandler {
     private final GameService gameService;
     private final AuthTokenValidationHandler validAuthToken;
-    private final AuthDataDAO authDataDAO;
+//    private final AuthDataDAO authDataDAO;
+    private final SQLAuthDataAccess sqlAuth;
 
-    public GameHandler(GameService gameService, AuthTokenValidationHandler validAuthToken, AuthDataDAO authDataDAO) {
+    public GameHandler(GameService gameService, AuthTokenValidationHandler validAuthToken, SQLAuthDataAccess sqlAuth) {
         this.gameService = gameService;
         this.validAuthToken = validAuthToken;
-        this.authDataDAO = authDataDAO;
+        this.sqlAuth = sqlAuth;
     }
 
     public Object listGames(Request request, Response response) {
@@ -68,7 +70,7 @@ public class GameHandler {
         try {
             if (validAuthToken.isValidToken(authToken)) {
 
-                AuthDataRecord authDataRecord = authDataDAO.getAuthData(authToken);
+                AuthDataRecord authDataRecord = sqlAuth.getAuthData(authToken);
                 if (authDataRecord == null) {
                     response.status(401);
                     return new Gson().toJson((new ErrorMessage(401, "Error: unauthorized")));
