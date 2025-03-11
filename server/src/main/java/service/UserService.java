@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.SQLAuthDataAccess;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthDataRecord;
@@ -9,12 +10,12 @@ import service.records.*;
 
 public class UserService {
 
+    private final SQLAuthDataAccess sqlAuth;
     private final UserDAO userDAO;
-    private final AuthDataDAO authDataDAO;
 
-    public UserService(UserDAO userDAO, AuthDataDAO authDataDAO) {
+    public UserService(UserDAO userDAO, SQLAuthDataAccess sqlAuth) {
         this.userDAO = userDAO;
-        this.authDataDAO = authDataDAO;
+        this.sqlAuth = sqlAuth;
     }
 
     public RegisterResult register(RegisterRequest registerRequest) {
@@ -38,7 +39,10 @@ public class UserService {
 
         userDAO.registerUser(newUser);
 
-        AuthDataRecord authData = authDataDAO.createAuthData(newUser);
+//        AuthDataRecord authData = authDataDAO.createAuthData(newUser);
+
+        AuthDataRecord authData = sqlAuth.createAuthData(newUser);
+
         String authToken = authData.authToken();
 
         return new RegisterResult(registerRequest.username(), authToken);
@@ -55,14 +59,18 @@ public class UserService {
                 throw new ResponseException(401, "Error: unauthorized");
             }
 
-            AuthDataRecord authData = authDataDAO.createAuthData(user);
-            String authToken = authData.authToken();
+//            AuthDataRecord authData = authDataDAO.createAuthData(user);
 
-            return new LoginResult(user.username(), authToken);
+        AuthDataRecord authData = sqlAuth.createAuthData(user);
+        String authToken = authData.authToken();
+
+        return new LoginResult(user.username(), authToken);
     }
 
     public LogoutResult logout(String authToken) {
-        boolean wasAuthTokenRemoved = authDataDAO.deleteAuthData(authToken);
+//        boolean wasAuthTokenRemoved = authDataDAO.deleteAuthData(authToken);
+
+        boolean wasAuthTokenRemoved = sqlAuth.deleteAuthData(authToken);
 
         if (!wasAuthTokenRemoved) {
             throw new ResponseException(401, "Error: unauthorized");

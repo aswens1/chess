@@ -13,12 +13,15 @@ public class Server {
     static ClearService clearService;
     private final ClearHandler clearHandler;
 
-    public Server() {
+    public Server() throws DataAccessException {
         AuthDataDAO authDataDAO = new AuthDataDAO();
         UserDAO userDAO = new UserDAO();
         GameDAO gameDAO = new GameDAO();
 
-        userService = new UserService(userDAO, authDataDAO);
+        SQLAuthDataAccess sqlAuthDataAccess = new SQLAuthDataAccess();
+
+
+        userService = new UserService(userDAO, sqlAuthDataAccess);
         gameService = new GameService(userDAO, authDataDAO, gameDAO);
         clearService = new ClearService(userDAO, authDataDAO, gameDAO);
 

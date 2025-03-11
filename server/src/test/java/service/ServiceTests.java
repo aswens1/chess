@@ -45,15 +45,15 @@ public class ServiceTests {
 
     @Order(2)
     @Test
-    void registerUserTestPositive() {
+    void registerUserTestPositive() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
 
-        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
 
         RegisterRequest registerRequest = new RegisterRequest("testUser", "testUserPassword", "testUserEmail");
 
-        userService = new UserService(testUserDao, testAuthDataDao);
+        userService = new UserService(testUserDao, testSQLAuth);
         userService.register(registerRequest);
 
         assertEquals(testUser, testUserDao.getUser("testUser"));
@@ -62,14 +62,15 @@ public class ServiceTests {
 
     @Order(3)
     @Test
-    void registerUserNullUsernameTestNegative() {
+    void registerUserNullUsernameTestNegative() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
 
-        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+
 
         RegisterRequest registerRequest = new RegisterRequest(null, "testUserPassword", "testUserEmail");
 
-        userService = new UserService(testUserDao, testAuthDataDao);
+        userService = new UserService(testUserDao, testSQLAuth);
 
         ResponseException ex = assertThrows(ResponseException.class, () -> userService.register(registerRequest));
         assertEquals("Error: bad request", ex.getMessage());
@@ -78,36 +79,37 @@ public class ServiceTests {
 
     @Order(4)
     @Test
-    void loginUserTestPositive() {
+    void loginUserTestPositive() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
         testUserDao.registerUser(testUser);
 
-        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
 
         LoginRequest loginRequest = new LoginRequest("testUser", "testUserPassword");
 
-        userService = new UserService(testUserDao, testAuthDataDao);
+        userService = new UserService(testUserDao, testSQLAuth);
         LoginResult loginResult = userService.login(loginRequest);
 
         String username = loginResult.username();
         String authToken = loginResult.authToken();
 
-        assertEquals(username, testAuthDataDao.getAuthData(authToken).username());
+        assertEquals(username, testSQLAuth.getAuthData(authToken).username());
     }
 
 
     @Order(5)
     @Test
-    void loginUserTestWrongPasswordNegative() {
+    void loginUserTestWrongPasswordNegative() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
-        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+
 
         testUserDao.registerUser(new UserRecord("testUser", "testUserPassword", "testEmailUser"));
 
         LoginRequest loginRequest = new LoginRequest("testUser", "testUser");
 
-        userService = new UserService(testUserDao, testAuthDataDao);
+        userService = new UserService(testUserDao, testSQLAuth);
 
         ResponseException ex = assertThrows(ResponseException.class, () -> userService.login(loginRequest));
         assertEquals("Error: unauthorized", ex.getMessage());
@@ -116,41 +118,43 @@ public class ServiceTests {
 
     @Order(6)
     @Test
-    void logoutUserTestPositive() {
+    void logoutUserTestPositive() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
         testUserDao.registerUser(testUser);
 
-        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
 
-        userService = new UserService(testUserDao, testAuthDataDao);
 
-        AuthDataRecord testAuth = testAuthDataDao.createAuthData(testUser);
-        String authToken = testAuth.authToken();
+        userService = new UserService(testUserDao, testSQLAuth);
+
+        AuthDataRecord testSQL = testSQLAuth.createAuthData(testUser);
+        String authToken = testSQL.authToken();
 
         userService.logout(authToken);
 
-        assertNull(testAuthDataDao.getAuthData(authToken));
+        assertNull(testSQLAuth.getAuthData(authToken));
     }
 
 
     @Order(7)
     @Test
-    void logoutUserTestAuthDataNotRemovedNegative() {
+    void logoutUserTestAuthDataNotRemovedNegative() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
         testUserDao.registerUser(testUser);
 
-        AuthDataDAO testAuthDataDao = new AuthDataDAO();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
 
-        userService = new UserService(testUserDao, testAuthDataDao);
 
-        AuthDataRecord testAuth = testAuthDataDao.createAuthData(testUser);
+        userService = new UserService(testUserDao, testSQLAuth);
+
+        AuthDataRecord testAuth = testSQLAuth.createAuthData(testUser);
         String authToken = testAuth.authToken();
 
         userService.logout(authToken);
 
-        assertNull(testAuthDataDao.getAuthData(authToken));
+        assertNull(testSQLAuth.getAuthData(authToken));
 
         ResponseException ex = assertThrows(ResponseException.class, () -> userService.logout(authToken));
         assertEquals("Error: unauthorized", ex.getMessage());

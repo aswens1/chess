@@ -31,7 +31,7 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
               `authToken` varchar(256) NOT NULL,
               `userName` varchar(256) NOT NULL,
               PRIMARY KEY (`authToken`),
-              INDEX(name)
+              INDEX(userName)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
@@ -58,10 +58,10 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
     @Override
     public AuthDataRecord getAuthData(String authToken) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            String sql = "SELECT authToken, userName FROM AuthToken WHERE authToken=?";
+            String sql = "SELECT authToken, userName FROM AuthData WHERE authToken=?";
             try (var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, authToken);
-                try (var rs = ps.executeQuery(sql)) {
+                try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return new AuthDataRecord(authToken, rs.getString("userName"));
                     }
@@ -78,11 +78,23 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
     @Override
     public boolean deleteAuthData(String authToken) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            String sql = "DELETE FROM AuthData WHERE authToken = ?";
+
+            String checkIfThere = "SELECT COUNT(*) FROM AuthData WHERE authToken=?";
+            try (var checkPs = conn.prepareStatement(checkIfThere)) {
+                checkPs.setString(1, authToken);
+                try (var rs = checkPs.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) == 0) {
+                        return false;
+                    }
+                }
+            }
+
+
+            String sql = "DELETE FROM AuthData WHERE authToken=?";
             try (var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, authToken);
                 int rowsDeleted = ps.executeUpdate();
-                return rowsDeleted == 1;
+                return rowsDeleted > 0;
             }
         } catch (SQLException e) {
             throw new ResponseException(500, "AuthData Database Error: " + e.getMessage());
