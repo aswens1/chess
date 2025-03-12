@@ -14,11 +14,11 @@ public class Server {
     private final ClearHandler clearHandler;
 
     public Server() throws DataAccessException {
-        UserDAO userDAO = new UserDAO();
         GameDAO gameDAO = new GameDAO();
 
         SQLAuthDataAccess sqlAuthDataAccess = new SQLAuthDataAccess();
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
+        SQLGameDataAccess sqlGameDataAccess = new SQLGameDataAccess();
 
 
         userService = new UserService(sqlUserDataAccess, sqlAuthDataAccess);

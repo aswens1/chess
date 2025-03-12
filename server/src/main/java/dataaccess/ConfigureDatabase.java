@@ -4,7 +4,7 @@ import exception.ResponseException;
 
 public class ConfigureDatabase {
 
-    static void ConfigureDatabase(String[] createStatements) throws ResponseException, DataAccessException {
+    static void configureDatabase(String[] createStatements) throws ResponseException, DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
