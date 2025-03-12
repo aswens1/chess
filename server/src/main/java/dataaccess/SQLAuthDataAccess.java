@@ -9,32 +9,16 @@ import java.sql.*;
 public class SQLAuthDataAccess implements AuthDataDAOInterface {
 
     public SQLAuthDataAccess() throws ResponseException, DataAccessException {
-        configureDatabase();
-    }
-
-    private void configureDatabase() throws ResponseException, DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (Exception ex) {
-            throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
-
-    private final String[] createStatements = {
-            """
+        String[] createStatements = { """
             CREATE TABLE IF NOT EXISTS authdata (
               `authtoken` varchar(256) NOT NULL,
               `username` varchar(256) NOT NULL,
               PRIMARY KEY (`authtoken`),
               INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
-    };
+            """ };
+        ConfigureDatabase.ConfigureDatabase(createStatements);
+    }
 
     @Override
     public AuthDataRecord createAuthData(UserRecord user) throws ResponseException {
