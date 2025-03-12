@@ -18,8 +18,8 @@ public class SQLGameDataAccess implements GameDAOInterface{
                 """
             CREATE TABLE IF NOT EXISTS gamedata (
               `gameID` int NOT NULL AUTO_INCREMENT,
-              `white_user` varchar(256) NOT NULL,
-              `black_user` varchar(256) NOT NULL,
+              `white_user` varchar(256) DEFAULT NULL,
+              `black_user` varchar(256) DEFAULT NULL,
               `game_name` varchar(256) NOT NULL,
               `chess_game` LONGTEXT NOT NULL,
               PRIMARY KEY (`gameID`)
@@ -58,8 +58,8 @@ public class SQLGameDataAccess implements GameDAOInterface{
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "INSERT INTO gamedata (white_user, black_user, game_name, chess_game) VALUES (?,?,?,?)";
             try (var ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, "");
-                ps.setString(2, "");
+                ps.setString(1, null);
+                ps.setString(2, null);
                 ps.setString(3, gameName);
                 ps.setString(4, new Gson().toJson(new ChessGame()));
                 ps.executeUpdate();
@@ -107,9 +107,9 @@ public class SQLGameDataAccess implements GameDAOInterface{
             String sql;
 
             if (playerColour == ChessGame.TeamColor.WHITE) {
-                sql = "UPDATE gamedata SET white_user =? WHERE gameID=?";
+                sql = "UPDATE gamedata SET white_user=? WHERE gameID=?";
             } else if (playerColour == ChessGame.TeamColor.BLACK) {
-                sql = "UPDATE gamedata SET black_user =? WHERE gameID=?";
+                sql = "UPDATE gamedata SET black_user=? WHERE gameID=?";
             } else {
                 throw new ResponseException(400, "Error: bad request");
             }
@@ -129,6 +129,10 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
     @Override
     public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
+        if (gameID == null) {
+            throw new ResponseException(400, "Error: invalid gameID");
+        }
+
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "SELECT white_user, black_user FROM gamedata WHERE gameID=?";
             try (var ps = conn.prepareStatement(sql)) {
@@ -139,9 +143,9 @@ public class SQLGameDataAccess implements GameDAOInterface{
                         String black = rs.getString("black_user");
 
 
-                        if (playerColor == ChessGame.TeamColor.BLACK && !black.isEmpty()) {
+                        if (playerColor == ChessGame.TeamColor.BLACK && black != null) {
                             throw new ResponseException(403, "Error: already taken");
-                        } else if (playerColor == ChessGame.TeamColor.WHITE && !white.isEmpty()) {
+                        } else if (playerColor == ChessGame.TeamColor.WHITE && white != null) {
                             throw new ResponseException(403, "Error: already taken");
                         }
 
