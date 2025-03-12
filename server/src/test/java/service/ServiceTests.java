@@ -4,10 +4,7 @@ import dataaccess.*;
 import exception.ResponseException;
 import model.*;
 import org.junit.jupiter.api.*;
-import service.records.JoinGameRequest;
-import service.records.LoginRequest;
-import service.records.LoginResult;
-import service.records.RegisterRequest;
+import service.records.*;
 
 import java.util.List;
 
@@ -19,13 +16,25 @@ public class ServiceTests {
     static GameService gameService;
     static ClearService clearService;
 
+    @AfterEach
+    void cleanupDatabase() throws DataAccessException {
+        SQLUserDataAccess testSQLUser = new SQLUserDataAccess();
+        SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
+        GameDAO testGameDao = new GameDAO();
+
+        clearService = new ClearService(testSQLUser, testSQLAuth, testGameDao);
+
+        clearService.clearAllDatabases();
+    }
 
     @Order(1)
     @Test
     void allDatabasesShouldBeClear() throws DataAccessException {
         UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
-        testUserDao.registerUser(testUser);
+
+        SQLUserDataAccess testSQLUser = new SQLUserDataAccess();
+        testSQLUser.registerUser(testUser);
 
         GameDAO testGameDao = new GameDAO();
         testGameDao.createGame("testGame");
@@ -33,7 +42,7 @@ public class ServiceTests {
         SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
         AuthDataRecord testAuth = testSQLAuth.createAuthData(testUser);
 
-        clearService = new ClearService(testUserDao, testSQLAuth, testGameDao);
+        clearService = new ClearService(testSQLUser, testSQLAuth, testGameDao);
 
         clearService.clearAllDatabases();
 
@@ -54,10 +63,10 @@ public class ServiceTests {
 
         RegisterRequest registerRequest = new RegisterRequest("testUser", "testUserPassword", "testUserEmail");
 
-        userService = new UserService(testUserDao, testSQLUser, testSQLAuth);
+        userService = new UserService(testSQLUser, testSQLAuth);
         userService.register(registerRequest);
 
-        assertEquals(testUser, testUserDao.getUser("testUser"));
+        assertEquals(testUser, testSQLUser.getUser("testUser"));
     }
 
 
@@ -73,7 +82,7 @@ public class ServiceTests {
 
         RegisterRequest registerRequest = new RegisterRequest(null, "testUserPassword", "testUserEmail");
 
-        userService = new UserService(testUserDao, testSQLUser, testSQLAuth);
+        userService = new UserService(testSQLUser, testSQLAuth);
 
         ResponseException ex = assertThrows(ResponseException.class, () -> userService.register(registerRequest));
         assertEquals("Error: bad request", ex.getMessage());
@@ -95,7 +104,7 @@ public class ServiceTests {
 
         LoginRequest loginRequest = new LoginRequest("testUser", "testUserPassword");
 
-        userService = new UserService(testUserDao, testSQLUser, testSQLAuth);
+        userService = new UserService(testSQLUser, testSQLAuth);
         LoginResult loginResult = userService.login(loginRequest);
 
         String username = loginResult.username();
@@ -118,7 +127,7 @@ public class ServiceTests {
 
         LoginRequest loginRequest = new LoginRequest("testUser", "testUser");
 
-        userService = new UserService(testUserDao, testSQLUser, testSQLAuth);
+        userService = new UserService(testSQLUser, testSQLAuth);
 
         ResponseException ex = assertThrows(ResponseException.class, () -> userService.login(loginRequest));
         assertEquals("Error: unauthorized", ex.getMessage());
@@ -137,7 +146,7 @@ public class ServiceTests {
 
 
 
-        userService = new UserService(testUserDao, testSQLUser, testSQLAuth);
+        userService = new UserService(testSQLUser, testSQLAuth);
 
         AuthDataRecord testSQL = testSQLAuth.createAuthData(testUser);
         String authToken = testSQL.authToken();
@@ -160,7 +169,7 @@ public class ServiceTests {
 
 
 
-        userService = new UserService(testUserDao, testSQLUser, testSQLAuth);
+        userService = new UserService(testSQLUser, testSQLAuth);
 
         AuthDataRecord testAuth = testSQLAuth.createAuthData(testUser);
         String authToken = testAuth.authToken();
@@ -177,15 +186,13 @@ public class ServiceTests {
     @Order(8)
     @Test
     void listGamesTestPositive() throws DataAccessException {
-        UserDAO testUserDao = new UserDAO();
-
         SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
         SQLUserDataAccess testSQLUser = new SQLUserDataAccess();
 
 
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testSQLAuth, testGameDao);
+        gameService = new GameService(testSQLUser, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);
@@ -208,15 +215,13 @@ public class ServiceTests {
     @Order(9)
     @Test
     void listGamesTestNegative() throws DataAccessException {
-        UserDAO testUserDao = new UserDAO();
-
         SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
         SQLUserDataAccess testSQLUser = new SQLUserDataAccess();
 
 
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testSQLAuth, testGameDao);
+        gameService = new GameService(testSQLUser, testSQLAuth, testGameDao);
 
         List<CondensedGameData> listGamesResult = gameService.listGames().games();
 
@@ -232,14 +237,12 @@ public class ServiceTests {
     @Order(10)
     @Test
     void createGameTestPositive() throws DataAccessException {
-        UserDAO testUserDao = new UserDAO();
         SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
         SQLUserDataAccess testSQLUser = new SQLUserDataAccess();
 
-
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testSQLAuth, testGameDao);
+        gameService = new GameService(testSQLUser, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);
@@ -250,20 +253,20 @@ public class ServiceTests {
     @Order(11)
     @Test
     void createGameTestNegative() throws DataAccessException {
-        UserDAO testUserDao = new UserDAO();
         SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
         SQLUserDataAccess testSQLUser = new SQLUserDataAccess();
 
 
+
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testSQLAuth, testGameDao);
+        gameService = new GameService(testSQLUser, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);
         assertNotNull(game);
 
-        GameService error = new GameService(testUserDao, testSQLAuth, null);
+        GameService error = new GameService(testSQLUser, testSQLAuth, null);
         assertThrows(NullPointerException.class, error::listGames);
     }
 
@@ -271,7 +274,6 @@ public class ServiceTests {
     @Order(12)
     @Test
     void joinGameTestPositive() throws DataAccessException {
-        UserDAO testUserDao = new UserDAO();
         UserRecord testUser = new UserRecord("testUser", "testUserPassword", "testUserEmail");
 
         SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
@@ -280,7 +282,7 @@ public class ServiceTests {
 
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testSQLAuth, testGameDao);
+        gameService = new GameService(testSQLUser, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);
@@ -298,15 +300,13 @@ public class ServiceTests {
     @Order(13)
     @Test
     void joinGameTestNegative() throws DataAccessException {
-        UserDAO testUserDao = new UserDAO();
-
         SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
         SQLUserDataAccess testSQLUser = new SQLUserDataAccess();
 
 
         GameDAO testGameDao = new GameDAO();
 
-        gameService = new GameService(testUserDao, testSQLAuth, testGameDao);
+        gameService = new GameService(testSQLUser, testSQLAuth, testGameDao);
 
         int newGame = testGameDao.createGame("testGame");
         GameDataRecord game = testGameDao.getGame(newGame);

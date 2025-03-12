@@ -1,25 +1,22 @@
 package service;
 
-import dataaccess.AuthDataDAO;
-import dataaccess.GameDAO;
-import dataaccess.SQLAuthDataAccess;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import service.records.*;
 
 public class GameService {
 
+    final SQLUserDataAccess sqlUser;
     final SQLAuthDataAccess sqlAuth;
-    final UserDAO userDAO;
     final GameDAO gameDAO;
 
-    public GameService(UserDAO userDAO, SQLAuthDataAccess sqlAuth, GameDAO gameDAO) {
-        this.userDAO = userDAO;
+    public GameService(SQLUserDataAccess sqlUser, SQLAuthDataAccess sqlAuth, GameDAO gameDAO) {
+        this.sqlUser = sqlUser;
         this.gameDAO = gameDAO;
         this.sqlAuth = sqlAuth;
     }
 
     public ListGamesResult listGames() {
-        if (userDAO == null || sqlAuth == null || gameDAO == null) {
+        if (sqlUser == null || sqlAuth == null || gameDAO == null) {
             throw new NullPointerException("Cannot pass in null DAO");
         }
 
@@ -27,7 +24,7 @@ public class GameService {
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) {
-        if (userDAO == null || sqlAuth == null || gameDAO == null) {
+        if (sqlUser == null || sqlAuth == null || gameDAO == null) {
             throw new NullPointerException("Cannot pass in null DAO");
         }
 

@@ -1,24 +1,21 @@
 package service;
 
-import dataaccess.AuthDataDAO;
-import dataaccess.GameDAO;
-import dataaccess.SQLAuthDataAccess;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import service.records.ClearResult;
 
 public class ClearService {
-    final UserDAO userDAO;
     final SQLAuthDataAccess sqlAuth;
     final GameDAO gameDAO;
+    final SQLUserDataAccess sqlUser;
 
-    public ClearService(UserDAO userDAO, SQLAuthDataAccess sqlAuth, GameDAO gameDAO) {
-        this.userDAO = userDAO;
+    public ClearService(SQLUserDataAccess sqlUser, SQLAuthDataAccess sqlAuth, GameDAO gameDAO) {
+        this.sqlUser = sqlUser;
         this.sqlAuth = sqlAuth;
         this.gameDAO = gameDAO;
     }
 
     public ClearResult clearAllDatabases() {
-        userDAO.clear();
+        sqlUser.clear();
         sqlAuth.clear();
         gameDAO.clear();
 

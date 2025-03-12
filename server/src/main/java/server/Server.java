@@ -14,7 +14,6 @@ public class Server {
     private final ClearHandler clearHandler;
 
     public Server() throws DataAccessException {
-        AuthDataDAO authDataDAO = new AuthDataDAO();
         UserDAO userDAO = new UserDAO();
         GameDAO gameDAO = new GameDAO();
 
@@ -22,9 +21,9 @@ public class Server {
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
 
 
-        userService = new UserService(userDAO, sqlUserDataAccess, sqlAuthDataAccess);
-        gameService = new GameService(userDAO, sqlAuthDataAccess, gameDAO);
-        clearService = new ClearService(userDAO, sqlAuthDataAccess, gameDAO);
+        userService = new UserService(sqlUserDataAccess, sqlAuthDataAccess);
+        gameService = new GameService(sqlUserDataAccess, sqlAuthDataAccess, gameDAO);
+        clearService = new ClearService(sqlUserDataAccess, sqlAuthDataAccess, gameDAO);
 
 
         AuthTokenValidationHandler validAuthToken = new AuthTokenValidationHandler(sqlAuthDataAccess);

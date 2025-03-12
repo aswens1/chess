@@ -10,7 +10,6 @@ import spark.*;
 
 public class UserHandler {
     UserService userService;
-    AuthDataRecord authDataRecord;
     AuthTokenValidationHandler validAuthToken;
 
 

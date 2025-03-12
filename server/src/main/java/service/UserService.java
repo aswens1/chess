@@ -6,17 +6,14 @@ import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthDataRecord;
 import model.UserRecord;
-import dataaccess.AuthDataDAO;
 import service.records.*;
 
 public class UserService {
 
     private final SQLUserDataAccess sqlUser;
     private final SQLAuthDataAccess sqlAuth;
-    private final UserDAO userDAO;
 
-    public UserService(UserDAO userDAO, SQLUserDataAccess sqlUser, SQLAuthDataAccess sqlAuth) {
-        this.userDAO = userDAO;
+    public UserService(SQLUserDataAccess sqlUser, SQLAuthDataAccess sqlAuth) {
         this.sqlAuth = sqlAuth;
         this.sqlUser = sqlUser;
     }
@@ -31,16 +28,14 @@ public class UserService {
             throw new ResponseException(400, "Error: bad request");
         }
 
-
-
-        if (userDAO.getUser(registerRequest.username()) != null) {
+        if (sqlUser.getUser(registerRequest.username()) != null) {
             throw new ResponseException(403, "Error: already taken");
         }
 
         UserRecord newUser = new UserRecord(registerRequest.username(),
                 registerRequest.password(), registerRequest.email());
 
-        userDAO.registerUser(newUser);
+        sqlUser.registerUser(newUser);
 
         AuthDataRecord authData = sqlAuth.createAuthData(newUser);
 
@@ -50,7 +45,7 @@ public class UserService {
     }
 
     public LoginResult login(LoginRequest loginRequest) {
-            UserRecord user = userDAO.getUser(loginRequest.username());
+            UserRecord user = sqlUser.getUser(loginRequest.username());
 
             if (user == null) {
                 throw new ResponseException(401, "Error: unauthorized");
@@ -67,7 +62,6 @@ public class UserService {
     }
 
     public LogoutResult logout(String authToken) {
-//        boolean wasAuthTokenRemoved = authDataDAO.deleteAuthData(authToken);
 
         boolean wasAuthTokenRemoved = sqlAuth.deleteAuthData(authToken);
 
