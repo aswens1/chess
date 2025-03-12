@@ -2,6 +2,8 @@ package dataaccess;
 
 import exception.ResponseException;
 import model.UserRecord;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.SQLException;
 
 public class SQLUserDataAccess implements  UserDAOInterface {
@@ -27,7 +29,11 @@ public class SQLUserDataAccess implements  UserDAOInterface {
             String sql = "INSERT INTO userdata (username, password, email) VALUES (?, ?, ?)";
             try (var ps = conn.prepareStatement(sql)) {
                 ps.setString(1, user.username());
-                ps.setString(2, user.password());
+
+                String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+
+
+                ps.setString(2, hashedPassword);
                 ps.setString(3, user.email());
                 ps.executeUpdate();
             }
@@ -51,7 +57,7 @@ public class SQLUserDataAccess implements  UserDAOInterface {
                 }
             }
         } catch (SQLException e) {
-        throw new ResponseException(500, "UserData Database Error: " + e.getMessage());
+            throw new ResponseException(500, "UserData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }

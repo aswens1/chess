@@ -6,6 +6,7 @@ import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthDataRecord;
 import model.UserRecord;
+import org.mindrot.jbcrypt.BCrypt;
 import service.records.*;
 
 public class UserService {
@@ -51,7 +52,7 @@ public class UserService {
                 throw new ResponseException(401, "Error: unauthorized");
             }
 
-            if (!user.password().equals(loginRequest.password())) {
+            if (!BCrypt.checkpw(loginRequest.password(), user.password())) {
                 throw new ResponseException(401, "Error: unauthorized");
             }
 
