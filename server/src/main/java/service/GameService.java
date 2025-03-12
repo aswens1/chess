@@ -7,32 +7,32 @@ public class GameService {
 
     final SQLUserDataAccess sqlUser;
     final SQLAuthDataAccess sqlAuth;
-    final GameDAO gameDAO;
+    final SQLGameDataAccess sqlGame;
 
-    public GameService(SQLUserDataAccess sqlUser, SQLAuthDataAccess sqlAuth, GameDAO gameDAO) {
+    public GameService(SQLUserDataAccess sqlUser, SQLAuthDataAccess sqlAuth, SQLGameDataAccess sqlGame) {
         this.sqlUser = sqlUser;
-        this.gameDAO = gameDAO;
         this.sqlAuth = sqlAuth;
+        this.sqlGame = sqlGame;
     }
 
     public ListGamesResult listGames() {
-        if (sqlUser == null || sqlAuth == null || gameDAO == null) {
+        if (sqlUser == null || sqlAuth == null || sqlGame == null) {
             throw new NullPointerException("Cannot pass in null DAO");
         }
 
-        return new ListGamesResult(gameDAO.listGames());
+        return new ListGamesResult(sqlGame.listGames());
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) {
-        if (sqlUser == null || sqlAuth == null || gameDAO == null) {
+        if (sqlUser == null || sqlAuth == null || sqlGame == null) {
             throw new NullPointerException("Cannot pass in null DAO");
         }
 
-        return new CreateGameResult(gameDAO.createGame(createGameRequest.gameName()));
+        return new CreateGameResult(sqlGame.createGame(createGameRequest.gameName()));
     }
 
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String username) {
-        gameDAO.joinGame(joinGameRequest.playerColor(), joinGameRequest.gameID(), username);
+        sqlGame.joinGame(joinGameRequest.playerColor(), joinGameRequest.gameID(), username);
         return new JoinGameResult();
     }
 }

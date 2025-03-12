@@ -10,22 +10,18 @@ import model.GameDataRecord;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class SQLGameDataAccess implements GameDAOInterface{
-
-    private int nextGame = 0;
-
 
     public SQLGameDataAccess() throws ResponseException, DataAccessException {
         String[] createStatements = {
                 """
             CREATE TABLE IF NOT EXISTS gamedata (
-              `gameID` int NOT NULL,
+              `gameID` int NOT NULL AUTO_INCREMENT,
               `white_user` varchar(256) NOT NULL,
               `black_user` varchar(256) NOT NULL,
               `game_name` varchar(256) NOT NULL,
-              `chess_game` varchar(256) NOT NULL,
+              `chess_game` LONGTEXT NOT NULL,
               PRIMARY KEY (`gameID`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
@@ -41,9 +37,9 @@ public class SQLGameDataAccess implements GameDAOInterface{
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "SELECT gameID, white_user, black_user, game_name FROM gamedata";
             try (var ps = conn.prepareStatement(sql)) {
-                try (var rs = ps.executeQuery(sql)) {
+                try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        games.add(new CondensedGameData(Integer.parseInt(rs.getString("gameID")),
+                        games.add(new CondensedGameData(rs.getInt("gameID"),
                                 rs.getString("white_user"), rs.getString("black_user"),
                                 rs.getString("game_name")));
                     }
@@ -59,24 +55,27 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
     @Override
     public int createGame(String gameName) {
-        String formattedGameID = String.format("%04d", nextGame);
         try (var conn = DatabaseManager.getConnection()) {
-            String sql = "INSERT INTO gamedata (gameID, white_user, black_user, game_name, chess_game)";
-            try (var ps = conn.prepareStatement(sql)) {
-                ps.setString(1, formattedGameID);
-                ps.setString(2, null);
-                ps.setString(3, null);
-                ps.setString(4, gameName);
-                ps.setString(5, new Gson().toJson(new ChessGame()));
+            String sql = "INSERT INTO gamedata (white_user, black_user, game_name, chess_game) VALUES (?,?,?,?)";
+            try (var ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, "");
+                ps.setString(2, "");
+                ps.setString(3, gameName);
+                ps.setString(4, new Gson().toJson(new ChessGame()));
                 ps.executeUpdate();
-                nextGame++;
+
+                try (var rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
             }
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        return Integer.parseInt(formattedGameID);
+        return -1;
     }
 
     @Override
@@ -84,9 +83,10 @@ public class SQLGameDataAccess implements GameDAOInterface{
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "SELECT gameID, white_user, black_user, game_name, chess_game FROM gamedata WHERE gameID=?";
             try (var ps = conn.prepareStatement(sql)) {
-                try (var rs = ps.executeQuery(sql)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return new GameDataRecord(Integer.parseInt(rs.getString("gameID")),
+                        return new GameDataRecord(rs.getInt("gameID"),
                                 rs.getString("white_user"), rs.getString("black_user"),
                                 rs.getString("game_name"),
                                 new Gson().fromJson(rs.getString("chess_game"), ChessGame.class));
@@ -102,38 +102,75 @@ public class SQLGameDataAccess implements GameDAOInterface{
     }
 
     @Override
-    public void updateGame(Integer gameID, String username, ChessGame.TeamColor playerColour) {
+    public void updateGame(Integer id, String username, ChessGame.TeamColor playerColour) {
         try (var conn = DatabaseManager.getConnection()) {
+            String sql;
 
+            if (playerColour == ChessGame.TeamColor.WHITE) {
+                sql = "UPDATE gamedata SET white_user =? WHERE gameID=?";
+            } else if (playerColour == ChessGame.TeamColor.BLACK) {
+                sql = "UPDATE gamedata SET black_user =? WHERE gameID=?";
+            } else {
+                throw new ResponseException(400, "Error: bad request");
+            }
+
+            try (var ps = conn.prepareStatement(sql)) {
+                ps.setString(1, username);
+                ps.setInt(2, id);
+
+                ps.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
-    public void joinGame(ChessGame.TeamColor playerColour, Integer gameID, String username) {
+    public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
         try (var conn = DatabaseManager.getConnection()) {
+            String sql = "SELECT white_user, black_user FROM gamedata WHERE gameID=?";
+            try (var ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()){
+                        String white = rs.getString("white_user");
+                        String black = rs.getString("black_user");
 
+
+                        if (playerColor == ChessGame.TeamColor.BLACK && !black.isEmpty()) {
+                            throw new ResponseException(403, "Error: already taken");
+                        } else if (playerColor == ChessGame.TeamColor.WHITE && !white.isEmpty()) {
+                            throw new ResponseException(403, "Error: already taken");
+                        }
+
+                        if (playerColor == ChessGame.TeamColor.BLACK || playerColor == ChessGame.TeamColor.WHITE) {
+                            updateGame(gameID, username, playerColor);
+                        } else {
+                            throw new ResponseException(400, "Error: bad request");
+                        }
+                    }
+                }
+            }
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
     public void clear() {
         try (var conn = DatabaseManager.getConnection()) {
-
+            String sql = "DELETE FROM gamedata";
+            try (var ps = conn.prepareStatement(sql)) {
+                ps.executeUpdate();
+            }
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

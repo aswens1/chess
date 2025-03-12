@@ -63,8 +63,11 @@ public class SQLUserDataAccess implements  UserDAOInterface {
         try (var conn = DatabaseManager.getConnection()) {
             String doesUserExist = "SELECT COUNT(*) FROM userdata WHERE username=?";
             try (var checkPs = conn.prepareStatement(doesUserExist)) {
+                checkPs.setString(1, username);
                 try (var rs = checkPs.executeQuery()) {
-                    return rs.next();
+                    if (rs.next()) {
+                        return rs.getInt(1) > 0;
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -72,6 +75,7 @@ public class SQLUserDataAccess implements  UserDAOInterface {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+        return false;
     }
 
     @Override

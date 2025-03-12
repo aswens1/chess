@@ -22,8 +22,8 @@ public class Server {
 
 
         userService = new UserService(sqlUserDataAccess, sqlAuthDataAccess);
-        gameService = new GameService(sqlUserDataAccess, sqlAuthDataAccess, gameDAO);
-        clearService = new ClearService(sqlUserDataAccess, sqlAuthDataAccess, gameDAO);
+        gameService = new GameService(sqlUserDataAccess, sqlAuthDataAccess, sqlGameDataAccess);
+        clearService = new ClearService(sqlUserDataAccess, sqlAuthDataAccess, sqlGameDataAccess);
 
 
         AuthTokenValidationHandler validAuthToken = new AuthTokenValidationHandler(sqlAuthDataAccess);
