@@ -23,13 +23,9 @@ public class DAOTests {
 
     @BeforeAll
     public static void setUp() {
-        try {
-            testSQLGame = new SQLGameDataAccess();
-            testSQLUser = new SQLUserDataAccess();
-            testSQLAuth = new SQLAuthDataAccess();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        testSQLGame = new SQLGameDataAccess();
+        testSQLUser = new SQLUserDataAccess();
+        testSQLAuth = new SQLAuthDataAccess();
 
         clearService = new ClearService(testSQLUser, testSQLAuth, testSQLGame);
         clearService.clearAllDatabases();
