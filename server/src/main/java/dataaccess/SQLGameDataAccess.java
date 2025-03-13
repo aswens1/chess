@@ -40,15 +40,16 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "SELECT gameID, white_user, black_user, game_name FROM gamedata";
-            try (var ps = conn.prepareStatement(sql)) {
-                try (var rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        games.add(new CondensedGameData(rs.getInt("gameID"),
-                                rs.getString("white_user"), rs.getString("black_user"),
-                                rs.getString("game_name")));
-                    }
-                }
+
+            var ps = conn.prepareStatement(sql);
+            var rs = ps.executeQuery();
+
+            while (rs.next()) {
+                games.add(new CondensedGameData(rs.getInt("gameID"),
+                        rs.getString("white_user"), rs.getString("black_user"),
+                        rs.getString("game_name")));
             }
+
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
@@ -65,19 +66,19 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "INSERT INTO gamedata (white_user, black_user, game_name, chess_game) VALUES (?,?,?,?)";
-            try (var ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                ps.setString(1, null);
-                ps.setString(2, null);
-                ps.setString(3, gameName);
-                ps.setString(4, new Gson().toJson(new ChessGame()));
-                ps.executeUpdate();
 
-                try (var rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        return rs.getInt(1);
-                    }
-                }
+            var ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, null);
+            ps.setString(2, null);
+            ps.setString(3, gameName);
+            ps.setString(4, new Gson().toJson(new ChessGame()));
+            ps.executeUpdate();
+
+            var rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
             }
+
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
@@ -94,17 +95,19 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "SELECT gameID, white_user, black_user, game_name, chess_game FROM gamedata WHERE gameID=?";
-            try (var ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, gameID);
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return new GameDataRecord(rs.getInt("gameID"),
-                                rs.getString("white_user"), rs.getString("black_user"),
-                                rs.getString("game_name"),
-                                new Gson().fromJson(rs.getString("chess_game"), ChessGame.class));
-                    }
-                }
+
+            var ps = conn.prepareStatement(sql);
+            ps.setInt(1, gameID);
+
+            var rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new GameDataRecord(rs.getInt("gameID"),
+                        rs.getString("white_user"), rs.getString("black_user"),
+                        rs.getString("game_name"),
+                        new Gson().fromJson(rs.getString("chess_game"), ChessGame.class));
             }
+
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
@@ -130,12 +133,12 @@ public class SQLGameDataAccess implements GameDAOInterface{
                 throw new ResponseException(400, "Error: bad request");
             }
 
-            try (var ps = conn.prepareStatement(sql)) {
-                ps.setString(1, username);
-                ps.setInt(2, id);
+            var ps = conn.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setInt(2, id);
 
-                ps.executeUpdate();
-            }
+            ps.executeUpdate();
+
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
@@ -151,28 +154,31 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "SELECT white_user, black_user FROM gamedata WHERE gameID=?";
-            try (var ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, gameID);
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()){
-                        String white = rs.getString("white_user");
-                        String black = rs.getString("black_user");
+
+            var ps = conn.prepareStatement(sql);
+            ps.setInt(1, gameID);
+
+            var rs = ps.executeQuery();
+
+            if (rs.next()){
+                String white = rs.getString("white_user");
+                String black = rs.getString("black_user");
 
 
-                        if (playerColor == ChessGame.TeamColor.BLACK && black != null) {
-                            throw new ResponseException(403, "Error: already taken");
-                        } else if (playerColor == ChessGame.TeamColor.WHITE && white != null) {
-                            throw new ResponseException(403, "Error: already taken");
-                        }
+                if (playerColor == ChessGame.TeamColor.BLACK && black != null) {
+                    throw new ResponseException(403, "Error: already taken");
+                } else if (playerColor == ChessGame.TeamColor.WHITE && white != null) {
+                    throw new ResponseException(403, "Error: already taken");
+                }
 
-                        if (playerColor == ChessGame.TeamColor.BLACK || playerColor == ChessGame.TeamColor.WHITE) {
-                            updateGame(gameID, username, playerColor);
-                        } else {
-                            throw new ResponseException(400, "Error: bad request");
-                        }
-                    }
+                if (playerColor == ChessGame.TeamColor.BLACK || playerColor == ChessGame.TeamColor.WHITE) {
+                    updateGame(gameID, username, playerColor);
+                } else {
+                    throw new ResponseException(400, "Error: bad request");
                 }
             }
+
+
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
         } catch (DataAccessException e) {
