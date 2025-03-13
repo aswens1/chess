@@ -84,6 +84,10 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
     @Override
     public GameDataRecord getGame(Integer gameID) {
+        if (gameID == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "SELECT gameID, white_user, black_user, game_name, chess_game FROM gamedata WHERE gameID=?";
             try (var ps = conn.prepareStatement(sql)) {
@@ -107,6 +111,10 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
     @Override
     public void updateGame(Integer id, String username, ChessGame.TeamColor playerColour) {
+        if (username == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
         try (var conn = DatabaseManager.getConnection()) {
             String sql;
 

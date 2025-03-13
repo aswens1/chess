@@ -1,9 +1,13 @@
 package dataaccess;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import org.junit.jupiter.api.*;
 import service.ClearService;
+
+import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -185,41 +189,89 @@ public class DAOTests {
         assertEquals("Error: bad request", ex.getMessage());
     }
 
-    @Order(15)
-    @Disabled
+    @Order(17)
+    @Test
     void positiveListGames() {
+        int gameID = testSQLGame.createGame("testingCreateGame");
 
+        List<CondensedGameData> games = testSQLGame.listGames();
+
+        boolean gameInList = false;
+        for (CondensedGameData g : games) {
+            if (g.gameID() == gameID) {
+                gameInList = true;
+            }
+        }
+
+        assertTrue(gameInList);
     }
 
-    @Order(16)
-    @Disabled
-    void negativeListGames() {
-
+    @Order(18)
+    @Test
+    void negativeListGames() throws DataAccessException, SQLException {
+        List<CondensedGameData> games = testSQLGame.listGames();
+        assertTrue(games.isEmpty());
     }
 
-    @Order(14)
-    @Disabled
+    @Order(19)
+    @Test
+    void positiveGetGame() {
+        int gameID = testSQLGame.createGame("testingCreateGame");
+        String gamename = testSQLGame.getGame(gameID).gameName();
+
+        assertEquals("testingCreateGame", gamename);
+    }
+
+    @Order(20)
+    @Test
+    void negativeGetGame() {
+        ResponseException ex = assertThrows(ResponseException.class, () -> testSQLGame.getGame(null));
+        assertEquals("Error: bad request", ex.getMessage());
+    }
+
+    @Order(21)
+    @Test
     void positiveUpdateGame() {
+        int gameID = testSQLGame.createGame("testingCreateGame");
 
+        testSQLGame.updateGame(gameID, "testUserName", ChessGame.TeamColor.WHITE);
+
+        String white = testSQLGame.getGame(gameID).whiteUsername();
+        assertEquals("testUserName", white);
     }
-    @Order(14)
-    @Disabled
+
+    @Order(22)
+    @Test
     void negativeUpdateGame() {
+        int gameID = testSQLGame.createGame("testingCreateGame");
 
+        ResponseException ex = assertThrows(ResponseException.class, () -> testSQLGame.updateGame(gameID, null, ChessGame.TeamColor.BLACK));
+        assertEquals("Error: bad request", ex.getMessage());
     }
-    @Order(14)
-    @Disabled
+
+
+    @Order(23)
+    @Test
     void positiveJoinGame() {
+        int gameID = testSQLGame.createGame("testingCreateGame");
+        testSQLGame.joinGame(ChessGame.TeamColor.WHITE, gameID, "testUserName");
 
+        String white = testSQLGame.getGame(gameID).whiteUsername();
+        assertEquals("testUserName", white);
     }
-    @Order(14)
-    @Disabled
+
+    @Order(24)
+    @Test
     void negativeJoinGame() {
-
+        ResponseException ex = assertThrows(ResponseException.class, () -> testSQLGame.joinGame(ChessGame.TeamColor.BLACK, null, "testUserName"));
+        assertEquals("Error: invalid gameID", ex.getMessage());
     }
-    @Order(14)
-    @Disabled
-    void clearGameData() {
 
+    @Order(25)
+    @Test
+    void clearGameData() {
+        int gameID = testSQLGame.createGame("testingCreateGame");
+        testSQLGame.clear();
+        assertNull(testSQLGame.getGame(gameID));
     }
 }
