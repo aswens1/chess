@@ -55,6 +55,10 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
     @Override
     public int createGame(String gameName) {
+        if (gameName == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "INSERT INTO gamedata (white_user, black_user, game_name, chess_game) VALUES (?,?,?,?)";
             try (var ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {

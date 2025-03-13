@@ -80,12 +80,8 @@ public class ServiceTests {
     @Order(3)
     @Test
     void registerUserNullUsernameTestNegative() throws DataAccessException {
-        UserDAO testUserDao = new UserDAO();
-
         SQLAuthDataAccess testSQLAuth = new SQLAuthDataAccess();
         SQLUserDataAccess testSQLUser = new SQLUserDataAccess();
-
-
 
         RegisterRequest registerRequest = new RegisterRequest(null, "testUserPassword", "testUserEmail");
 

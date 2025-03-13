@@ -22,6 +22,10 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
 
     @Override
     public AuthDataRecord createAuthData(UserRecord user) throws ResponseException {
+        if (user.username() == null || user.password() == null || user.email() == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
         String authToken = java.util.UUID.randomUUID().toString();
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "INSERT INTO authdata (authtoken, username) VALUES (?, ?)";
@@ -41,6 +45,10 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
 
     @Override
     public AuthDataRecord getAuthData(String authToken) throws ResponseException {
+        if (authToken == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
         try (var conn = DatabaseManager.getConnection()) {
             String sql = "SELECT authtoken, username FROM authdata WHERE authtoken=?";
             try (var ps = conn.prepareStatement(sql)) {
@@ -61,6 +69,10 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
 
     @Override
     public boolean deleteAuthData(String authToken) throws ResponseException {
+        if (authToken == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
         try (var conn = DatabaseManager.getConnection()) {
 
             String checkIfThere = "SELECT COUNT(*) FROM authdata WHERE authtoken=?";
