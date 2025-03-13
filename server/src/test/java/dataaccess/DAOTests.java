@@ -124,9 +124,9 @@ public class DAOTests {
         testAuth = testSQLAuth.createAuthData(testUser);
 
         String authToken = testAuth.authToken();
-        assertNotNull(authToken);
+        AuthDataRecord newAuth = new AuthDataRecord(authToken, "testUserName");
 
-        assertEquals(testUser.username(), testSQLAuth.getAuthData(testAuth.authToken()).username());
+        assertEquals(newAuth, testSQLAuth.getAuthData(authToken));
     }
 
     @Order(11)
