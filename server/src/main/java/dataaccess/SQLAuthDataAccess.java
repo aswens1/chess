@@ -8,7 +8,7 @@ import java.sql.*;
 
 public class SQLAuthDataAccess implements AuthDataDAOInterface {
 
-    public SQLAuthDataAccess() throws ResponseException, DataAccessException {
+    public SQLAuthDataAccess() throws ResponseException {
         String[] createStatements = { """
             CREATE TABLE IF NOT EXISTS authdata (
               `authtoken` varchar(256) NOT NULL,
@@ -17,7 +17,11 @@ public class SQLAuthDataAccess implements AuthDataDAOInterface {
               INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """ };
-        ConfigureDatabase.configureDatabase(createStatements);
+        try {
+            ConfigureDatabase.configureDatabase(createStatements);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

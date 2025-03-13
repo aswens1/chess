@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class SQLUserDataAccess implements  UserDAOInterface {
 
-    public SQLUserDataAccess() throws ResponseException, DataAccessException {
+    public SQLUserDataAccess() throws ResponseException {
         String[] createStatements = {
                 """
             CREATE TABLE IF NOT EXISTS userdata (
@@ -19,7 +19,11 @@ public class SQLUserDataAccess implements  UserDAOInterface {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
         };
-        ConfigureDatabase.configureDatabase(createStatements);
+        try {
+            ConfigureDatabase.configureDatabase(createStatements);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

@@ -12,6 +12,8 @@ public class ConfigureDatabase {
                     preparedStatement.executeUpdate();
                 }
             }
+        } catch (DataAccessException x) {
+            throw new DataAccessException(x.getMessage());
         } catch (Exception ex) {
             throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
         }

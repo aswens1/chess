@@ -13,9 +13,7 @@ public class Server {
     static ClearService clearService;
     private final ClearHandler clearHandler;
 
-    public Server() throws DataAccessException {
-        GameDAO gameDAO = new GameDAO();
-
+    public Server() {
         SQLAuthDataAccess sqlAuthDataAccess = new SQLAuthDataAccess();
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
         SQLGameDataAccess sqlGameDataAccess = new SQLGameDataAccess();
