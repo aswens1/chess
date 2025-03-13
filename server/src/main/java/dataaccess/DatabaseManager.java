@@ -46,7 +46,6 @@ public class DatabaseManager {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
-        throw new DataAccessException("error");
     }
 
     /**
