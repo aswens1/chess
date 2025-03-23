@@ -5,11 +5,7 @@ import ui.PreLoginUI;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 import java.util.Scanner;
-import static ui.EscapeSequences.*;
-
-import ui.GameBoardDrawing.*;
 
 public class Main {
 
@@ -23,8 +19,11 @@ public class Main {
 
         out.println(" ♕ Welcome to 240 Chess! Enter a command to get started. ♕ ");
 
-        GameBoardDrawing.drawBoard(ChessGame.TeamColor.WHITE);
-        GameBoardDrawing.drawBoard(ChessGame.TeamColor.BLACK);
+        ChessBoard startingBoard = new ChessBoard();
+        startingBoard.resetBoard();
+
+        GameBoardDrawing.DrawBoard(ChessGame.TeamColor.WHITE, startingBoard);
+        GameBoardDrawing.DrawBoard(ChessGame.TeamColor.BLACK, startingBoard);
 
 //        while (true) {
 //            String command = scanner.nextLine().trim();
