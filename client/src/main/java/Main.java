@@ -24,6 +24,7 @@ public class Main {
         out.println(" ♕ Welcome to 240 Chess! Enter a command to get started. ♕ ");
 
         GameBoardDrawing.drawBoard(ChessGame.TeamColor.WHITE);
+        GameBoardDrawing.drawBoard(ChessGame.TeamColor.BLACK);
 
 //        while (true) {
 //            String command = scanner.nextLine().trim();

@@ -3,9 +3,7 @@ package ui;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-import chess.ChessBoard;
 import chess.ChessGame;
-import model.GameDataRecord;
 
 import static ui.EscapeSequences.*;
 
@@ -23,25 +21,14 @@ public class GameBoardDrawing {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
 
-        printHeaders(out, pov);
-
-        for (int rows = BOARD_SIZE_IN_SQUARES; rows >= 1; rows--) {
-            out.print(border);
-
-            for (int columns = 1; columns <= BOARD_SIZE_IN_SQUARES; columns++) { // A to H
-                boolean isDark = (rows + columns) % 2 == 0;
-                out.print(isDark ? darkSquare : lightSquare);
-            }
-            out.print(border);
-            out.println();
-        }
-
-        printHeaders(out, pov);
+        printLetters(out, pov);
+        printSquares(out, pov, BOARD_SIZE_IN_SQUARES);
+        printLetters(out, pov);
 
         out.println();
     }
 
-    public static void printHeaders(PrintStream out, ChessGame.TeamColor pov) {
+    public static void printLetters(PrintStream out, ChessGame.TeamColor pov) {
         String[] headers = {"   ", " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", "   "};
 
         out.print(SET_BG_COLOR_LIGHT_GREY);
@@ -60,5 +47,39 @@ public class GameBoardDrawing {
         out.println();
     }
 
+    public static void printNumbers(PrintStream out, int rowNum) {
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print(" " + rowNum + " ");
+        out.print(RESET_BG_COLOR);
+    }
 
+    public static void printSquares(PrintStream out, ChessGame.TeamColor pov, int row) {
+//        for (int column = 1; column <= BOARD_SIZE_IN_SQUARES; column++) {
+
+        if (pov == ChessGame.TeamColor.BLACK) {
+            for (int i = 1; i <= 8; i++) {
+                individualSquare(out, row, i);
+                row--;
+            }
+        } else {
+            for (int i = 8; i >= 1; i--) {
+                individualSquare(out, row, i);
+                row--;
+            }
+        }
+    }
+
+    public static void printRowBackground(PrintStream out, int row) {
+        for (int column = 1; column <= BOARD_SIZE_IN_SQUARES; column++) {
+            boolean isDark = (row + column) % 2 == 0;
+            out.print(isDark ? darkSquare : lightSquare);
+        }
+    }
+
+    public static void individualSquare(PrintStream out, int row, int i) {
+            printNumbers(out, i);
+            printRowBackground(out, row);
+            printNumbers(out, i);
+            out.println();
+    }
 }
