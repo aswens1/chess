@@ -11,17 +11,40 @@ public class PreLoginUI {
     }
 
     public void preLoginCommandHandler(PrintStream out, String command) {
-        String lowerCase = command.toLowerCase();
-        if (lowerCase.contains("register")) {
-            out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Register a new user: " + EscapeSequences.RESET_TEXT_COLOR);
-            // somehow connect to the server and register a user
-        } else if (lowerCase.contains("login")) {
-            out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Login existing user: " + EscapeSequences.RESET_TEXT_COLOR);
-            // somehow connect to the server and login the user
-        } else if (lowerCase.contains("quit")) {
+        String[] partsOfCommand = command.split(" ");
+
+        if (partsOfCommand.length == 0) {
+            out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Invalid command. Type help for a list of commands." + EscapeSequences.RESET_TEXT_COLOR);
+        }
+
+        String actualCommand = partsOfCommand[0].toLowerCase();
+
+        if (actualCommand.equals("register") && partsOfCommand.length == 4) {
+
+            String username = partsOfCommand[1];
+            String password = partsOfCommand[2];
+            String email = partsOfCommand[3];
+
+            out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Registering new user: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + username + EscapeSequences.RESET_TEXT_COLOR);
+
+
+
+
+
+        } else if (actualCommand.equals("login") && partsOfCommand.length == 3) {
+
+            String username = partsOfCommand[1];
+            String password = partsOfCommand[2];
+
+            out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Logging in: " + EscapeSequences.SET_TEXT_COLOR_YELLOW + username + EscapeSequences.RESET_TEXT_COLOR);
+
+
+
+
+        } else if (actualCommand.equals("quit") && partsOfCommand.length == 1) {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Exiting program." + EscapeSequences.RESET_TEXT_COLOR);
             System.exit(0);
-        } else if (lowerCase.contains("help")) {
+        } else if (actualCommand.equals("help") && partsOfCommand.length == 1) {
             displayHelp(out);
         } else {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Invalid command. Type help for a list of commands." + EscapeSequences.RESET_TEXT_COLOR);
