@@ -16,27 +16,49 @@ public class GameBoardDrawing {
 
     private static final String darkSquare = SET_BG_COLOR_BLUE + "   " + RESET_BG_COLOR;
     private static final String lightSquare = SET_BG_COLOR_WHITE + "   " + RESET_BG_COLOR;
+    private static final String border = SET_BG_COLOR_LIGHT_GREY + "   " + RESET_BG_COLOR;
 
 
     public static void drawBoard(ChessGame.TeamColor pov) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
 
-        if (pov == ChessGame.TeamColor.WHITE) {
-            whitePerspective(out);
-        }
+        printHeaders(out, pov);
 
-    }
+        for (int rows = BOARD_SIZE_IN_SQUARES; rows >= 1; rows--) {
+            out.print(border);
 
-    public static void whitePerspective(PrintStream out) {
-        for (int rows = 1; rows <= BOARD_SIZE_IN_SQUARES; rows++) {
             for (int columns = 1; columns <= BOARD_SIZE_IN_SQUARES; columns++) { // A to H
                 boolean isDark = (rows + columns) % 2 == 0;
                 out.print(isDark ? darkSquare : lightSquare);
             }
-            out.println(RESET_BG_COLOR); // Move to next row
+            out.print(border);
+            out.println();
         }
 
+        printHeaders(out, pov);
+
+        out.println();
     }
+
+    public static void printHeaders(PrintStream out, ChessGame.TeamColor pov) {
+        String[] headers = {"   ", " a ", " b ", " c ", " d ", " e ", " f ", " g ", " h ", "   "};
+
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+
+        if (pov == ChessGame.TeamColor.WHITE) {
+            for (int i = 0; i <= 9; i++) {
+                out.print(headers[i]);
+            }
+        } else {
+            for (int i = headers.length - 1; i >= 0; i--){
+                out.print(headers[i]);
+            }
+        }
+
+        out.print(RESET_BG_COLOR);
+        out.println();
+    }
+
 
 }
