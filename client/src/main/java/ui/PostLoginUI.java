@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 
 import java.io.PrintStream;
@@ -23,6 +24,9 @@ public class PostLoginUI {
 
     public void postLoginCommandHandler(PrintStream out, String command) {
         String[] partsOfCommand = command.split(" ");
+
+        ChessBoard startingBoard = new ChessBoard();
+        startingBoard.resetBoard();
 
         if (partsOfCommand.length == 0) {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Invalid command. Type help for a list of commands." + EscapeSequences.RESET_TEXT_COLOR);
@@ -48,8 +52,9 @@ public class PostLoginUI {
             String playerColour = partsOfCommand[2].toLowerCase();
 
             if (playerColour.equals("white")) {
-
-
+                GameBoardDrawing.DrawBoard(ChessGame.TeamColor.WHITE, startingBoard);
+            } else {
+                GameBoardDrawing.DrawBoard(ChessGame.TeamColor.BLACK, startingBoard);
             }
 
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Joining " +
@@ -64,19 +69,13 @@ public class PostLoginUI {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Joining " + id +
                     " as observer." + EscapeSequences.RESET_TEXT_COLOR);
 
-
-
+            GameBoardDrawing.DrawBoard(ChessGame.TeamColor.WHITE, startingBoard);
 
         } else if (actualCommand.equals("quit") && partsOfCommand.length == 1) {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Exiting program." + EscapeSequences.RESET_TEXT_COLOR);
             System.exit(0);
-
-
-
-
         } else if (actualCommand.equals("help") && partsOfCommand.length == 1) {
             displayHelp(out);
-
         } else {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Invalid command. Type " +
                     EscapeSequences.SET_TEXT_COLOR_YELLOW + "help" + " for a list of commands." +
