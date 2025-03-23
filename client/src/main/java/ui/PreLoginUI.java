@@ -1,5 +1,4 @@
 package ui;
-
 import java.io.PrintStream;
 
 public class PreLoginUI {
@@ -12,24 +11,20 @@ public class PreLoginUI {
     }
 
     public void preLoginCommandHandler(PrintStream out, String command) {
-
-        if (command.equalsIgnoreCase("register")) {
+        String lowerCase = command.toLowerCase();
+        if (lowerCase.contains("register")) {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Register a new user: " + EscapeSequences.RESET_TEXT_COLOR);
-
-        } else if (command.equalsIgnoreCase("login")) {
+            // somehow connect to the server and register a user
+        } else if (lowerCase.contains("login")) {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Login existing user: " + EscapeSequences.RESET_TEXT_COLOR);
-
-
-        } else if (command.equalsIgnoreCase("quit")) {
+            // somehow connect to the server and login the user
+        } else if (lowerCase.contains("quit")) {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Exiting program." + EscapeSequences.RESET_TEXT_COLOR);
             System.exit(0);
-
-        } else if (command.equalsIgnoreCase("help")) {
-
+        } else if (lowerCase.contains("help")) {
+            displayHelp(out);
         } else {
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Invalid command. Type help for a list of commands." + EscapeSequences.RESET_TEXT_COLOR);
         }
-
-
     }
 }

@@ -2,7 +2,6 @@ package service;
 
 import dataaccess.SQLAuthDataAccess;
 import dataaccess.SQLUserDataAccess;
-import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthDataRecord;
 import model.UserRecord;
@@ -72,5 +71,4 @@ public class UserService {
 
         return new LogoutResult();
     }
-
 }
