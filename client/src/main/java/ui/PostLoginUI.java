@@ -1,5 +1,7 @@
 package ui;
 
+import chess.ChessGame;
+
 import java.io.PrintStream;
 
 public class PostLoginUI {
@@ -43,7 +45,12 @@ public class PostLoginUI {
 
         } else if (actualCommand.equals("join") && partsOfCommand.length == 3){
             String id = partsOfCommand[1];
-            String playerColour = partsOfCommand[2];
+            String playerColour = partsOfCommand[2].toLowerCase();
+
+            if (playerColour.equals("white")) {
+
+
+            }
 
             out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + "Joining " +
                     EscapeSequences.SET_TEXT_COLOR_YELLOW + id + EscapeSequences.RESET_TEXT_COLOR + " as " +

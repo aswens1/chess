@@ -1,4 +1,5 @@
 import chess.*;
+import ui.GameBoardDrawing;
 import ui.PostLoginUI;
 import ui.PreLoginUI;
 
@@ -7,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
+
+import ui.GameBoardDrawing.*;
 
 public class Main {
 
@@ -20,13 +23,15 @@ public class Main {
 
         out.println(" ♕ Welcome to 240 Chess! Enter a command to get started. ♕ ");
 
-        while (true) {
-            String command = scanner.nextLine().trim();
-            if (session.loggedIn()) {
-                post.postLoginCommandHandler(out, command);
-            } else {
-                pre.preLoginCommandHandler(out, command);
-            }
-        }
+        GameBoardDrawing.drawBoard(ChessGame.TeamColor.WHITE);
+
+//        while (true) {
+//            String command = scanner.nextLine().trim();
+//            if (session.loggedIn()) {
+//                post.postLoginCommandHandler(out, command);
+//            } else {
+//                pre.preLoginCommandHandler(out, command);
+//            }
+//        }
     }
 }
