@@ -6,8 +6,6 @@ import java.util.Scanner;
 
 public class PreRepl {
 
-    private State state = State.LOGGED_OUT;
-
     private final ChessClient client;
 
     public PreRepl(String serverURL) {
@@ -27,11 +25,12 @@ public class PreRepl {
 
             try {
                 command = client.eval(line);
+                System.out.print(command);
+                System.out.println();
             } catch (Throwable e) {
                 var message = e.toString();
                 System.out.print(message);
             }
         }
-
     }
 }
