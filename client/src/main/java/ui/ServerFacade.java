@@ -95,6 +95,12 @@ public class ServerFacade {
         GameBoardDrawing.DrawBoard(ChessGame.TeamColor.WHITE, game.getBoard());
     }
 
+    public void clear() {
+        var path = "/db";
+        ClearRequest clearRequest = new ClearRequest();
+        this.makeRequest("DELETE", path, clearRequest, null, ClearResult.class);
+    }
+
     private <T> T makeRequest(String method, String path, Object request, String requestHeader, Class<T> responseClass) throws ResponseException {
         try {
             URL url = (new URI(serverURL + path)).toURL();

@@ -32,6 +32,7 @@ public class PreClient implements ChessClient {
                 case "login" -> login(params);
                 case "quit" -> quit();
                 case "help" -> displayHelp();
+                case "clear" -> clearDB(params);
                 default -> "Invalid command. Use command " + SET_TEXT_COLOR_BLUE + "'help'" + RESET_TEXT_COLOR + " for a list of possible commands.";
             };
 
@@ -78,11 +79,20 @@ public class PreClient implements ChessClient {
 
         LoginResult login = sf.loginUser(new LoginRequest(username, password));
         state.stateLogIn();
-        return "Logging " + SET_TEXT_COLOR_BLUE + login.username() + RESET_TEXT_COLOR + " in!";
+        return SET_TEXT_COLOR_BLUE + login.username() + RESET_TEXT_COLOR + " is now logged in!";
     }
 
     public String quit() {
         return "";
+    }
+
+    public String clearDB(String... params) {
+        if (params.length != 1 || !params[0].equals("leesie")) {
+            return "You are not authorized for this action.";
+        }
+
+        sf.clear();
+        return "All databases cleared.";
     }
 
     public String displayHelp(){

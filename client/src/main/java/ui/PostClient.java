@@ -37,6 +37,7 @@ public class PostClient implements ChessClient {
                 case "observe" -> observe(params);
                 case "quit" -> quit();
                 case "help" -> displayHelp();
+                case "clear" -> clearDB(params);
                 default -> "Invalid command. Use command " + SET_TEXT_COLOR_BLUE + "'help'" + RESET_TEXT_COLOR + " for a list of possible commands.";
             };
 
@@ -181,6 +182,16 @@ public class PostClient implements ChessClient {
         System.out.println(logout());
         return "";
     }
+
+    public String clearDB(String... params) {
+        if (params.length != 2 || !params[1].equals("leesie")) {
+            return "You are not authorized for this action.";
+        }
+
+        sf.clear();
+        return "All databases cleared.";
+    }
+
 
     public String displayHelp(){
         String[] helpCommands = {
