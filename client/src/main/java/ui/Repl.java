@@ -12,11 +12,13 @@ public class Repl {
     private final ChessClient preClient;
     private final ChessClient postClient;
     private final State state = new State();
+    private final ServerFacade sf;
 
 
     public Repl(String serverURL) {
-        preClient = new PreClient(serverURL, this, state);
-        postClient = new PostClient(serverURL, this, state);
+        sf = new ServerFacade(serverURL);
+        preClient = new PreClient(sf, state);
+        postClient = new PostClient(sf, state);
     }
 
 

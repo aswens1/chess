@@ -12,16 +12,12 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class PreClient implements ChessClient {
 
-    private final String serverURL;
-    private final Repl repl;
     private State state;
     private final ServerFacade sf;
 
 
-    public PreClient(String serverURL, Repl repl, State state) {
-        sf = new ServerFacade(serverURL);
-        this.serverURL = serverURL;
-        this.repl = repl;
+    public PreClient(ServerFacade sf, State state) {
+        this.sf = sf;
         this.state = state;
     }
 

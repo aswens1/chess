@@ -9,15 +9,11 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class PostClient implements ChessClient {
 
-    private final String serverURL;
-    private final Repl repl;
     private final State state;
     private final ServerFacade sf;
 
-    public PostClient(String serverURL, Repl repl, State state) {
-        sf = new ServerFacade(serverURL);
-        this.serverURL = serverURL;
-        this.repl = repl;
+    public PostClient(ServerFacade sf, State state) {
+        this.sf = sf;
         this.state = state;
     }
 

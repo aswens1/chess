@@ -39,14 +39,16 @@ public class ServerFacade {
     public RegisterResult registerUser(RegisterRequest registerRequest) {
         var path = "/user";
         RegisterResult registerResult = this.makeRequest("POST", path, registerRequest, null, RegisterResult.class);
-        this.authToken = registerResult.authToken();
+        setAuth(registerResult.authToken());
+        setUsername(registerResult.username());
         return registerResult;
     }
 
     public LoginResult loginUser(LoginRequest loginRequest) {
         var path = "/session";
         LoginResult loginResult = this.makeRequest("POST", path, loginRequest, null, LoginResult.class);
-        this.authToken = loginResult.authToken();
+        setAuth(loginResult.authToken());
+        setUsername(loginResult.username());
         return loginResult;
     }
 
