@@ -3,8 +3,9 @@ package ui;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
-import model.CondensedGameData;
-import service.records.*;
+import model.*;
+import records.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

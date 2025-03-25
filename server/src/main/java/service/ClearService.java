@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.*;
-import service.records.ClearResult;
+import records.ClearResult;
 
 public class ClearService {
     final SQLAuthDataAccess sqlAuth;

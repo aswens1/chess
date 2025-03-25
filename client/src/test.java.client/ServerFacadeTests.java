@@ -2,8 +2,8 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.CondensedGameData;
 import org.junit.jupiter.api.*;
-import server.Server;
-import service.records.*;
+import records.*;
+import server.*;
 import ui.ServerFacade;
 import static org.junit.jupiter.api.Assertions.*;
 

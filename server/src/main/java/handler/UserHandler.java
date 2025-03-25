@@ -3,9 +3,8 @@ package handler;
 import com.google.gson.Gson;
 import exception.ErrorMessage;
 import exception.ResponseException;
-import model.AuthDataRecord;
+import records.*;
 import service.*;
-import service.records.*;
 import spark.*;
 
 public class UserHandler {

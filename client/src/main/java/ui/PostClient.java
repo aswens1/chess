@@ -2,8 +2,8 @@ package ui;
 
 import chess.ChessGame;
 import exception.ResponseException;
-import model.CondensedGameData;
-import service.records.*;
+import model.*;
+import records.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

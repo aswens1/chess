@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.*;
-import service.records.*;
+import records.*;
 
 public class GameService {
 

@@ -5,8 +5,8 @@ import dataaccess.SQLAuthDataAccess;
 import model.AuthDataRecord;
 import exception.ErrorMessage;
 import exception.ResponseException;
+import records.*;
 import service.*;
-import service.records.*;
 import spark.Request;
 import spark.Response;
 

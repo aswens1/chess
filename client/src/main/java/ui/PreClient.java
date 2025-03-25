@@ -1,11 +1,12 @@
 package ui;
-import service.records.LoginRequest;
-import service.records.LoginResult;
-import service.records.RegisterRequest;
-import service.records.RegisterResult;
-import java.util.Arrays;
 
 import exception.ResponseException;
+import records.LoginRequest;
+import records.LoginResult;
+import records.RegisterRequest;
+import records.RegisterResult;
+import java.util.Arrays;
+
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
