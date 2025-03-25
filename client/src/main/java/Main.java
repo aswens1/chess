@@ -1,4 +1,4 @@
-import ui.PreRepl;
+import ui.Repl;
 
 public class Main {
 
@@ -9,6 +9,6 @@ public class Main {
             serverURL = args[0];
         }
 
-        new PreRepl(serverURL).run();
+        new Repl(serverURL).run();
     }
 }

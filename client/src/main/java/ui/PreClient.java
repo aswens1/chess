@@ -13,15 +13,16 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 public class PreClient implements ChessClient {
 
     private final String serverURL;
-    private final PreRepl preRepl;
-    private State state = State.LOGGED_OUT;
+    private final Repl repl;
+    private final State state;
     private final ServerFacade sf;
 
 
-    public PreClient(String serverURL, PreRepl preRepl) {
+    public PreClient(String serverURL, Repl repl, State state) {
         sf = new ServerFacade(serverURL);
         this.serverURL = serverURL;
-        this.preRepl = preRepl;
+        this.repl = repl;
+        this.state = state;
     }
 
     @Override
@@ -57,19 +58,20 @@ public class PreClient implements ChessClient {
         }
 
         RegisterResult register = sf.registerUser(new RegisterRequest(username, password, email));
-        String authToken = register.authToken();
 
-        if (!authToken.isEmpty()) {
-            sf.setAuth(authToken);
+        try {
+            state.stateLogIn();
+            new PostRepl(serverURL, sf.returnAuth(), sf.getUsername()).run();
             // move to post login
-        } else {
-            throw new ResponseException(500, "Server did not return a valid response.");
+
+            return "Welcome " + SET_TEXT_COLOR_BLUE + register.username() + RESET_TEXT_COLOR + "!";
+        } catch (ResponseException exception){
+            throw new ResponseException(exception.statusCode(), exception.getMessage());
         }
-        return "Welcome " + SET_TEXT_COLOR_BLUE + register.username() + RESET_TEXT_COLOR + "!";
     }
 
     private String quit() {
-        return "";
+        return SET_TEXT_COLOR_BLUE + " ♕ Goodbye! Thank you for playing! ♕ " + RESET_TEXT_COLOR;
     }
 
     private String login(String... params) {
@@ -85,18 +87,13 @@ public class PreClient implements ChessClient {
         }
 
         LoginResult login = sf.loginUser(new LoginRequest(username, password));
-        String authToken = login.authToken();
-        String user = login.username();
+        state.stateLogIn();
 
-        if (!authToken.isEmpty()) {
-            sf.setAuth(authToken);
-            sf.setUsername(user);
-            // move to post login
-        } else {
-            throw new ResponseException(500, "Server did not return a valid response.");
-        }
-
+        // move to post login
         return "Logging " + SET_TEXT_COLOR_BLUE + login.username() + RESET_TEXT_COLOR + " in!";
+
+//        throw new ResponseException(500, "Server did not return a valid response.");
+//        return "Logging " + SET_TEXT_COLOR_BLUE + login.username() + RESET_TEXT_COLOR + " in!";
     }
 
     public String displayHelp(){

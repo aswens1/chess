@@ -2,7 +2,6 @@ package exception;
 
 import com.google.gson.Gson;
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,14 +23,17 @@ public class ResponseException extends RuntimeException {
         return new Gson().toJson(Map.of("message", getMessage(), "status", statusCode));
     }
 
-    public static ResponseException fromJson(InputStream inputStream) {
-        var map = new Gson().fromJson(new InputStreamReader(inputStream), HashMap.class);
+    public static ResponseException fromJson(String json) {
+        var map = new Gson().fromJson(json, HashMap.class);
 
-        var status = ((Double)map.get("status")).intValue();
+        Double status = (map.get("status") instanceof Double) ? (Double) map.get("status") :
+                        (map.get("statusCode") instanceof Double) ? (Double) map.get("statusCode") :
+                        500;
+
+//        var status = ((Double)map.get("status")).intValue();
 
         String message = map.get("message").toString();
 
-        return new ResponseException(status, message);
+        return new ResponseException(status.intValue(), message);
     }
-
 }

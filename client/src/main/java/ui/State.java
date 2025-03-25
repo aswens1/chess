@@ -1,6 +1,22 @@
 package ui;
 
-public enum State {
-    LOGGED_IN,
-    LOGGED_OUT
+public class State {
+
+    private boolean loggedIn;
+
+    public State() {
+        this.loggedIn = false;
+    }
+
+    public void stateLogIn() {
+        this.loggedIn = true;
+    }
+
+    public void stateLogOut() {
+        this.loggedIn = false;
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
 }

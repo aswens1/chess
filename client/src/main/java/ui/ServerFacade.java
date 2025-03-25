@@ -38,12 +38,16 @@ public class ServerFacade {
 
     public RegisterResult registerUser(RegisterRequest registerRequest) {
         var path = "/user";
-        return this.makeRequest("POST", path, registerRequest, null, RegisterResult.class);
+        RegisterResult registerResult = this.makeRequest("POST", path, registerRequest, null, RegisterResult.class);
+        this.authToken = registerResult.authToken();
+        return registerResult;
     }
 
     public LoginResult loginUser(LoginRequest loginRequest) {
         var path = "/session";
-        return this.makeRequest("POST", path, loginRequest, null, LoginResult.class);
+        LoginResult loginResult = this.makeRequest("POST", path, loginRequest, null, LoginResult.class);
+        this.authToken = loginResult.authToken();
+        return loginResult;
     }
 
     private <T> T makeRequest(String method, String path, Object request, String requestHeader, Class<T> responseClass) throws ResponseException {
@@ -65,6 +69,7 @@ public class ServerFacade {
         } catch (ResponseException ex) {
             throw ex;
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new ResponseException(500, ex.getMessage());
         }
     }
@@ -73,6 +78,8 @@ public class ServerFacade {
         T response = null;
 
         try (InputStream responseBody = http.getInputStream()) {
+//            String rawResponse = new String(responseBody.readAllBytes());
+//            System.out.println(rawResponse);
             if (responseBody.available() > 0) {
                 InputStreamReader inputReader = new InputStreamReader(responseBody);
                 if (responseClass != null) {
@@ -98,9 +105,11 @@ public class ServerFacade {
         if (!code200(status)) {
             try (InputStream responseError = http.getErrorStream()) {
                 if (responseError != null) {
-                    ResponseException error = ResponseException.fromJson(responseError);
 
-                    if (status == 401) {
+                    String rawError = new String(responseError.readAllBytes());
+                    ResponseException error = ResponseException.fromJson(rawError);
+
+                    if (error.statusCode() == 401) {
                         throw new ResponseException(401, EscapeSequences.SET_TEXT_COLOR_BLUE + "Unauthorised." +
                                 EscapeSequences.RESET_TEXT_COLOR + " Please check your " +
                                 EscapeSequences.SET_TEXT_COLOR_BLUE + "username" + EscapeSequences.RESET_TEXT_COLOR +
