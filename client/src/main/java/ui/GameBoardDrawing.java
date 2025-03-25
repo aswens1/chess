@@ -51,6 +51,7 @@ public class GameBoardDrawing {
     }
 
     public static void printSquares(PrintStream out, ChessGame.TeamColor pov, int row, ChessBoard board) {
+
         if (pov == ChessGame.TeamColor.BLACK) {
             for (int i = 1; i <= 8; i++) {
                 eachRow(out, row, i, board, pov);
@@ -64,13 +65,20 @@ public class GameBoardDrawing {
         }
     }
 
-    public static void printRowBackground(PrintStream out, int row, ChessBoard board) {
+    public static void printRowBackground(PrintStream out, int row, ChessBoard board, ChessGame.TeamColor pov) {
         for (int column = 1; column <= BOARD_SIZE_IN_SQUARES; column++) {
 
             ChessPosition currentPos = new ChessPosition(row, column);
             String pieceToPrint = getPieceToPrint(board, currentPos);
 
-            boolean isDark = (row + column) % 2 == 0;
+            boolean isDark;
+
+            if (pov == ChessGame.TeamColor.WHITE) {
+                isDark = (row + column) % 2 == 0;
+            } else {
+                isDark = (row + column) % 2 != 0;
+            }
+
             out.print(SET_TEXT_COLOR_BLACK);
             out.print(isDark ? DARK_SQUARE + pieceToPrint : LIGHT_SQUARE + pieceToPrint);
         }
@@ -99,7 +107,7 @@ public class GameBoardDrawing {
     public static void eachRow(PrintStream out, int row, int i, ChessBoard board, ChessGame.TeamColor pov) {
         int adjustForBlackPOV = ((pov == ChessGame.TeamColor.BLACK) ? (BOARD_SIZE_IN_SQUARES - row + 1) : row);
         printNumbers(out, i);
-        printRowBackground(out, adjustForBlackPOV, board);
+        printRowBackground(out, adjustForBlackPOV, board, pov);
         printNumbers(out, i);
         out.println();
     }

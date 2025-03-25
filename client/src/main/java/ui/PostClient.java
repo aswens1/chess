@@ -108,6 +108,11 @@ public class PostClient implements ChessClient {
                 CondensedGameData gameToJoin = game.get(userInId);
                 int serverGameID = gameToJoin.gameID();
 
+//                switch () {
+//                    case teamColor == ChessGame.TeamColor.WHITE ->
+//
+//                }
+
                 sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
                 ChessGame chessGame = new ChessGame();
                 GameBoardDrawing.drawBoard(teamColor, chessGame.getBoard());
@@ -117,7 +122,6 @@ public class PostClient implements ChessClient {
             } catch (NumberFormatException ex) {
                 throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR);
             }
-
         } catch (ResponseException ex) {
             throw new ResponseException(ex.statusCode(), ex.getMessage());
         }
