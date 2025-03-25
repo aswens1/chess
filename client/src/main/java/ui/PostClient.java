@@ -152,7 +152,28 @@ public class PostClient implements ChessClient {
     }
 
     public String observe(String... params) {
-        return "";
+        if (params == null || params.length != 1) {
+            return "Please enter the " + SET_TEXT_COLOR_BLUE + "gameID" + RESET_TEXT_COLOR + " of the game you would like to observe.";
+        }
+
+        int userInGameID = Integer.parseInt(params[0]);
+
+        list();
+        HashMap<Integer, CondensedGameData> game = sf.getGameMap();
+
+        if (!game.containsKey(userInGameID)) {
+            return "Game " + SET_TEXT_COLOR_BLUE + userInGameID + RESET_TEXT_COLOR + " not found.";
+        }
+
+        CondensedGameData gameToJoin = game.get(userInGameID);
+        int serverGameID = gameToJoin.gameID();
+
+        try {
+            sf.observe(serverGameID, sf.returnAuth());
+            return "Now observing game " + SET_TEXT_COLOR_BLUE + userInGameID + RESET_TEXT_COLOR + ".";
+        } catch (ResponseException ex) {
+            throw new ResponseException(ex.statusCode(), ex.getMessage());
+        }
     }
 
     public String quit() {

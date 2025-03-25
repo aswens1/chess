@@ -1,5 +1,7 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.CondensedGameData;
@@ -10,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ServerFacade {
 
@@ -92,6 +95,11 @@ public class ServerFacade {
     public void join(JoinGameRequest joinGameRequest, String authToken) {
         var path = "/game";
         this.makeRequest("PUT", path, joinGameRequest , authToken, JoinGameResult.class);
+    }
+
+    public void observe(int gameID, String authToken) {
+        ChessGame game = new ChessGame();
+        GameBoardDrawing.DrawBoard(ChessGame.TeamColor.WHITE, game.getBoard());
     }
 
     private <T> T makeRequest(String method, String path, Object request, String requestHeader, Class<T> responseClass) throws ResponseException {
