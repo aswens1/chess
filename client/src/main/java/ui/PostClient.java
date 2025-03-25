@@ -1,8 +1,14 @@
 package ui;
 
 import exception.ResponseException;
+import service.records.ListGamesRequest;
+import service.records.ListGamesResult;
+import service.records.LogoutRequest;
+import service.records.LogoutResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
@@ -39,7 +45,16 @@ public class PostClient implements ChessClient {
     }
 
     public String logout() {
-        return "";
+        try {
+            sf.logoutUser(new LogoutRequest(sf.returnAuth()));
+            String tempUserName = sf.getUsername();
+            sf.setUsername(null);
+            sf.setAuth(null);
+            state.stateLogOut();
+            return "Goodbye " + SET_TEXT_COLOR_BLUE + tempUserName + RESET_TEXT_COLOR + "!";
+        } catch (ResponseException ex) {
+            throw new ResponseException(ex.statusCode(), ex.getMessage());
+        }
     }
 
     public String create(String... params) {
@@ -51,7 +66,19 @@ public class PostClient implements ChessClient {
     }
 
     public String list() {
-        return "";
+        try {
+            ListGamesResult listOfGames = sf.list(new ListGamesRequest(sf.returnAuth()));
+
+            List<String> numberedGames = new ArrayList<>();
+
+            for (var i = 0; i <= listOfGames.games().size(); i++) {
+                sf.createGameMap(i + 1, listOfGames.games().get(i));
+                numberedGames.add(String.format("%s%d.%s %s%n", SET_TEXT_COLOR_BLUE, i + 1, RESET_TEXT_COLOR, listOfGames.games().get(i)));
+            }
+            return String.join("\n", numberedGames);
+        } catch (ResponseException ex) {
+            throw new ResponseException(ex.statusCode(), ex.getMessage());
+        }
     }
 
     public String observe(String... params) {
@@ -59,6 +86,8 @@ public class PostClient implements ChessClient {
     }
 
     public String quit() {
+        state.stateLogOut();
+        System.out.println(logout());
         return "";
     }
 

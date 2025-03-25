@@ -41,7 +41,7 @@ public class Repl {
                 System.out.println(command);
 
                 if(line.equalsIgnoreCase("quit")) {
-                    out.println(SET_TEXT_COLOR_BLUE + " ♕ Goodbye! Thank you for playing! ♕ " + RESET_TEXT_COLOR);
+                    out.println(SET_TEXT_COLOR_BLUE + " ♕ Thank you for playing! ♕ " + RESET_TEXT_COLOR);
                     System.exit(200);
                 }
 

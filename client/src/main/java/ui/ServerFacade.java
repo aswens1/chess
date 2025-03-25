@@ -2,12 +2,15 @@ package ui;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.CondensedGameData;
 import service.records.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ServerFacade {
 
@@ -15,6 +18,8 @@ public class ServerFacade {
     private String username;
 
     private final String serverURL;
+
+    private final HashMap<Integer, CondensedGameData> gameMap = new HashMap<>();
 
     public ServerFacade(String url) {
         serverURL = url;
@@ -36,6 +41,14 @@ public class ServerFacade {
         this.username = username;
     }
 
+    public void createGameMap(int i, CondensedGameData gameData) {
+        gameMap.put(i, gameData);
+    }
+
+    public HashMap<Integer, CondensedGameData> getGameMap() {
+        return gameMap;
+    }
+
     public RegisterResult registerUser(RegisterRequest registerRequest) {
         var path = "/user";
         RegisterResult registerResult = this.makeRequest("POST", path, registerRequest, null, RegisterResult.class);
@@ -50,6 +63,19 @@ public class ServerFacade {
         setAuth(loginResult.authToken());
         setUsername(loginResult.username());
         return loginResult;
+    }
+
+    public void logoutUser(LogoutRequest logoutRequest) {
+        var path = "/session";
+        this.makeRequest("DELETE", path, logoutRequest, logoutRequest.authToken(), LogoutResult.class);
+    }
+
+    public ListGamesResult list(ListGamesRequest listGamesRequest) {
+        var path = "/game";
+        var listGames = this.makeRequest("GET", path, listGamesRequest, listGamesRequest.authToken(), ListGamesResult.class);
+        ArrayList<CondensedGameData> listOfGames = (ArrayList<CondensedGameData>) listGames.games();
+
+        return listGames;
     }
 
     private <T> T makeRequest(String method, String path, Object request, String requestHeader, Class<T> responseClass) throws ResponseException {
