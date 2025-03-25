@@ -19,6 +19,7 @@ public class ServerFacade {
     private String username;
 
     private final String serverURL;
+//    private final int serverPort;
 
     private final HashMap<Integer, CondensedGameData> gameMap = new HashMap<>();
 
