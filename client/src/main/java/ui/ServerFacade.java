@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ServerFacade {
@@ -20,6 +19,8 @@ public class ServerFacade {
     private final String serverURL;
 
     private final HashMap<Integer, CondensedGameData> gameMap = new HashMap<>();
+    private final HashMap<Integer, CondensedGameData> fullGameMap = new HashMap<>();
+
 
     public ServerFacade(String url) {
         serverURL = url;
@@ -49,6 +50,14 @@ public class ServerFacade {
         return gameMap;
     }
 
+    public void resetGameMap() {
+        gameMap.clear();
+    }
+
+    public void fullGameMap(int gameID, CondensedGameData gameData) {
+        fullGameMap.put(gameID, gameData);
+    }
+
     public RegisterResult registerUser(RegisterRequest registerRequest) {
         var path = "/user";
         RegisterResult registerResult = this.makeRequest("POST", path, registerRequest, null, RegisterResult.class);
@@ -72,10 +81,17 @@ public class ServerFacade {
 
     public ListGamesResult list(ListGamesRequest listGamesRequest) {
         var path = "/game";
-        var listGames = this.makeRequest("GET", path, listGamesRequest, listGamesRequest.authToken(), ListGamesResult.class);
-        ArrayList<CondensedGameData> listOfGames = (ArrayList<CondensedGameData>) listGames.games();
+        return this.makeRequest("GET", path, null, listGamesRequest.authToken(), ListGamesResult.class);
+    }
 
-        return listGames;
+    public void create(CreateGameRequest createGameRequest, String authToken) {
+        var path = "/game";
+        this.makeRequest("POST", path, createGameRequest, authToken, CreateGameResult.class);
+    }
+
+    public void join(JoinGameRequest joinGameRequest, String authToken) {
+        var path = "/game";
+        this.makeRequest("PUT", path, joinGameRequest , authToken, JoinGameResult.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, String requestHeader, Class<T> responseClass) throws ResponseException {
@@ -97,7 +113,6 @@ public class ServerFacade {
         } catch (ResponseException ex) {
             throw ex;
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new ResponseException(500, ex.getMessage());
         }
     }
@@ -106,8 +121,6 @@ public class ServerFacade {
         T response = null;
 
         try (InputStream responseBody = http.getInputStream()) {
-//            String rawResponse = new String(responseBody.readAllBytes());
-//            System.out.println(rawResponse);
             if (responseBody.available() > 0) {
                 InputStreamReader inputReader = new InputStreamReader(responseBody);
                 if (responseClass != null) {

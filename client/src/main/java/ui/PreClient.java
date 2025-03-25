@@ -31,7 +31,8 @@ public class PreClient implements ChessClient {
                 case "register" -> register(params);
                 case "login" -> login(params);
                 case "quit" -> quit();
-                default -> displayHelp();
+                case "help" -> displayHelp();
+                default -> "Invalid command. Use command " + SET_TEXT_COLOR_BLUE + "'help'" + RESET_TEXT_COLOR + " for a list of possible commands.";
             };
 
         } catch (ResponseException ex) {
@@ -41,7 +42,7 @@ public class PreClient implements ChessClient {
 
     private String register(String... params) {
         if (params.length != 3) {
-            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: <USERNAME> <PASSWORD> <EMAIL>" + RESET_TEXT_COLOR);
+            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: register <USERNAME> <PASSWORD> <EMAIL>" + RESET_TEXT_COLOR);
         }
 
         String username = params[0];
@@ -50,7 +51,7 @@ public class PreClient implements ChessClient {
 
         if ((username == null || username.isEmpty()) ||
                 (password == null || password.isEmpty()) || (email == null || email.isEmpty())) {
-            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: <USERNAME> <PASSWORD> <EMAIL>" + RESET_TEXT_COLOR);
+            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: register <USERNAME> <PASSWORD> <EMAIL>" + RESET_TEXT_COLOR);
         }
 
         RegisterResult register = sf.registerUser(new RegisterRequest(username, password, email));
@@ -65,14 +66,14 @@ public class PreClient implements ChessClient {
 
     private String login(String... params) {
         if (params.length != 2) {
-            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: <USERNAME> <PASSWORD>" + RESET_TEXT_COLOR);
+            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: login <USERNAME> <PASSWORD>" + RESET_TEXT_COLOR);
         }
 
         String username = params[0];
         String password = params[1];
 
         if ((username == null || username.isEmpty()) || (password == null || password.isEmpty())) {
-            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: <USERNAME> <PASSWORD>" + RESET_TEXT_COLOR);
+            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: login <USERNAME> <PASSWORD>" + RESET_TEXT_COLOR);
         }
 
         LoginResult login = sf.loginUser(new LoginRequest(username, password));

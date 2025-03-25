@@ -1,13 +1,13 @@
 package ui;
 
+import chess.ChessGame;
 import exception.ResponseException;
-import service.records.ListGamesRequest;
-import service.records.ListGamesResult;
-import service.records.LogoutRequest;
-import service.records.LogoutResult;
+import model.CondensedGameData;
+import service.records.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
@@ -31,12 +31,13 @@ public class PostClient implements ChessClient {
             var params = Arrays.copyOfRange(partsOfCommand, 1, partsOfCommand.length);
             return switch (command) {
                 case "logout" -> logout();
-                case "create <NAME>" -> create(params);
+                case "create" -> create(params);
                 case "join" -> join(params);
                 case "list" -> list();
                 case "observe" -> observe(params);
                 case "quit" -> quit();
-                default -> displayHelp();
+                case "help" -> displayHelp();
+                default -> "Invalid command. Use command " + SET_TEXT_COLOR_BLUE + "'help'" + RESET_TEXT_COLOR + " for a list of possible commands.";
             };
 
         } catch (ResponseException ex) {
@@ -58,27 +59,96 @@ public class PostClient implements ChessClient {
     }
 
     public String create(String... params) {
-        return "";
+        if (params.length != 1) {
+            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: create <NAME>" + RESET_TEXT_COLOR);
+        }
+
+        String gameName = params[0];
+
+        if (gameName.isEmpty()) {
+            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: create <NAME>" + RESET_TEXT_COLOR);
+        }
+
+        sf.create(new CreateGameRequest(gameName), sf.returnAuth());
+        return "Created new game: " + SET_TEXT_COLOR_BLUE + gameName;
     }
 
     public String join(String... params) {
-        return "";
+        if (params.length != 2) {
+            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR);
+        }
+
+        try {
+            int userInId = Integer.parseInt(params[0]);
+            ChessGame.TeamColor teamColor;
+
+            switch (params[1].toLowerCase()) {
+                case "white":
+                    teamColor = ChessGame.TeamColor.WHITE;
+                    break;
+                case "black":
+                    teamColor = ChessGame.TeamColor.BLACK;
+                    break;
+                default:
+                    return "Invalid team colour. Please choose " + SET_TEXT_COLOR_BLUE + "white" + RESET_TEXT_COLOR +
+                            " or " + SET_TEXT_COLOR_BLUE + "black" + RESET_TEXT_COLOR + ".";
+            }
+
+            list();
+            HashMap<Integer, CondensedGameData> game = sf.getGameMap();
+
+            if (!game.containsKey(userInId)) {
+                return "Game " + SET_TEXT_COLOR_BLUE + userInId + RESET_TEXT_COLOR + " not found.";
+            }
+
+            CondensedGameData gameToJoin = game.get(userInId);
+            int serverGameID = gameToJoin.gameID();
+
+            sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
+            return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
+                    + teamColor + RESET_TEXT_COLOR + " player.";
+
+        } catch (ResponseException ex) {
+            throw new ResponseException(ex.statusCode(), ex.getMessage());
+        }
     }
 
     public String list() {
         try {
             ListGamesResult listOfGames = sf.list(new ListGamesRequest(sf.returnAuth()));
 
+            sf.resetGameMap();
+
             List<String> numberedGames = new ArrayList<>();
 
-            for (var i = 0; i <= listOfGames.games().size(); i++) {
-                sf.createGameMap(i + 1, listOfGames.games().get(i));
-                numberedGames.add(String.format("%s%d.%s %s%n", SET_TEXT_COLOR_BLUE, i + 1, RESET_TEXT_COLOR, listOfGames.games().get(i)));
+            if (listOfGames != null && !listOfGames.games().isEmpty()) {
+                for (var i = 0; i < listOfGames.games().size(); i++) {
+                    String info = getGameInfo(listOfGames, i);
+
+                    sf.createGameMap(i + 1, listOfGames.games().get(i));
+
+                    numberedGames.add(info);
+                }
+            } else {
+                return "There are no games to play. Use command " + SET_TEXT_COLOR_BLUE + "'create'" + RESET_TEXT_COLOR + " to make a new game!";
             }
+
             return String.join("\n", numberedGames);
         } catch (ResponseException ex) {
             throw new ResponseException(ex.statusCode(), ex.getMessage());
         }
+    }
+
+    private static String getGameInfo(ListGamesResult listOfGames, int i) {
+        var game = listOfGames.games().get(i);
+
+        String gameName = game.gameName();
+        String whitePlayer = game.whiteUsername();
+        String blackPlayer = game.blackUsername();
+
+        return String.format("%d. %sname:%s %s, %swhite player:%s %s, %sblack player: %s%s",
+                i + 1, SET_TEXT_COLOR_BLUE, RESET_TEXT_COLOR, gameName, SET_TEXT_COLOR_BLUE, RESET_TEXT_COLOR,
+                whitePlayer, SET_TEXT_COLOR_BLUE, RESET_TEXT_COLOR, blackPlayer);
     }
 
     public String observe(String... params) {
@@ -95,7 +165,7 @@ public class PostClient implements ChessClient {
         String[] helpCommands = {
                 SET_TEXT_COLOR_BLUE + "logout" + RESET_TEXT_COLOR + " -> log out of your account",
                 SET_TEXT_COLOR_BLUE + "create <NAME>" + RESET_TEXT_COLOR + " -> create a new game",
-                SET_TEXT_COLOR_BLUE + "join <ID>" + RESET_TEXT_COLOR + " -> join a game",
+                SET_TEXT_COLOR_BLUE + "join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR + " -> join a game",
                 SET_TEXT_COLOR_BLUE + "list" + RESET_TEXT_COLOR + " -> list all games",
                 SET_TEXT_COLOR_BLUE + "observe <ID>" + RESET_TEXT_COLOR + " -> watch a game",
                 SET_TEXT_COLOR_BLUE + "quit" + RESET_TEXT_COLOR + " -> exit program",
