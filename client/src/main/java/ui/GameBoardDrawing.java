@@ -72,14 +72,6 @@ public class GameBoardDrawing {
         for (int i = 1; i <= BOARD_SIZE_IN_SQUARES; i++) {
             int column = (pov == ChessGame.TeamColor.WHITE) ? i : (BOARD_SIZE_IN_SQUARES - i - 1); // Flip column order only for Black
 
-//            int col;
-
-//            if (pov.equals(ChessGame.TeamColor.WHITE)) {
-//                for ()
-//            } else {
-//                col = BOARD_SIZE_IN_SQUARES - i + 1;
-//            }
-
             boolean isDark;
             ChessPosition currentPos;
             String pieceToPrint;
@@ -98,17 +90,6 @@ public class GameBoardDrawing {
         }
         out.print(RESET_TEXT_COLOR);
     }
-
-//    private static void printSquare(PrintStream out, int row, int column, ChessBoard board) {
-//        ChessPosition currentPos = new ChessPosition(row, column);
-//        String pieceToPrint = getPieceToPrint(board, currentPos);
-//
-//        // Determine correct square color
-//        boolean isDark = (row + column) % 2 == 0;
-//
-//        out.print(SET_TEXT_COLOR_BLACK);
-//        out.print(isDark ? DARK_SQUARE + pieceToPrint : LIGHT_SQUARE + pieceToPrint);
-//    }
 
     public static String getPieceToPrint(ChessBoard board, ChessPosition position) {
         if (board.getPiece(position) == null) {
