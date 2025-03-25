@@ -76,8 +76,7 @@ public class PostClient implements ChessClient {
     }
 
     public String join(String... params) {
-        if (params.length != 2 &&
-                (params[1].equalsIgnoreCase("white") || params[1].equalsIgnoreCase("black"))) {
+        if (params.length != 2) {
             throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR);
         }
 
@@ -106,12 +105,13 @@ public class PostClient implements ChessClient {
                 }
 
                 CondensedGameData gameToJoin = game.get(userInId);
+
                 int serverGameID = gameToJoin.gameID();
 
-//                switch () {
-//                    case teamColor == ChessGame.TeamColor.WHITE ->
-//
-//                }
+                if ((teamColor == ChessGame.TeamColor.WHITE && gameToJoin.whiteUsername() != null) ||
+                        (teamColor == ChessGame.TeamColor.BLACK && gameToJoin.blackUsername() != null)) {
+                    return "The " + SET_TEXT_COLOR_BLUE + teamColor + RESET_TEXT_COLOR + " team is already taken.";
+                }
 
                 sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
                 ChessGame chessGame = new ChessGame();
@@ -172,23 +172,27 @@ public class PostClient implements ChessClient {
             return "Please enter the " + SET_TEXT_COLOR_BLUE + "gameID" + RESET_TEXT_COLOR + " of the game you would like to observe.";
         }
 
-        int userInGameID = Integer.parseInt(params[0]);
-
-        list();
-        HashMap<Integer, CondensedGameData> game = sf.getGameMap();
-
-        if (!game.containsKey(userInGameID)) {
-            return "Game " + SET_TEXT_COLOR_BLUE + userInGameID + RESET_TEXT_COLOR + " not found.";
-        }
-
-        CondensedGameData gameToJoin = game.get(userInGameID);
-        int serverGameID = gameToJoin.gameID();
-
         try {
-            sf.observe(serverGameID, sf.returnAuth());
-            return "Now observing game " + SET_TEXT_COLOR_BLUE + userInGameID + RESET_TEXT_COLOR + ".";
-        } catch (ResponseException ex) {
-            throw new ResponseException(ex.statusCode(), ex.getMessage());
+            int userInGameID = Integer.parseInt(params[0]);
+
+            list();
+            HashMap<Integer, CondensedGameData> game = sf.getGameMap();
+
+            if (!game.containsKey(userInGameID)) {
+                return "Game " + SET_TEXT_COLOR_BLUE + userInGameID + RESET_TEXT_COLOR + " not found.";
+            }
+
+            CondensedGameData gameToJoin = game.get(userInGameID);
+            int serverGameID = gameToJoin.gameID();
+
+            try {
+                sf.observe(serverGameID, sf.returnAuth());
+                return "Now observing game " + SET_TEXT_COLOR_BLUE + userInGameID + RESET_TEXT_COLOR + ".";
+            } catch (ResponseException ex) {
+                throw new ResponseException(ex.statusCode(), ex.getMessage());
+            }
+        } catch (NumberFormatException e) {
+            throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: observe <ID>" + RESET_TEXT_COLOR);
         }
     }
 
