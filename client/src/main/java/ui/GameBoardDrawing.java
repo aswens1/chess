@@ -55,10 +55,12 @@ public class GameBoardDrawing {
         if (pov == ChessGame.TeamColor.BLACK) {
             for (int i = 1; i <= 8; i++) {
                 eachRow(out, row, i, board, pov);
+//                printRowBackground(out, row, board, pov);
                 row--;
             }
         } else {
             for (int i = 8; i >= 1; i--) {
+//                printRowBackground(out, row, board, pov);
                 eachRow(out, row, i, board, pov);
                 row--;
             }
@@ -66,17 +68,29 @@ public class GameBoardDrawing {
     }
 
     public static void printRowBackground(PrintStream out, int row, ChessBoard board, ChessGame.TeamColor pov) {
-        for (int column = 1; column <= BOARD_SIZE_IN_SQUARES; column++) {
 
-            ChessPosition currentPos = new ChessPosition(row, column);
-            String pieceToPrint = getPieceToPrint(board, currentPos);
+        for (int i = 1; i <= BOARD_SIZE_IN_SQUARES; i++) {
+            int column = (pov == ChessGame.TeamColor.WHITE) ? i : (BOARD_SIZE_IN_SQUARES - i - 1); // Flip column order only for Black
+
+//            int col;
+
+//            if (pov.equals(ChessGame.TeamColor.WHITE)) {
+//                for ()
+//            } else {
+//                col = BOARD_SIZE_IN_SQUARES - i + 1;
+//            }
 
             boolean isDark;
-
-            if (pov == ChessGame.TeamColor.WHITE) {
-                isDark = (row + column) % 2 == 0;
+            ChessPosition currentPos;
+            String pieceToPrint;
+            if (pov.equals(ChessGame.TeamColor.BLACK)) {
+                isDark = (row + (BOARD_SIZE_IN_SQUARES - i + 1)) % 2 == 0;
+                currentPos = new ChessPosition(row, i);
+                pieceToPrint = getPieceToPrint(board, currentPos);
             } else {
-                isDark = (row + column) % 2 != 0;
+                isDark = (row + i) % 2 == 0;
+                currentPos = new ChessPosition(row, BOARD_SIZE_IN_SQUARES - i + 1);
+                pieceToPrint = getPieceToPrint(board, currentPos);
             }
 
             out.print(SET_TEXT_COLOR_BLACK);
@@ -84,6 +98,17 @@ public class GameBoardDrawing {
         }
         out.print(RESET_TEXT_COLOR);
     }
+
+//    private static void printSquare(PrintStream out, int row, int column, ChessBoard board) {
+//        ChessPosition currentPos = new ChessPosition(row, column);
+//        String pieceToPrint = getPieceToPrint(board, currentPos);
+//
+//        // Determine correct square color
+//        boolean isDark = (row + column) % 2 == 0;
+//
+//        out.print(SET_TEXT_COLOR_BLACK);
+//        out.print(isDark ? DARK_SQUARE + pieceToPrint : LIGHT_SQUARE + pieceToPrint);
+//    }
 
     public static String getPieceToPrint(ChessBoard board, ChessPosition position) {
         if (board.getPiece(position) == null) {
@@ -102,7 +127,6 @@ public class GameBoardDrawing {
             };
         }
     }
-
 
     public static void eachRow(PrintStream out, int row, int i, ChessBoard board, ChessGame.TeamColor pov) {
         int adjustForBlackPOV = ((pov == ChessGame.TeamColor.BLACK) ? (BOARD_SIZE_IN_SQUARES - row + 1) : row);
