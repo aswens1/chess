@@ -14,7 +14,7 @@ public class PreClient implements ChessClient {
 
     private final String serverURL;
     private final Repl repl;
-    private final State state;
+    private State state;
     private final ServerFacade sf;
 
 
@@ -61,17 +61,10 @@ public class PreClient implements ChessClient {
 
         try {
             state.stateLogIn();
-            new PostRepl(serverURL, sf.returnAuth(), sf.getUsername()).run();
-            // move to post login
-
             return "Welcome " + SET_TEXT_COLOR_BLUE + register.username() + RESET_TEXT_COLOR + "!";
         } catch (ResponseException exception){
             throw new ResponseException(exception.statusCode(), exception.getMessage());
         }
-    }
-
-    private String quit() {
-        return SET_TEXT_COLOR_BLUE + " ♕ Goodbye! Thank you for playing! ♕ " + RESET_TEXT_COLOR;
     }
 
     private String login(String... params) {
@@ -88,12 +81,11 @@ public class PreClient implements ChessClient {
 
         LoginResult login = sf.loginUser(new LoginRequest(username, password));
         state.stateLogIn();
-
-        // move to post login
         return "Logging " + SET_TEXT_COLOR_BLUE + login.username() + RESET_TEXT_COLOR + " in!";
+    }
 
-//        throw new ResponseException(500, "Server did not return a valid response.");
-//        return "Logging " + SET_TEXT_COLOR_BLUE + login.username() + RESET_TEXT_COLOR + " in!";
+    public String quit() {
+        return "";
     }
 
     public String displayHelp(){

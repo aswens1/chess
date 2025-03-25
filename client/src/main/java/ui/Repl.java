@@ -4,14 +4,17 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
+import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
+
 public class Repl {
 
     private final ChessClient preClient;
     private final ChessClient postClient;
+    private final State state = new State();
 
 
     public Repl(String serverURL) {
-        State state = new State();
         preClient = new PreClient(serverURL, this, state);
         postClient = new PostClient(serverURL, this, state);
     }
@@ -19,7 +22,6 @@ public class Repl {
 
     public void run() {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        State state = new State();
         out.println(" ♕ Welcome to 240 Chess! Enter a command to get started. ♕ ");
 
         Scanner scanner = new Scanner(System.in);
@@ -37,6 +39,7 @@ public class Repl {
                 System.out.println(command);
 
                 if(line.equalsIgnoreCase("quit")) {
+                    out.println(SET_TEXT_COLOR_BLUE + " ♕ Goodbye! Thank you for playing! ♕ " + RESET_TEXT_COLOR);
                     System.exit(200);
                 }
 
