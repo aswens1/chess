@@ -74,14 +74,15 @@ public class GameBoardDrawing {
 
             boolean isDark;
             ChessPosition currentPos;
-            String pieceToPrint;
+            String pieceToPrint = "";
+            
             if (pov.equals(ChessGame.TeamColor.BLACK)) {
                 isDark = (row + (BOARD_SIZE_IN_SQUARES - i + 1)) % 2 == 0;
-                currentPos = new ChessPosition(row, i);
+                currentPos = new ChessPosition(row, BOARD_SIZE_IN_SQUARES - i + 1);
                 pieceToPrint = getPieceToPrint(board, currentPos);
             } else {
                 isDark = (row + i) % 2 == 0;
-                currentPos = new ChessPosition(row, BOARD_SIZE_IN_SQUARES - i + 1);
+                currentPos = new ChessPosition(row, i);
                 pieceToPrint = getPieceToPrint(board, currentPos);
             }
 
@@ -90,6 +91,7 @@ public class GameBoardDrawing {
         }
         out.print(RESET_TEXT_COLOR);
     }
+
 
     public static String getPieceToPrint(ChessBoard board, ChessPosition position) {
         if (board.getPiece(position) == null) {
