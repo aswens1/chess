@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
@@ -75,39 +76,47 @@ public class PostClient implements ChessClient {
     }
 
     public String join(String... params) {
-        if (params.length != 2) {
+        if (params.length != 2 &&
+                (params[1].equalsIgnoreCase("white") || params[1].equalsIgnoreCase("black"))) {
             throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR);
         }
 
         try {
-            int userInId = Integer.parseInt(params[0]);
-            ChessGame.TeamColor teamColor;
+            try {
+                int userInId = Integer.parseInt(params[0]);
+                ChessGame.TeamColor teamColor;
 
-            switch (params[1].toLowerCase()) {
-                case "white":
-                    teamColor = ChessGame.TeamColor.WHITE;
-                    break;
-                case "black":
-                    teamColor = ChessGame.TeamColor.BLACK;
-                    break;
-                default:
-                    return "Invalid team colour. Please choose " + SET_TEXT_COLOR_BLUE + "white" + RESET_TEXT_COLOR +
-                            " or " + SET_TEXT_COLOR_BLUE + "black" + RESET_TEXT_COLOR + ".";
+                switch (params[1].toLowerCase()) {
+                    case "white":
+                        teamColor = ChessGame.TeamColor.WHITE;
+                        break;
+                    case "black":
+                        teamColor = ChessGame.TeamColor.BLACK;
+                        break;
+                    default:
+                        return "Invalid team colour. Please choose " + SET_TEXT_COLOR_BLUE + "white" + RESET_TEXT_COLOR +
+                                " or " + SET_TEXT_COLOR_BLUE + "black" + RESET_TEXT_COLOR + ".";
+                }
+
+                list();
+                HashMap<Integer, CondensedGameData> game = sf.getGameMap();
+
+                if (!game.containsKey(userInId)) {
+                    return "Game " + SET_TEXT_COLOR_BLUE + userInId + RESET_TEXT_COLOR + " not found.";
+                }
+
+                CondensedGameData gameToJoin = game.get(userInId);
+                int serverGameID = gameToJoin.gameID();
+
+                sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
+                ChessGame chessGame = new ChessGame();
+                GameBoardDrawing.drawBoard(teamColor, chessGame.getBoard());
+
+                return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
+                        + teamColor + RESET_TEXT_COLOR + " player.";
+            } catch (NumberFormatException ex) {
+                throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR);
             }
-
-            list();
-            HashMap<Integer, CondensedGameData> game = sf.getGameMap();
-
-            if (!game.containsKey(userInId)) {
-                return "Game " + SET_TEXT_COLOR_BLUE + userInId + RESET_TEXT_COLOR + " not found.";
-            }
-
-            CondensedGameData gameToJoin = game.get(userInId);
-            int serverGameID = gameToJoin.gameID();
-
-            sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
-            return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
-                    + teamColor + RESET_TEXT_COLOR + " player.";
 
         } catch (ResponseException ex) {
             throw new ResponseException(ex.statusCode(), ex.getMessage());
@@ -146,6 +155,8 @@ public class PostClient implements ChessClient {
         String gameName = game.gameName();
         String whitePlayer = game.whiteUsername();
         String blackPlayer = game.blackUsername();
+
+        System.out.print(RESET_TEXT_COLOR);
 
         return String.format("%d. %sname:%s %s, %swhite player:%s %s, %sblack player: %s%s",
                 i + 1, SET_TEXT_COLOR_BLUE, RESET_TEXT_COLOR, gameName, SET_TEXT_COLOR_BLUE, RESET_TEXT_COLOR,
