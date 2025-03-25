@@ -97,7 +97,7 @@ public class ServerFacade {
         }
 
         ChessGame game = new ChessGame();
-        GameBoardDrawing.DrawBoard(ChessGame.TeamColor.WHITE, game.getBoard());
+        GameBoardDrawing.drawBoard(ChessGame.TeamColor.WHITE, game.getBoard());
     }
 
     public void clear() {

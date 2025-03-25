@@ -11,10 +11,10 @@ public class GameBoardDrawing {
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
-    private static final String darkSquare = SET_BG_COLOR_BLUE;
-    private static final String lightSquare = SET_BG_COLOR_WHITE;
+    private static final String DARK_SQUARE = SET_BG_COLOR_BLUE;
+    private static final String LIGHT_SQUARE = SET_BG_COLOR_WHITE;
 
-    public static void DrawBoard(ChessGame.TeamColor pov, ChessBoard board) {
+    public static void drawBoard(ChessGame.TeamColor pov, ChessBoard board) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
 
@@ -72,7 +72,7 @@ public class GameBoardDrawing {
 
             boolean isDark = (row + column) % 2 == 0;
             out.print(SET_TEXT_COLOR_BLACK);
-            out.print(isDark ? darkSquare + pieceToPrint : lightSquare + pieceToPrint);
+            out.print(isDark ? DARK_SQUARE + pieceToPrint : LIGHT_SQUARE + pieceToPrint);
         }
         out.print(RESET_TEXT_COLOR);
     }
