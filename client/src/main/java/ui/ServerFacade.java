@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
@@ -12,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.*;
 import java.util.HashMap;
-import java.util.Map;
 
 public class ServerFacade {
 
@@ -22,7 +20,6 @@ public class ServerFacade {
     private final String serverURL;
 
     private final HashMap<Integer, CondensedGameData> gameMap = new HashMap<>();
-    private final HashMap<Integer, CondensedGameData> fullGameMap = new HashMap<>();
 
 
     public ServerFacade(String url) {
@@ -55,10 +52,6 @@ public class ServerFacade {
 
     public void resetGameMap() {
         gameMap.clear();
-    }
-
-    public void fullGameMap(int gameID, CondensedGameData gameData) {
-        fullGameMap.put(gameID, gameData);
     }
 
     public RegisterResult registerUser(RegisterRequest registerRequest) {
