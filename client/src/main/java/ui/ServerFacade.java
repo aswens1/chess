@@ -91,6 +91,10 @@ public class ServerFacade {
     }
 
     public void observe(int gameID, String authToken) {
+        if (authToken == null) {
+            throw new ResponseException(400, "Error: unauthorized");
+        }
+
         ChessGame game = new ChessGame();
         GameBoardDrawing.DrawBoard(ChessGame.TeamColor.WHITE, game.getBoard());
     }
