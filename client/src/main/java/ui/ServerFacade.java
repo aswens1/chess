@@ -18,6 +18,9 @@ public class ServerFacade {
     private String authToken;
     private String username;
 
+    private ChessGame chessGame;
+    private ChessGame.TeamColor teamColor;
+
     private final String serverURL;
 //    private final int serverPort;
 
@@ -32,9 +35,15 @@ public class ServerFacade {
         this.authToken = authToken;
     }
 
-    public String returnAuth() {
-        return authToken;
-    }
+    public void setGame(ChessGame chessGame) {this.chessGame = chessGame;}
+
+    public void setTeamColor(ChessGame.TeamColor teamColor) { this.teamColor = teamColor; }
+
+    public ChessGame getGame() { return chessGame; }
+
+    public ChessGame.TeamColor getTeamColor() { return teamColor; }
+
+    public String returnAuth() { return authToken; }
 
     public String getUsername() {
         return username;

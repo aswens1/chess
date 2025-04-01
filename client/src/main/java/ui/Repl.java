@@ -11,13 +11,17 @@ public class Repl {
 
     private final ChessClient preClient;
     private final ChessClient postClient;
+    private final ChessClient gameClient;
     private final State state = new State();
+    private final GameState gameState = new GameState();
+
 
 
     public Repl(String serverURL) {
         ServerFacade sf = new ServerFacade(serverURL);
         preClient = new PreClient(sf, state);
-        postClient = new PostClient(sf, state);
+        postClient = new PostClient(sf, state, gameState);
+        gameClient = new GamePlayClient(sf, gameState);
     }
 
 
@@ -36,7 +40,11 @@ public class Repl {
                     command = preClient.eval(line);
                 } else {
                     command = postClient.eval(line);
+                    if (gameState.isInGame()) {
+                        command = gameClient.eval(line);
+                    }
                 }
+
                 System.out.println(command);
 
                 if(line.equalsIgnoreCase("quit")) {

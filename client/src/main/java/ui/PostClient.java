@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
@@ -18,10 +17,13 @@ public class PostClient implements ChessClient {
 
     private final State state;
     private final ServerFacade sf;
+    private final GameState gs;
 
-    public PostClient(ServerFacade sf, State state) {
+
+    public PostClient(ServerFacade sf, State state, GameState gs) {
         this.sf = sf;
         this.state = state;
+        this.gs = gs;
     }
 
     @Override
@@ -115,6 +117,9 @@ public class PostClient implements ChessClient {
 
                 sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
                 ChessGame chessGame = new ChessGame();
+                sf.setGame(chessGame);
+                sf.setTeamColor(teamColor);
+                gs.stateInGame();
                 GameBoardDrawing.drawBoard(teamColor, chessGame.getBoard());
 
                 return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
@@ -187,6 +192,7 @@ public class PostClient implements ChessClient {
 
             try {
                 sf.observe(serverGameID, sf.returnAuth());
+                gs.stateInGame();
                 return "Now observing game " + SET_TEXT_COLOR_BLUE + userInGameID + RESET_TEXT_COLOR + ".";
             } catch (ResponseException ex) {
                 throw new ResponseException(ex.statusCode(), ex.getMessage());
@@ -198,6 +204,7 @@ public class PostClient implements ChessClient {
 
     public String quit() {
         state.stateLogOut();
+        gs.stateLeaveGame();
         System.out.println(logout());
         return "";
     }
