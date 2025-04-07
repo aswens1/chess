@@ -42,13 +42,13 @@ public class GamePlayClient implements ChessClient{
     }
 
     public String redraw() {
-        GameBoardDrawing.drawBoard(sf.getTeamColor(), sf.getGame().getBoard());
+        GameBoardDrawing.drawBoard(sf.getTeamColor(), sf.getGame().getBoard(), null);
         return SET_TEXT_COLOR_BLUE + "Redrawing" + RESET_TEXT_COLOR + " the board.";
     }
 
     public String leave() {
         gs.stateLeaveGame();
-        return SET_TEXT_COLOR_BLUE + "Leaving" + RESET_TEXT_COLOR + " the game";
+        return SET_TEXT_COLOR_BLUE + "Leaving" + RESET_TEXT_COLOR + " the game.";
     }
 
     public String move(String... params) {

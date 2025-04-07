@@ -4,22 +4,34 @@ import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
 
+import static java.lang.System.out;
 import static ui.EscapeSequences.*;
 
 public class GameBoardDrawing {
+
+    private static ServerFacade sf;
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
     private static final String DARK_SQUARE = SET_BG_COLOR_BLUE;
     private static final String LIGHT_SQUARE = SET_BG_COLOR_WHITE;
 
-    public static void drawBoard(ChessGame.TeamColor pov, ChessBoard board) {
+    public static void drawBoard(ChessGame.TeamColor pov, ChessBoard board, ChessPosition highlightPosition) {
+
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
 
+        Collection<ChessMove> validMoves = List.of();
+        ChessGame currentGame = sf.getGame();
+        if (highlightPosition != null) {
+            validMoves = currentGame.validMoves(highlightPosition);
+        }
+
         printLetters(out, pov);
-        printSquares(out, pov, BOARD_SIZE_IN_SQUARES, board);
+        printSquares(out, pov, BOARD_SIZE_IN_SQUARES, board, validMoves, highlightPosition);
         printLetters(out, pov);
 
         out.println();
@@ -50,27 +62,24 @@ public class GameBoardDrawing {
         out.print(RESET_BG_COLOR);
     }
 
-    public static void printSquares(PrintStream out, ChessGame.TeamColor pov, int row, ChessBoard board) {
+    public static void printSquares(PrintStream out, ChessGame.TeamColor pov, int row, ChessBoard board, Collection<ChessMove> validMoves, ChessPosition highlightPosition) {
 
         if (pov == ChessGame.TeamColor.BLACK) {
             for (int i = 1; i <= 8; i++) {
-                eachRow(out, row, i, board, pov);
-//                printRowBackground(out, row, board, pov);
+                eachRow(out, row, i, board, pov, validMoves, highlightPosition);
                 row--;
             }
         } else {
             for (int i = 8; i >= 1; i--) {
-//                printRowBackground(out, row, board, pov);
-                eachRow(out, row, i, board, pov);
+                eachRow(out, row, i, board, pov, validMoves, highlightPosition);
                 row--;
             }
         }
     }
 
-    public static void printRowBackground(PrintStream out, int row, ChessBoard board, ChessGame.TeamColor pov) {
+    public static void printRowBackground(PrintStream out, int row, ChessBoard board, ChessGame.TeamColor pov, Collection<ChessMove> validMoves, ChessPosition highlightPosition) {
 
         for (int i = 1; i <= BOARD_SIZE_IN_SQUARES; i++) {
-            int column = (pov == ChessGame.TeamColor.WHITE) ? i : (BOARD_SIZE_IN_SQUARES - i - 1); // Flip column order only for Black
 
             boolean isDark;
             ChessPosition currentPos;
@@ -79,19 +88,17 @@ public class GameBoardDrawing {
             if (pov.equals(ChessGame.TeamColor.BLACK)) {
                 isDark = (row + (BOARD_SIZE_IN_SQUARES - i + 1)) % 2 == 0;
                 currentPos = new ChessPosition(row, BOARD_SIZE_IN_SQUARES - i + 1);
-                pieceToPrint = getPieceToPrint(board, currentPos);
             } else {
                 isDark = (row + i) % 2 == 0;
                 currentPos = new ChessPosition(row, i);
-                pieceToPrint = getPieceToPrint(board, currentPos);
             }
+            pieceToPrint = getPieceToPrint(board, currentPos);
 
             out.print(SET_TEXT_COLOR_BLACK);
             out.print(isDark ? DARK_SQUARE + pieceToPrint : LIGHT_SQUARE + pieceToPrint);
         }
         out.print(RESET_TEXT_COLOR);
     }
-
 
     public static String getPieceToPrint(ChessBoard board, ChessPosition position) {
         if (board.getPiece(position) == null) {
@@ -111,10 +118,10 @@ public class GameBoardDrawing {
         }
     }
 
-    public static void eachRow(PrintStream out, int row, int i, ChessBoard board, ChessGame.TeamColor pov) {
+    public static void eachRow(PrintStream out, int row, int i, ChessBoard board, ChessGame.TeamColor pov, Collection<ChessMove> validMoves, ChessPosition highlightPosition) {
         int adjustForBlackPOV = ((pov == ChessGame.TeamColor.BLACK) ? (BOARD_SIZE_IN_SQUARES - row + 1) : row);
         printNumbers(out, i);
-        printRowBackground(out, adjustForBlackPOV, board, pov);
+        printRowBackground(out, adjustForBlackPOV, board, pov, validMoves, highlightPosition);
         printNumbers(out, i);
         out.println();
     }

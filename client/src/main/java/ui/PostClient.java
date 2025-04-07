@@ -120,7 +120,7 @@ public class PostClient implements ChessClient {
                 sf.setGame(chessGame);
                 sf.setTeamColor(teamColor);
                 gs.stateInGame();
-                GameBoardDrawing.drawBoard(teamColor, chessGame.getBoard());
+                GameBoardDrawing.drawBoard(teamColor, chessGame.getBoard(), null);
 
                 return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
                         + teamColor + RESET_TEXT_COLOR + " player.";
