@@ -106,8 +106,8 @@ public class ServerFacade {
             throw new ResponseException(400, "Error: unauthorized");
         }
 
-        ChessGame game = new ChessGame();
-        GameBoardDrawing.drawBoard(ChessGame.TeamColor.WHITE, game.getBoard(), null);
+//        ChessGame game = new ChessGame();
+//        GameBoardDrawing.drawBoard(ChessGame.TeamColor.WHITE, game.getBoard(), null);
     }
 
     public void clear() {

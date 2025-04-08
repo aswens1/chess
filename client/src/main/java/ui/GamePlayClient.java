@@ -42,7 +42,8 @@ public class GamePlayClient implements ChessClient{
     }
 
     public String redraw() {
-        GameBoardDrawing.drawBoard(sf.getTeamColor(), sf.getGame().getBoard(), null);
+        ChessGame currentGame = sf.getGame();
+        GameBoardDrawing.drawBoard(sf.getTeamColor(), sf.getGame().getBoard(), null, currentGame);
         return SET_TEXT_COLOR_BLUE + "Redrawing" + RESET_TEXT_COLOR + " the board.";
     }
 

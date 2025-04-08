@@ -7,25 +7,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 
-import static java.lang.System.out;
 import static ui.EscapeSequences.*;
 
 public class GameBoardDrawing {
-
-    private static ServerFacade sf;
 
     private static final int BOARD_SIZE_IN_SQUARES = 8;
 
     private static final String DARK_SQUARE = SET_BG_COLOR_BLUE;
     private static final String LIGHT_SQUARE = SET_BG_COLOR_WHITE;
 
-    public static void drawBoard(ChessGame.TeamColor pov, ChessBoard board, ChessPosition highlightPosition) {
-
+    public static void drawBoard(ChessGame.TeamColor pov, ChessBoard board, ChessPosition highlightPosition, ChessGame currentGame) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
 
         Collection<ChessMove> validMoves = List.of();
-        ChessGame currentGame = sf.getGame();
         if (highlightPosition != null) {
             validMoves = currentGame.validMoves(highlightPosition);
         }
@@ -82,6 +77,7 @@ public class GameBoardDrawing {
         for (int i = 1; i <= BOARD_SIZE_IN_SQUARES; i++) {
 
             boolean isDark;
+            boolean highLightPiece;
             ChessPosition currentPos;
             String pieceToPrint = "";
             
@@ -92,12 +88,32 @@ public class GameBoardDrawing {
                 isDark = (row + i) % 2 == 0;
                 currentPos = new ChessPosition(row, i);
             }
+
+            highLightPiece = highlight(validMoves, currentPos);
             pieceToPrint = getPieceToPrint(board, currentPos);
 
             out.print(SET_TEXT_COLOR_BLACK);
-            out.print(isDark ? DARK_SQUARE + pieceToPrint : LIGHT_SQUARE + pieceToPrint);
+
+            if (currentPos == highlightPosition) {
+                out.print(SET_BG_COLOR_YELLOW + pieceToPrint);
+            } else if (highLightPiece) {
+                out.print(isDark ? SET_BG_COLOR_DARK_GREEN + pieceToPrint : SET_BG_COLOR_GREEN + pieceToPrint);
+            } else {
+                out.print(isDark ? DARK_SQUARE + pieceToPrint : LIGHT_SQUARE + pieceToPrint);
+            }
         }
         out.print(RESET_TEXT_COLOR);
+    }
+
+    private static boolean highlight(Collection<ChessMove> validMoves, ChessPosition currentPosition) {
+        if (validMoves != null) {
+            for (ChessMove move : validMoves) {
+                if (move.getEndPosition() == currentPosition) {
+                    return true;
+                }
+            }
+        }
+       return false;
     }
 
     public static String getPieceToPrint(ChessBoard board, ChessPosition position) {
