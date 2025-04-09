@@ -2,6 +2,7 @@ package server;
 import dataaccess.*;
 import exception.ResponseException;
 import handler.*;
+import server.websocket.WebSocketHandler;
 import service.*;
 import spark.*;
 
@@ -12,26 +13,29 @@ public class Server {
     private final GameHandler gameHandler;
     static ClearService clearService;
     private final ClearHandler clearHandler;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         SQLAuthDataAccess sqlAuthDataAccess = new SQLAuthDataAccess();
         SQLUserDataAccess sqlUserDataAccess = new SQLUserDataAccess();
         SQLGameDataAccess sqlGameDataAccess = new SQLGameDataAccess();
 
-
         userService = new UserService(sqlUserDataAccess, sqlAuthDataAccess);
         gameService = new GameService(sqlUserDataAccess, sqlAuthDataAccess, sqlGameDataAccess);
         clearService = new ClearService(sqlUserDataAccess, sqlAuthDataAccess, sqlGameDataAccess);
-
 
         AuthTokenValidationHandler validAuthToken = new AuthTokenValidationHandler(sqlAuthDataAccess);
         userHandler = new UserHandler(userService, validAuthToken);
         gameHandler = new GameHandler(gameService, validAuthToken, sqlAuthDataAccess);
         clearHandler = new ClearHandler(clearService);
+
+        webSocketHandler = new WebSocketHandler();
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         Spark.staticFiles.location("web");
 
@@ -48,8 +52,6 @@ public class Server {
         Spark.put("/game", gameHandler::joinGame);
 
         Spark.delete("/db", clearHandler::clearAllDatabases);
-
-
 
         Spark.exception(ResponseException.class, this::responseExHandler);
 

@@ -70,7 +70,7 @@ public class GameDAO implements GameDAOInterface {
     }
 
     @Override
-    public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
+    public ChessGame joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
         GameDataRecord gameToJoin = getGame(gameID);
 
         if (gameToJoin == null) {
@@ -88,6 +88,7 @@ public class GameDAO implements GameDAOInterface {
         } else {
             throw new ResponseException(400, "Error: bad request");
         }
+        return gameToJoin.game();
     }
 
 

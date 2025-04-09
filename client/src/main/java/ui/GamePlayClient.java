@@ -79,4 +79,5 @@ public class GamePlayClient implements ChessClient{
         };
         return String.join("\n", helpCommands);
     }
+
 }

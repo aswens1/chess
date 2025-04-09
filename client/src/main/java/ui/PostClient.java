@@ -4,6 +4,9 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import records.*;
+import websocket.WebSocketClient;
+import websocket.WebSocketFacade;
+import websocket.commands.UserGameCommand;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,12 +21,15 @@ public class PostClient implements ChessClient {
     private final State state;
     private final ServerFacade sf;
     private final GameState gs;
+    private final WebSocketFacade wsf;
+    private GamePlayClient gamePlayClient;
 
 
-    public PostClient(ServerFacade sf, State state, GameState gs) {
+    public PostClient(ServerFacade sf, State state, GameState gs, WebSocketFacade wsf) {
         this.sf = sf;
         this.state = state;
         this.gs = gs;
+        this.wsf = wsf;
     }
 
     @Override
@@ -116,11 +122,13 @@ public class PostClient implements ChessClient {
                 }
 
                 sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
-//                ChessGame chessGame = new ChessGame();
-//                sf.setGame(chessGame);
-//                sf.setTeamColor(teamColor);
-//                gs.stateInGame();
-//                GameBoardDrawing.drawBoard(teamColor, chessGame.getBoard(), null);
+                sf.setTeamColor(teamColor);
+                gs.stateInGame();
+                wsf.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, sf.returnAuth(), gameToJoin.gameID(), teamColor));
+
+//                gamePlayClient = new GamePlayClient(sf, gs);
+
+                GameBoardDrawing.drawBoard(teamColor, sf.getGame().getBoard(), null, sf.getGame());
 
                 return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
                         + teamColor + RESET_TEXT_COLOR + " player.";

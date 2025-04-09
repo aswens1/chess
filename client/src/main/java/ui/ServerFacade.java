@@ -5,6 +5,9 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import model.*;
 import records.*;
+import websocket.NotificationHandler;
+import websocket.WebSocketClient;
+import websocket.WebSocketFacade;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,7 +101,8 @@ public class ServerFacade {
 
     public void join(JoinGameRequest joinGameRequest, String authToken) {
         var path = "/game";
-        this.makeRequest("PUT", path, joinGameRequest , authToken, JoinGameResult.class);
+        JoinGameResult result = this.makeRequest("PUT", path, joinGameRequest , authToken, JoinGameResult.class);
+        setGame(result.game());
     }
 
     public void observe(int gameID, String authToken) {

@@ -147,7 +147,7 @@ public class SQLGameDataAccess implements GameDAOInterface{
     }
 
     @Override
-    public void joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
+    public ChessGame joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
         if (gameID == null) {
             throw new ResponseException(400, "Error: invalid gameID");
         }
@@ -178,6 +178,8 @@ public class SQLGameDataAccess implements GameDAOInterface{
                 }
             }
 
+            GameDataRecord gameDataRecord = getGame(gameID);
+            return gameDataRecord.game();
 
         } catch (SQLException e) {
             throw new ResponseException(500, "GameData Database Error: " + e.getMessage());

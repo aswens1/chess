@@ -60,6 +60,8 @@ public class WebSocketHandler {
             ChessGame game = serializer.fromJson(gameData.game().toString(), ChessGame.class);
             connections.add(UGC.getGameID(), session);
 
+            ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            session.getRemote().sendString(serializer.toJson(load));
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null);

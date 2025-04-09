@@ -1,5 +1,10 @@
 package ui;
 
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
+import websocket.messages.Notifications;
+import websocket.messages.ServerMessage;
+
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
@@ -15,12 +20,18 @@ public class Repl {
     private final State state = new State();
     private final GameState gameState = new GameState();
 
+    private final NotificationHandler notificationHandler = new NotificationHandler() {
+        @Override
+        public void notify(ServerMessage message) {
+        }
+    };
 
 
     public Repl(String serverURL) {
         ServerFacade sf = new ServerFacade(serverURL);
+        WebSocketFacade wsf = new WebSocketFacade(serverURL, notificationHandler);
         preClient = new PreClient(sf, state);
-        postClient = new PostClient(sf, state, gameState);
+        postClient = new PostClient(sf, state, gameState, wsf);
         gameClient = new GamePlayClient(sf, gameState);
     }
 

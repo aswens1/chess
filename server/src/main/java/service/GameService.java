@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
 import records.*;
 
@@ -32,7 +33,7 @@ public class GameService {
     }
 
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String username) {
-        sqlGame.joinGame(joinGameRequest.playerColor(), joinGameRequest.gameID(), username);
-        return new JoinGameResult();
+        ChessGame game = sqlGame.joinGame(joinGameRequest.playerColor(), joinGameRequest.gameID(), username);
+        return new JoinGameResult(game);
     }
 }
