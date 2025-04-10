@@ -26,8 +26,6 @@ public class WebSocketFacade extends Endpoint {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
 
-//            System.out.println(socketURI);
-
             this.notificationHandler = notificationHandler;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
@@ -37,22 +35,8 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage notification = gson.fromJson(message, ServerMessage.class);
-
-                    switch (notification.getServerMessageType()) {
-                        case NOTIFICATION:
-                            Notifications notifications = gson.fromJson(message, Notifications.class);
-                            notificationHandler.notify(notifications);
-                            break;
-                        case LOAD_GAME:
-                            ServerMessage loadGame = gson.fromJson(message, ServerMessage.class);
-                            currentBoard = loadGame.getGame().getBoard();
-                            GameBoardDrawing.drawBoard(playerColor, currentBoard, null, loadGame.getGame());
-                            break;
-                        case ERROR:
-                            ServerMessage errorMessage = gson.fromJson(message, ServerMessage.class);
-                            errorMessage.setMessage(errorMessage.getMessage());
-                    }
+                    Notifications notifications = new Gson().fromJson(message, Notifications.class);
+                    notificationHandler.notify(notifications);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -61,12 +45,23 @@ public class WebSocketFacade extends Endpoint {
     }
 
     @Override
-    public void onOpen(Session session, EndpointConfig endpointConfig) {
+    public void onOpen(Session session, EndpointConfig endpointConfig) {}
+
+    public void connectingToGame(String authToken, Integer gameID, ChessGame.TeamColor pov, String username) throws IOException {
+        try {
+            UserGameCommand UGC = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, pov, username);
+            System.out.println("Sending command: " + UGC);
+            this.session.getBasicRemote().sendText(new Gson().toJson(UGC));
+        } catch (IOException exception) {
+            throw new ResponseException(500, exception.getMessage());
+        }
     }
+
 
     public void sendCommand(UserGameCommand UGC) {
         if (session != null && session.isOpen()) {
             String json = new Gson().toJson(UGC);
+            System.out.println("Sending to server: " + json);
             session.getAsyncRemote().sendText(json);
         } else {
             System.out.println("Session is closed, cannot send message.");

@@ -47,13 +47,12 @@ public class Repl {
             String line = scanner.nextLine();
 
             try {
-                if (!state.isLoggedIn()) {
-                    command = preClient.eval(line);
-                } else {
+                if (gameState.isInGame()) {
+                    command = gameClient.eval(line);
+                } else if (!gameState.isInGame() && state.isLoggedIn()) {
                     command = postClient.eval(line);
-                    if (gameState.isInGame()) {
-                        command = gameClient.eval(line);
-                    }
+                } else {
+                    command = preClient.eval(line);
                 }
 
                 System.out.println(command);

@@ -30,6 +30,7 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
+        System.out.println("Received WebSocket message: " + message);
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
         SQLAuthDataAccess authDataAccess = new SQLAuthDataAccess();
@@ -37,20 +38,6 @@ public class WebSocketHandler {
 
         AuthDataRecord auth = authDataAccess.getAuthData(command.authToken());
         GameDataRecord gameData = gameDataAccess.getGame(command.gameID());
-
-        if (auth == null) {
-            ServerMessage errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null);
-            errorMessage.setMessage("Invalid" + SET_TEXT_COLOR_BLUE + "AuthToken" + RESET_TEXT_COLOR);
-            session.getRemote().sendString(serializer.toJson(errorMessage));
-            return;
-        }
-
-        if (gameData == null) {
-            ServerMessage gameError = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null);
-            gameError.setMessage(SET_TEXT_COLOR_BLUE + "Game" + RESET_TEXT_COLOR + " not found.");
-            session.getRemote().sendString(serializer.toJson(gameError));
-            return;
-        }
 
         ChessGame game = serializer.fromJson(gameData.game().toString(), ChessGame.class);
 
@@ -65,8 +52,10 @@ public class WebSocketHandler {
     private void connect(Session session, UserGameCommand UGC, ChessGame game) throws IOException{
        int gameID = UGC.gameID();
 
-       sessions.putIfAbsent(gameID, new ArrayList<>());
-       sessions.get(gameID).add(session);
+//       sessions.putIfAbsent(gameID, new ArrayList<>());
+//       sessions.get(gameID).add(session);
+
+       connections.add(UGC.gameID(), UGC.username(), session);
 
         try {
             ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
@@ -75,19 +64,7 @@ public class WebSocketHandler {
             String joinMessage = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has joined the game.";
             Notifications notification = new Notifications(joinMessage, null);
 
-            for (Session sesh : sessions.get(gameID)) {
-                if (sesh.isOpen() && !sesh.equals(session)) {
-                    sesh.getRemote().sendString(serializer.toJson(notification));
-                }
-            }
-
-//            connections.add(UGC.gameID(), UGC.username(), session);
-//            ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-//            session.getRemote().sendString(serializer.toJson(load));
-
-//            String joinMessage = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has joined the game.";
-//            Notifications notification = new Notifications(joinMessage, null);
-//            connections.broadcast(gameData.gameID(), UGC.username(), notification);
+            connections.broadcast(gameID, UGC.username(), notification);
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null);
@@ -112,12 +89,9 @@ public class WebSocketHandler {
 
             String message = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has resigned the game.";
             Notifications resignMessage = new Notifications(message, null);
+            connections.broadcast(gameID, UGC.username(), resignMessage);
+            connections.remove(gameID, UGC.username());
 
-            for (Session sesh : sessions.get(gameID)) {
-                if (sesh.isOpen()) {
-                    sesh.getRemote().sendString(serializer.toJson(resignMessage));
-                }
-            }
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null);
             error.setMessage("Resignation error: " + exception.getMessage());

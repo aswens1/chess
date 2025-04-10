@@ -7,6 +7,7 @@ import records.*;
 import websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -112,7 +113,6 @@ public class PostClient implements ChessClient {
                 }
 
                 CondensedGameData gameToJoin = game.get(userInId);
-
                 int serverGameID = gameToJoin.gameID();
 
                 if ((teamColor == ChessGame.TeamColor.WHITE && gameToJoin.whiteUsername() != null) ||
@@ -122,16 +122,19 @@ public class PostClient implements ChessClient {
 
                 sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
                 sf.setTeamColor(teamColor);
-                gs.stateInGame();
                 sf.setGameID(serverGameID);
-                wsf.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, sf.returnAuth(), gameToJoin.gameID(), teamColor, sf.getUsername()));
+                String authToken = sf.returnAuth();
 
-//                GameBoardDrawing.drawBoard(teamColor, sf.getGame().getBoard(), null, sf.getGame());
+                gs.stateInGame();
+
+                wsf.connectingToGame(authToken, gameToJoin.gameID(), teamColor, sf.getUsername());
 
                 return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
                         + teamColor + RESET_TEXT_COLOR + " player.";
             } catch (NumberFormatException ex) {
                 throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: join <ID> <WHITE|BLACK>" + RESET_TEXT_COLOR);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         } catch (ResponseException ex) {
             throw new ResponseException(ex.statusCode(), ex.getMessage());

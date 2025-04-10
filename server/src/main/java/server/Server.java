@@ -28,13 +28,14 @@ public class Server {
         userHandler = new UserHandler(userService, validAuthToken);
         gameHandler = new GameHandler(gameService, validAuthToken, sqlAuthDataAccess);
         clearHandler = new ClearHandler(clearService);
-
         webSocketHandler = new WebSocketHandler();
+
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
+//        WebSocketHandler webSocketHandler = new WebSocketHandler();
         Spark.webSocket("/ws", webSocketHandler);
 
         Spark.staticFiles.location("web");
