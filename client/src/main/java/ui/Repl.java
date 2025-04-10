@@ -32,7 +32,7 @@ public class Repl {
         WebSocketFacade wsf = new WebSocketFacade(serverURL, notificationHandler);
         preClient = new PreClient(sf, state);
         postClient = new PostClient(sf, state, gameState, wsf);
-        gameClient = new GamePlayClient(sf, gameState);
+        gameClient = new GamePlayClient(sf, gameState, wsf);
     }
 
 

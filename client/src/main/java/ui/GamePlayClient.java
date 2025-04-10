@@ -2,8 +2,11 @@ package ui;
 
 import chess.*;
 import exception.ResponseException;
+import websocket.WebSocketFacade;
+import websocket.commands.UserGameCommand;
 
 import java.util.Arrays;
+import java.util.Scanner;
 
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
@@ -12,11 +15,13 @@ public class GamePlayClient implements ChessClient{
 
     private final ServerFacade sf;
     private final GameState gs;
+    private final WebSocketFacade wsf;
 
 
-    public GamePlayClient(ServerFacade sf, GameState gs) {
+    public GamePlayClient(ServerFacade sf, GameState gs, WebSocketFacade wsf) {
         this.sf = sf;
         this.gs = gs;
+        this.wsf = wsf;
     }
 
 
@@ -44,7 +49,8 @@ public class GamePlayClient implements ChessClient{
     public String redraw() {
         ChessGame currentGame = sf.getGame();
         GameBoardDrawing.drawBoard(sf.getTeamColor(), sf.getGame().getBoard(), null, currentGame);
-        return SET_TEXT_COLOR_BLUE + "Redrawing" + RESET_TEXT_COLOR + " the board.";
+
+        return "Board" + SET_TEXT_COLOR_BLUE + " redrawn" + RESET_TEXT_COLOR + ".";
     }
 
     public String leave() {
@@ -58,13 +64,33 @@ public class GamePlayClient implements ChessClient{
     }
 
     public String resign() {
-        return null;
+        System.out.print("Are you sure? " + SET_TEXT_COLOR_BLUE + "(yes/no)" + RESET_TEXT_COLOR + ": ");
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine().trim().toLowerCase();
 
+        if (!input.equals("yes")) {
+            return SET_TEXT_COLOR_BLUE + "Resignation" + RESET_TEXT_COLOR + " cancelled.";
+        }
+
+        String authToken = sf.returnAuth();
+        if (authToken != null) {
+            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN, sf.returnAuth(), sf.getGameID(), sf.getTeamColor(), sf.getUsername());
+
+            if (wsf != null) {
+                try {
+                    wsf.sendCommand(resignUGC);
+                } catch (Exception exception) {
+                    System.out.println("Error sending resign command: " + exception.getMessage());
+                }
+            }
+        }
+
+        gs.stateLeaveGame();
+        return SET_TEXT_COLOR_BLUE + "You have resigned. " + RESET_TEXT_COLOR + "Returning to game selection.";
     }
 
     public String highlight(String... params) {
         return null;
-
     }
 
 

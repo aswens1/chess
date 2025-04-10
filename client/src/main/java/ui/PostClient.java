@@ -4,7 +4,6 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import records.*;
-import websocket.WebSocketClient;
 import websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
 
@@ -80,7 +79,7 @@ public class PostClient implements ChessClient {
         }
 
         sf.create(new CreateGameRequest(gameName), sf.returnAuth());
-        return "Created new game: " + SET_TEXT_COLOR_BLUE + gameName;
+        return "Created new game: " + SET_TEXT_COLOR_BLUE + gameName + RESET_TEXT_COLOR;
     }
 
     public String join(String... params) {
@@ -124,11 +123,10 @@ public class PostClient implements ChessClient {
                 sf.join(new JoinGameRequest(teamColor, serverGameID), sf.returnAuth());
                 sf.setTeamColor(teamColor);
                 gs.stateInGame();
-                wsf.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, sf.returnAuth(), gameToJoin.gameID(), teamColor));
+                sf.setGameID(serverGameID);
+                wsf.sendCommand(new UserGameCommand(UserGameCommand.CommandType.CONNECT, sf.returnAuth(), gameToJoin.gameID(), teamColor, sf.getUsername()));
 
-//                gamePlayClient = new GamePlayClient(sf, gs);
-
-                GameBoardDrawing.drawBoard(teamColor, sf.getGame().getBoard(), null, sf.getGame());
+//                GameBoardDrawing.drawBoard(teamColor, sf.getGame().getBoard(), null, sf.getGame());
 
                 return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
                         + teamColor + RESET_TEXT_COLOR + " player.";

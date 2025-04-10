@@ -8,10 +8,12 @@ public class Connection {
 
     public int gameID;
     public Session session;
+    public String username;
 
-    public Connection(int gameID, Session session) {
+    public Connection(int gameID, String username, Session session) {
         this.gameID = gameID;
         this.session = session;
+        this.username = username;
     }
 
     public void send(String msg) throws IOException {

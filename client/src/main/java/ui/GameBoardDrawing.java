@@ -28,8 +28,6 @@ public class GameBoardDrawing {
         printLetters(out, pov);
         printSquares(out, pov, BOARD_SIZE_IN_SQUARES, board, validMoves, highlightPosition);
         printLetters(out, pov);
-
-        out.println();
     }
 
     public static void printLetters(PrintStream out, ChessGame.TeamColor pov) {

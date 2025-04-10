@@ -5,9 +5,6 @@ import com.google.gson.Gson;
 import exception.ResponseException;
 import model.*;
 import records.*;
-import websocket.NotificationHandler;
-import websocket.WebSocketClient;
-import websocket.WebSocketFacade;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +17,7 @@ public class ServerFacade {
 
     private String authToken;
     private String username;
+    private int gameID;
 
     private ChessGame chessGame;
     private ChessGame.TeamColor teamColor;
@@ -30,19 +28,20 @@ public class ServerFacade {
     private final HashMap<Integer, CondensedGameData> gameMap = new HashMap<>();
 
 
-    public ServerFacade(String url) {
-        serverURL = url;
-    }
+    public ServerFacade(String url) { serverURL = url; }
 
     public void setAuth(String authToken) {
         this.authToken = authToken;
     }
 
-    public void setGame(ChessGame chessGame) {this.chessGame = chessGame;}
+    public void setGame(ChessGame chessGame) { this.chessGame = chessGame; }
 
     public void setTeamColor(ChessGame.TeamColor teamColor) { this.teamColor = teamColor; }
 
     public ChessGame getGame() { return chessGame; }
+
+    public void setGameID(int gameID) { this.gameID = gameID; }
+    public int getGameID() { return gameID; }
 
     public ChessGame.TeamColor getTeamColor() { return teamColor; }
 
@@ -86,6 +85,11 @@ public class ServerFacade {
 
     public void logoutUser(LogoutRequest logoutRequest) {
         var path = "/session";
+        setAuth(null);
+        setGame(null);
+        setTeamColor(null);
+        setUsername(null);
+        setGameID(0);
         this.makeRequest("DELETE", path, logoutRequest, logoutRequest.authToken(), LogoutResult.class);
     }
 
@@ -102,6 +106,7 @@ public class ServerFacade {
     public void join(JoinGameRequest joinGameRequest, String authToken) {
         var path = "/game";
         JoinGameResult result = this.makeRequest("PUT", path, joinGameRequest , authToken, JoinGameResult.class);
+        setTeamColor(joinGameRequest.playerColor());
         setGame(result.game());
     }
 
@@ -109,9 +114,6 @@ public class ServerFacade {
         if (authToken == null) {
             throw new ResponseException(400, "Error: unauthorized");
         }
-
-//        ChessGame game = new ChessGame();
-//        GameBoardDrawing.drawBoard(ChessGame.TeamColor.WHITE, game.getBoard(), null);
     }
 
     public void clear() {
