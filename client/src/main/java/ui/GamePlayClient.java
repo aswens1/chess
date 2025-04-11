@@ -74,7 +74,7 @@ public class GamePlayClient implements ChessClient{
 
         String authToken = sf.returnAuth();
         if (authToken != null) {
-            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN, sf.returnAuth(), sf.getGameID(), sf.getTeamColor(), sf.getUsername());
+            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername());
 
             if (wsf != null) {
                 try {

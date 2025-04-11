@@ -5,15 +5,14 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
 import org.eclipse.jetty.websocket.api.*;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
 import websocket.messages.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 
 @WebSocket
 public class WebSocketHandler {
@@ -26,34 +25,42 @@ public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
     Gson serializer = new Gson();
 
-    private final HashMap<Integer, ArrayList<Session>> sessions = new HashMap<>();
+    private final SQLAuthDataAccess authDataAccess = new SQLAuthDataAccess();
+    private final SQLGameDataAccess sqlGameDataAccess = new SQLGameDataAccess();
+
+    public WebSocketHandler() {
+        System.out.println("websockethandler instantiated");
+    }
+
+    @OnWebSocketConnect
+    public void onConnect(Session session) {
+        System.out.println("WebSocket connected: " + session.getRemoteAddress());
+    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         System.out.println("Received WebSocket message: " + message);
+        System.out.println("First char: " + message.charAt(0));
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
-        SQLAuthDataAccess authDataAccess = new SQLAuthDataAccess();
-        SQLGameDataAccess gameDataAccess = new SQLGameDataAccess();
-
         AuthDataRecord auth = authDataAccess.getAuthData(command.authToken());
-        GameDataRecord gameData = gameDataAccess.getGame(command.gameID());
+        GameDataRecord gameData = sqlGameDataAccess.getGame(command.gameID());
 
-        ChessGame game = serializer.fromJson(gameData.game().toString(), ChessGame.class);
+        System.out.println("gameData.game(): " + gameData.game());
+        System.out.println("class: " + gameData.game().getClass().getName());
 
         switch (command.commandType()) {
-            case CONNECT -> connect(session, command, game);
+            case CONNECT -> connect(session, command, gameData.game());
             case MAKE_MOVE -> make_move();
             case LEAVE -> leave();
             case RESIGN -> resign(session, command);
         }
     }
 
+
+
     private void connect(Session session, UserGameCommand UGC, ChessGame game) throws IOException{
        int gameID = UGC.gameID();
-
-//       sessions.putIfAbsent(gameID, new ArrayList<>());
-//       sessions.get(gameID).add(session);
 
        connections.add(UGC.gameID(), UGC.username(), session);
 

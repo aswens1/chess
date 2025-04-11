@@ -1,5 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPosition;
+import com.google.gson.Gson;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 import websocket.messages.Notifications;
@@ -22,10 +26,28 @@ public class Repl {
 
     private final NotificationHandler notificationHandler = new NotificationHandler() {
         @Override
-        public void notify(ServerMessage message) {
+        public void notify(String message) {
+            Gson serializer = new Gson();
+            ServerMessage msg = serializer.fromJson(message, ServerMessage.class);
+
+            switch (msg.getServerMessageType()) {
+                case LOAD_GAME -> {
+                    ChessGame currentGame = msg.getGame();
+                    ChessBoard currentBoard = currentGame.getBoard();
+                    ChessGame.TeamColor teamColor = currentGame.getTeamTurn();
+
+                    GameBoardDrawing.drawBoard(teamColor, currentBoard, null, currentGame);
+                }
+                case NOTIFICATION -> {
+
+                }
+                case ERROR -> {
+
+                }
+            }
+
         }
     };
-
 
     public Repl(String serverURL) {
         ServerFacade sf = new ServerFacade(serverURL);

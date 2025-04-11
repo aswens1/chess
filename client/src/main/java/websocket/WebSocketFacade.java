@@ -4,7 +4,6 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
-import ui.GameBoardDrawing;
 import websocket.commands.UserGameCommand;
 import websocket.messages.Notifications;
 import websocket.messages.ServerMessage;
@@ -26,17 +25,23 @@ public class WebSocketFacade extends Endpoint {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
 
-            this.notificationHandler = notificationHandler;
+            System.out.println(socketURI);
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
+            System.out.println("Connected to server? Session: " + this.session);
+            this.notificationHandler = notificationHandler;
 
             //set message handler
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notifications notifications = new Gson().fromJson(message, Notifications.class);
-                    notificationHandler.notify(notifications);
+                    try {
+                        notificationHandler.notify(message);
+                    } catch (Exception exception) {
+                        ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null);
+                        notificationHandler.notify(error.toString());
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -47,10 +52,10 @@ public class WebSocketFacade extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
-    public void connectingToGame(String authToken, Integer gameID, ChessGame.TeamColor pov, String username) throws IOException {
+    public void connectingToGame(String authToken, Integer gameID, String pov, String username) throws IOException {
         try {
             UserGameCommand UGC = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, pov, username);
-            System.out.println("Sending command: " + UGC);
+//            System.out.println("Sending command: " + UGC);
             this.session.getBasicRemote().sendText(new Gson().toJson(UGC));
         } catch (IOException exception) {
             throw new ResponseException(500, exception.getMessage());

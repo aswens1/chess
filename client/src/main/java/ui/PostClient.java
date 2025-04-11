@@ -127,7 +127,7 @@ public class PostClient implements ChessClient {
 
                 gs.stateInGame();
 
-                wsf.connectingToGame(authToken, gameToJoin.gameID(), teamColor, sf.getUsername());
+                wsf.connectingToGame(authToken, gameToJoin.gameID(), teamColor.toString(), sf.getUsername());
 
                 return "Joined " + SET_TEXT_COLOR_BLUE + gameToJoin.gameName() + RESET_TEXT_COLOR + " as " + SET_TEXT_COLOR_BLUE
                         + teamColor + RESET_TEXT_COLOR + " player.";

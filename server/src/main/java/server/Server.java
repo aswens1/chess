@@ -13,7 +13,9 @@ public class Server {
     private final GameHandler gameHandler;
     static ClearService clearService;
     private final ClearHandler clearHandler;
-    private final WebSocketHandler webSocketHandler;
+
+
+//    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         SQLAuthDataAccess sqlAuthDataAccess = new SQLAuthDataAccess();
@@ -28,17 +30,17 @@ public class Server {
         userHandler = new UserHandler(userService, validAuthToken);
         gameHandler = new GameHandler(gameService, validAuthToken, sqlAuthDataAccess);
         clearHandler = new ClearHandler(clearService);
-        webSocketHandler = new WebSocketHandler();
+//        webSocketHandler = new WebSocketHandler();
 
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
-//        WebSocketHandler webSocketHandler = new WebSocketHandler();
-        Spark.webSocket("/ws", webSocketHandler);
-
         Spark.staticFiles.location("web");
+
+        WebSocketHandler webSocketHandler = new WebSocketHandler();
+        Spark.webSocket("/ws", webSocketHandler);
 
         Spark.post("/user", userHandler::register);
 
