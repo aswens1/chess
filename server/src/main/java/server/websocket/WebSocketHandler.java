@@ -40,16 +40,25 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
 //        System.out.println("Received WebSocket message: " + message);
 //        System.out.println("First char: " + message.charAt(0));
-        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+        UserGameCommand command = serializer.fromJson(message, UserGameCommand.class);
 
         AuthDataRecord auth = authDataAccess.getAuthData(command.authToken());
         GameDataRecord gameData = sqlGameDataAccess.getGame(command.gameID());
+
+        if (auth == null) {
+            sendError(session, "Invalid authentication token.");
+            return;
+        }
+        if (gameData == null) {
+            sendError(session, "Game not found with ID: " + command.gameID());
+            return;
+        }
 
 //        System.out.println("gameData.game(): " + gameData.game());
 //        System.out.println("class: " + gameData.game().getClass().getName());
 
         switch (command.commandType()) {
-            case CONNECT -> connect(session, command, gameData.game());
+            case CONNECT -> connect(session, command, auth, gameData);
             case MAKE_MOVE -> make_move(session, command);
             case LEAVE -> leave(session, command);
             case RESIGN -> resign(session, command);
@@ -58,32 +67,57 @@ public class WebSocketHandler {
 
 
 
-    private void connect(Session session, UserGameCommand UGC, ChessGame game) throws IOException{
-       int gameID = UGC.gameID();
+    private void connect(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData) throws IOException{
 
-       connections.add(UGC.gameID(), UGC.username(), session);
+        ChessGame game = gameData.game();
+        String blackUser = gameData.blackUsername();
+        String whiteUser = gameData.whiteUsername();
 
-       ChessGame.TeamColor pov;
-        if (UGC.playerColor().equals("WHITE")) {
-            pov = ChessGame.TeamColor.WHITE;
-        } else {
-            pov = ChessGame.TeamColor.BLACK;
+        String username = "";
+        if (UGC.username() == null) {
+            username = authData.username();
         }
+        ChessGame.TeamColor pov;
+        if (UGC.playerColor() == null) {
+            pov = getTeamColor(username, blackUser, whiteUser);
+        } else {
+            if (UGC.playerColor().equals("WHITE")) {
+                pov = ChessGame.TeamColor.WHITE;
+            } else {
+                pov = ChessGame.TeamColor.BLACK;
+            }
+        }
+
+        int gameID = UGC.gameID();
+
+        connections.add(UGC.gameID(), username, session);
 
         try {
             ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, pov);
             session.getRemote().sendString(serializer.toJson(load));
 
-            String joinMessage = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has joined the game.";
+            String joinMessage = SET_TEXT_COLOR_BLUE + username + RESET_TEXT_COLOR + " has joined the game.";
             Notifications notification = new Notifications(joinMessage, null, null);
 
-            connections.broadcast(gameID, UGC.username(), notification);
+            connections.broadcast(gameID, username, notification);
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
             error.setMessage(SET_TEXT_COLOR_BLUE + "Failed to connect: " + RESET_TEXT_COLOR + exception.getMessage());
             session.getRemote().sendString(serializer.toJson(error));
         }
+    }
+
+    private static ChessGame.TeamColor getTeamColor(String username, String blackUser, String whiteUser) {
+        ChessGame.TeamColor pov = null;
+        if (username != null) {
+           if (blackUser.equals(username)) {
+               pov = ChessGame.TeamColor.BLACK;
+           } else if (whiteUser.equals(username)) {
+               pov = ChessGame.TeamColor.WHITE;
+           }
+        }
+        return pov;
     }
 
     private void make_move(Session session, UserGameCommand UGC) throws IOException {
@@ -129,6 +163,8 @@ public class WebSocketHandler {
             Notifications leaveMessage = new Notifications(message, null, null);
             connections.broadcast(UGC.gameID(), UGC.username(), leaveMessage);
 
+            connections.remove(UGC.gameID(), UGC.username());
+
         } catch (Exception exception) {
 
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
@@ -156,4 +192,11 @@ public class WebSocketHandler {
             session.getRemote().sendString(serializer.toJson(error));
         }
     }
+
+    private void sendError(Session session, String msg) throws IOException {
+        ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+        error.setMessage(SET_TEXT_COLOR_BLUE + "Command Error: " + RESET_TEXT_COLOR + msg);
+        session.getRemote().sendString(serializer.toJson(error));
+    }
+
 }
