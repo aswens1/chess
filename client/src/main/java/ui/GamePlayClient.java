@@ -70,11 +70,19 @@ public class GamePlayClient implements ChessClient{
     }
 
     public String move(String... params) {
+        if (!gs.isPlayer()) {
+            return "Observers cannot make moves.";
+        }
+
         return null;
 
     }
 
     public String resign() {
+        if (!gs.isPlayer()) {
+            return "Observers cannot resign. Try " + SET_TEXT_COLOR_BLUE + "leave" + RESET_TEXT_COLOR + " if you are done observing.";
+        }
+
         System.out.print("Are you sure? " + SET_TEXT_COLOR_BLUE + "(yes/no)" + RESET_TEXT_COLOR + ": ");
         Scanner scanner = new Scanner(System.in);
         String input = scanner.nextLine().trim().toLowerCase();

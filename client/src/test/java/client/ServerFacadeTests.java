@@ -193,11 +193,11 @@ public class ServerFacadeTests {
 
         ListGamesResult listOne = sf.list(new ListGamesRequest(result.authToken()));
         assertNotNull(listOne);
+        assertFalse(listOne.games().isEmpty());
 
-        int gameInListId = 0;
-        CondensedGameData gameToJoin = listOne.games().get(gameInListId);
+        int actualGameID = listOne.games().getFirst().gameID();
 
-        assertDoesNotThrow(() -> sf.observe(gameToJoin.gameID(), result.authToken()));
+        assertDoesNotThrow(() -> sf.observe(actualGameID, result.authToken()));
     }
 
     @Test
@@ -210,10 +210,9 @@ public class ServerFacadeTests {
         ListGamesResult listOne = sf.list(new ListGamesRequest(result.authToken()));
         assertNotNull(listOne);
 
-        int gameInListId = 0;
-        CondensedGameData gameToJoin = listOne.games().get(gameInListId);
+        int actualGameID = listOne.games().getFirst().gameID();
 
-        assertThrows(ResponseException.class, () -> sf.observe(gameToJoin.gameID(), null));
+        assertThrows(ResponseException.class, () -> sf.observe(actualGameID, null));
     }
 
     @Test

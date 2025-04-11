@@ -2,11 +2,9 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
-import chess.ChessPosition;
 import com.google.gson.Gson;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
-import websocket.messages.Notifications;
 import websocket.messages.ServerMessage;
 
 import java.io.PrintStream;

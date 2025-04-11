@@ -48,6 +48,8 @@ public class Server {
 
         Spark.delete("/session", userHandler::logout);
 
+        Spark.get("/game/:id", gameHandler::getGame);
+
         Spark.get("/game", gameHandler::listGames);
 
         Spark.post("/game", gameHandler::createGame);

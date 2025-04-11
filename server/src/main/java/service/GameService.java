@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
+import model.GameDataRecord;
 import records.*;
 
 public class GameService {
@@ -35,5 +36,10 @@ public class GameService {
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String username) {
         ChessGame game = sqlGame.joinGame(joinGameRequest.playerColor(), joinGameRequest.gameID(), username);
         return new JoinGameResult(game);
+    }
+
+    public GetGameResult getGame(int gameID) {
+        GameDataRecord gameData = sqlGame.getGame(gameID);
+        return new GetGameResult(gameData);
     }
 }

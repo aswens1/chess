@@ -2,9 +2,11 @@ package handler;
 
 import com.google.gson.Gson;
 import dataaccess.SQLAuthDataAccess;
+import dataaccess.SQLGameDataAccess;
 import model.AuthDataRecord;
 import exception.ErrorMessage;
 import exception.ResponseException;
+import model.GameDataRecord;
 import records.*;
 import service.*;
 import spark.Request;
@@ -14,6 +16,7 @@ public class GameHandler {
     private final GameService gameService;
     private final AuthTokenValidationHandler validAuthToken;
     private final SQLAuthDataAccess sqlAuth;
+
 
     public GameHandler(GameService gameService, AuthTokenValidationHandler validAuthToken, SQLAuthDataAccess sqlAuth) {
         this.gameService = gameService;
@@ -80,6 +83,32 @@ public class GameHandler {
                 response.status(200);
                 return new Gson().toJson(joinGameResult);
             }
+            response.status(401);
+            return new Gson().toJson((new ErrorMessage(401, "Error: unauthorized")));
+        } catch (ResponseException ex) {
+            response.status(ex.statusCode());
+            return new Gson().toJson(new ErrorMessage(ex.statusCode(), ex.getMessage()));
+        } catch (Exception ex) {
+            response.status(500);
+            return new Gson().toJson(new ErrorMessage(500, "Error " + ex.getMessage()));
+        }
+    }
+
+    public Object getGame(Request request, Response response) {
+        String authToken = request.headers("Authorization");
+        try {
+            if (validAuthToken.isValidToken(authToken)) {
+
+                int gameID = Integer.parseInt(request.params("id"));
+
+//                GetGameRequest getGameRequest = new Gson().fromJson(request.body(), GetGameRequest.class);
+                GetGameResult getGameResult = gameService.getGame(gameID);
+
+                response.status(200);
+                return new Gson().toJson(getGameResult);
+            }
+
+
             response.status(401);
             return new Gson().toJson((new ErrorMessage(401, "Error: unauthorized")));
         } catch (ResponseException ex) {

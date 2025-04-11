@@ -47,25 +47,15 @@ public class ServerFacade {
 
     public String returnAuth() { return authToken; }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getUsername() { return username; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public void setUsername(String username) { this.username = username; }
 
-    public void createGameMap(int i, CondensedGameData gameData) {
-        gameMap.put(i, gameData);
-    }
+    public void createGameMap(int i, CondensedGameData gameData) { gameMap.put(i, gameData); }
 
-    public HashMap<Integer, CondensedGameData> getGameMap() {
-        return gameMap;
-    }
+    public HashMap<Integer, CondensedGameData> getGameMap() { return gameMap; }
 
-    public void resetGameMap() {
-        gameMap.clear();
-    }
+    public void resetGameMap() { gameMap.clear(); }
 
     public RegisterResult registerUser(RegisterRequest registerRequest) {
         var path = "/user";
@@ -114,6 +104,11 @@ public class ServerFacade {
         if (authToken == null) {
             throw new ResponseException(400, "Error: unauthorized");
         }
+
+        var path = "/game/" + gameID;
+        GetGameResult result = this.makeRequest("GET", path, null, authToken, GetGameResult.class);
+        setTeamColor(ChessGame.TeamColor.WHITE);
+        setGame(result.gameData().game());
     }
 
     public void clear() {

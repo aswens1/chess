@@ -126,6 +126,7 @@ public class PostClient implements ChessClient {
                 String authToken = sf.returnAuth();
 
                 gs.stateInGame();
+                gs.statePlayer();
 
                 wsf.connectingToGame(authToken, gameToJoin.gameID(), teamColor.toString(), sf.getUsername());
 
@@ -200,11 +201,24 @@ public class PostClient implements ChessClient {
             int serverGameID = gameToJoin.gameID();
 
             try {
-                sf.observe(serverGameID, sf.returnAuth());
+                String authToken = sf.returnAuth();
+
+                sf.observe(serverGameID, authToken);
                 gs.stateInGame();
+                gs.stateObserver();
+
+                ChessGame.TeamColor pov = ChessGame.TeamColor.WHITE;
+
+                sf.setTeamColor(pov);
+                sf.setGameID(serverGameID);
+
+                wsf.connectingToGame(authToken, gameToJoin.gameID(), pov.toString(), sf.getUsername());
+
                 return "Now observing game " + SET_TEXT_COLOR_BLUE + userInGameID + RESET_TEXT_COLOR + ".";
             } catch (ResponseException ex) {
                 throw new ResponseException(ex.statusCode(), ex.getMessage());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         } catch (NumberFormatException e) {
             throw new ResponseException(400, SET_TEXT_COLOR_BLUE + "Expected: observe <ID>" + RESET_TEXT_COLOR);
