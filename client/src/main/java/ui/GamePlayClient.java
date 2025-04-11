@@ -118,8 +118,6 @@ public class GamePlayClient implements ChessClient{
 
         GameBoardDrawing.drawBoard(sf.getTeamColor(), currentBoard, convertedPosition, currentGame);
 
-//        System.out.println(convertedPosition);
-
         return "";
     }
 
@@ -136,12 +134,6 @@ public class GamePlayClient implements ChessClient{
             String error =  "Invalid row number. Example position: " + SET_TEXT_COLOR_BLUE + "a1" + RESET_TEXT_COLOR;
             throw new ResponseException(401, error);
         }
-
-
-//        if (pov == ChessGame.TeamColor.BLACK) {
-//            col = 9 - col;
-//            row = 9 - row;
-//        }
 
         return new ChessPosition(row, col);
     }
