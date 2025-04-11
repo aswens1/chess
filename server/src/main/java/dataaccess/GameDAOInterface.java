@@ -9,7 +9,8 @@ public interface GameDAOInterface {
     List<CondensedGameData> listGames();
     int createGame(String gameName);
     GameDataRecord getGame(Integer gameID);
-    void updateGame(Integer gameID, String username, ChessGame.TeamColor playerColour);
+    void updateGamePlayer(Integer gameID, String username, ChessGame.TeamColor playerColour, ChessGame game);
+    void updateGameState(Integer gameID, String username, ChessGame.TeamColor playerColour, ChessGame game);
     ChessGame joinGame(ChessGame.TeamColor playerColour, Integer gameID, String username);
     void clear();
 }

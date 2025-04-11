@@ -1,6 +1,8 @@
 package service;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataaccess.*;
 import model.GameDataRecord;
 import records.*;
@@ -41,5 +43,30 @@ public class GameService {
     public GetGameResult getGame(int gameID) {
         GameDataRecord gameData = sqlGame.getGame(gameID);
         return new GetGameResult(gameData);
+    }
+
+    public MoveResult makeMove(MoveRequest moveRequest) throws InvalidMoveException {
+        GameDataRecord gameData = sqlGame.getGame(moveRequest.gameID());
+        ChessGame game = gameData.game();
+
+//        System.out.println("original board: " + game.getBoard().toString());
+
+        ChessMove move = moveRequest.move();
+        String username = moveRequest.username();
+        ChessGame.TeamColor pov = moveRequest.pov();
+
+//        System.out.println("move: " + move);
+
+        game.makeMove(move);
+
+//        System.out.println("move made?" + game.getBoard().toString());
+
+        sqlGame.updateGameState(moveRequest.gameID(), username, pov, game);
+
+        GameDataRecord updatedGame = sqlGame.getGame(moveRequest.gameID());
+
+//        System.out.println("updated board: " + updatedGame.game().getBoard().toString());
+
+        return new MoveResult(updatedGame.game());
     }
 }

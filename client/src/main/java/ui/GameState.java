@@ -1,13 +1,25 @@
 package ui;
 
+import chess.ChessGame;
+
 public class GameState {
 
     private boolean inGame;
     private boolean isPlayer;
 
+    private ChessGame game;
+
     public GameState() {
         this.inGame = false;
         this.isPlayer = false;
+    }
+
+    public void setGame(ChessGame game) {
+        this.game = game;
+    }
+
+    public ChessGame getGame() {
+        return game;
     }
 
     public void stateInGame() {

@@ -236,6 +236,18 @@ public class ChessGame {
         return false;
     }
 
+    public boolean isPromotionPiece(ChessPosition startPos, ChessPosition endPos) {
+
+        ChessPiece piece = board.getPiece(startPos);
+
+        if (piece == null || piece.getPieceType() != ChessPiece.PieceType.PAWN) {
+            return false;
+        }
+
+        return (piece.getTeamColor() == TeamColor.WHITE && endPos.getRow() == 8) ||
+                (piece.getTeamColor() == TeamColor.BLACK && endPos.getRow() == 1);
+    }
+
 
 
 }

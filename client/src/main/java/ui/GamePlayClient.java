@@ -2,6 +2,7 @@ package ui;
 
 import chess.*;
 import exception.ResponseException;
+import records.MoveRequest;
 import websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -57,7 +58,7 @@ public class GamePlayClient implements ChessClient{
     public String leave() {
         gs.stateLeaveGame();
 
-        UserGameCommand leaveUGC = new UserGameCommand(UserGameCommand.CommandType.LEAVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername());
+        UserGameCommand leaveUGC = new UserGameCommand(UserGameCommand.CommandType.LEAVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null);
         if (wsf != null) {
             try {
                 wsf.sendCommand(leaveUGC);
@@ -74,7 +75,70 @@ public class GamePlayClient implements ChessClient{
             return "Observers cannot make moves.";
         }
 
-        return null;
+        if (params.length != 2 || params[0] == null || params[0].length() != 2 && params[1].length() != 2) {
+            return "Invalid position. Example move: " + SET_TEXT_COLOR_BLUE + "a1 a2" + RESET_TEXT_COLOR;
+        }
+
+        String oldString = params[0];
+        String newString = params[1];
+
+        char oldPosColChar = oldString.charAt(0);
+        int oldPosRow = Character.getNumericValue(oldString.charAt(1));
+
+        char newPosColChar = newString.charAt(0);
+        int newPosRow = Character.getNumericValue(newString.charAt(1));
+
+        ChessPosition convertedStartPos = convertToChessPosition(oldPosColChar, oldPosRow, sf.getTeamColor());
+        ChessPosition convertedEndPos = convertToChessPosition(newPosColChar, newPosRow, sf.getTeamColor());
+
+        ChessGame game = sf.getGame();
+        ChessMove move;
+
+        if (game.isPromotionPiece(convertedStartPos, convertedEndPos)) {
+            String promotionText = "Choose a promotion piece: " + SET_TEXT_COLOR_BLUE + "queen" + RESET_TEXT_COLOR + ", "
+                    + SET_TEXT_COLOR_BLUE + "bishop" + RESET_TEXT_COLOR + ", " + SET_TEXT_COLOR_BLUE + "knight" + RESET_TEXT_COLOR
+                    + "rook" + RESET_TEXT_COLOR;
+            System.out.println(promotionText);
+
+            ChessPiece.PieceType promotion = null;
+
+            while (promotion == null) {
+                Scanner scanner = new Scanner(System.in);
+                String input = scanner.nextLine().toLowerCase();
+
+                promotion = switch (input) {
+                    case "queen" -> ChessPiece.PieceType.QUEEN;
+                    case "bishop" -> ChessPiece.PieceType.BISHOP;
+                    case "knight" -> ChessPiece.PieceType.KNIGHT;
+                    case "rook" -> ChessPiece.PieceType.ROOK;
+                    default -> {
+                        System.out.println("Invalid piece type. Please try again.");
+                        yield null;
+                    }
+                };
+            }
+            move = new ChessMove(convertedStartPos, convertedEndPos, promotion);
+        } else {
+            move = new ChessMove(convertedStartPos, convertedEndPos, null);
+        }
+
+        MoveRequest moveRequest = new MoveRequest(sf.getGameID(), move, sf.getUsername(), sf.getTeamColor());
+        sf.makeMove(moveRequest, sf.returnAuth());
+
+        gs.setGame(sf.getGame());
+
+        UserGameCommand moveUGC = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), oldString, newString);
+
+        if (wsf != null) {
+            try {
+                wsf.sendCommand(moveUGC);
+            } catch (Exception exception) {
+                System.out.println("Error sending move command: " + exception.getMessage());
+            }
+        }
+
+        return RESET_TEXT_COLOR + "Piece at " + SET_TEXT_COLOR_BLUE + oldString + RESET_TEXT_COLOR + " moved to "
+                + SET_TEXT_COLOR_BLUE + newString + RESET_TEXT_COLOR + ".";
 
     }
 
@@ -93,7 +157,7 @@ public class GamePlayClient implements ChessClient{
 
         String authToken = sf.returnAuth();
         if (authToken != null) {
-            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername());
+            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null);
 
             if (wsf != null) {
                 try {
@@ -129,7 +193,7 @@ public class GamePlayClient implements ChessClient{
         return "";
     }
 
-    private ChessPosition convertToChessPosition(char columnChar, int row, ChessGame.TeamColor pov) throws ResponseException {
+    public ChessPosition convertToChessPosition(char columnChar, int row, ChessGame.TeamColor pov) throws ResponseException {
 
         columnChar = Character.toLowerCase(columnChar);
         int col = columnChar - 'a' + 1;

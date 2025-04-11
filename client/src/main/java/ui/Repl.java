@@ -30,17 +30,22 @@ public class Repl {
 
             switch (msg.getServerMessageType()) {
                 case LOAD_GAME -> {
+//                    System.out.println("Received LOAD_GAME WebSocket message");
+
                     ChessGame currentGame = msg.getGame();
                     ChessBoard currentBoard = currentGame.getBoard();
+
+//                    System.out.println(currentBoard.toString());
+
                     ChessGame.TeamColor teamColor = msg.getPov();
+
+                    gameState.setGame(currentGame);
 
                     GameBoardDrawing.drawBoard(teamColor, currentBoard, null, currentGame);
                 }
                 case NOTIFICATION -> {
-
                 }
                 case ERROR -> {
-
                 }
             }
 

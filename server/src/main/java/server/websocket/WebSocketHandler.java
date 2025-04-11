@@ -38,7 +38,7 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        System.out.println("Received WebSocket message: " + message);
+//        System.out.println("Received WebSocket message: " + message);
 //        System.out.println("First char: " + message.charAt(0));
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
@@ -50,7 +50,7 @@ public class WebSocketHandler {
 
         switch (command.commandType()) {
             case CONNECT -> connect(session, command, gameData.game());
-            case MAKE_MOVE -> make_move();
+            case MAKE_MOVE -> make_move(session, command);
             case LEAVE -> leave(session, command);
             case RESIGN -> resign(session, command);
         }
@@ -86,7 +86,38 @@ public class WebSocketHandler {
         }
     }
 
-    private void make_move() {
+    private void make_move(Session session, UserGameCommand UGC) throws IOException {
+
+        ChessGame.TeamColor pov;
+        if (UGC.playerColor().equals("WHITE")) {
+            pov = ChessGame.TeamColor.WHITE;
+        } else {
+            pov = ChessGame.TeamColor.BLACK;
+        }
+
+        String start = UGC.ogPos();
+        String end = UGC.newPos();
+
+        try {
+            GameDataRecord updatedGameData = sqlGameDataAccess.getGame(UGC.gameID());
+            ChessGame updatedGame = updatedGameData.game();
+
+            System.out.println(updatedGame.getBoard().toString());
+
+            ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, updatedGame, pov);
+            session.getRemote().sendString(serializer.toJson(load));
+
+            String moveMess = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR +" moved the piece at " +
+                    SET_TEXT_COLOR_BLUE + start + RESET_TEXT_COLOR + " to " + SET_TEXT_COLOR_BLUE + end +
+                    RESET_TEXT_COLOR + ".";
+            Notifications notifications = new Notifications(moveMess, null, null);
+            connections.broadcast(UGC.gameID(), UGC.username(), notifications);
+
+        } catch (Exception exception) {
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setMessage("Move error: " + exception.getMessage());
+            session.getRemote().sendString(serializer.toJson(error));
+        }
 
     }
 

@@ -127,6 +127,7 @@ public class PostClient implements ChessClient {
 
                 gs.stateInGame();
                 gs.statePlayer();
+                gs.setGame(sf.getGame());
 
                 wsf.connectingToGame(authToken, gameToJoin.gameID(), teamColor.toString(), sf.getUsername());
 

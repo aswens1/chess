@@ -51,21 +51,35 @@ public class GameDAO implements GameDAOInterface {
     }
 
     @Override
-    public void updateGame(Integer gameID, String username, ChessGame.TeamColor playerColor) {
+    public void updateGamePlayer(Integer gameID, String username, ChessGame.TeamColor playerColor, ChessGame game) {
         GameDataRecord gameToUpdate = getGame(gameID);
 
         if (gameToUpdate != null) {
-            GameDataRecord updatedGame = null;
+            GameDataRecord updatedGame;
             if(playerColor == ChessGame.TeamColor.BLACK) {
                 updatedGame = new GameDataRecord(gameID, gameToUpdate.whiteUsername(), username,
-                                                                        gameToUpdate.gameName(), gameToUpdate.game());
+                                                                        gameToUpdate.gameName(), game);
             } else if (playerColor == ChessGame.TeamColor.WHITE) {
                 updatedGame = new GameDataRecord(gameID, username, gameToUpdate.blackUsername(),
-                        gameToUpdate.gameName(), gameToUpdate.game());
+                        gameToUpdate.gameName(), game);
             } else {
                 throw new ResponseException(400, "Error: bad request");
             }
             gameDataMap.put(gameID, updatedGame);
+        }
+    }
+
+    @Override
+    public void updateGameState(Integer gameID, String username, ChessGame.TeamColor playerColor, ChessGame updatedGame) {
+        GameDataRecord gameToUpdate = getGame(gameID);
+
+        if (gameToUpdate != null) {
+
+            GameDataRecord newGame = new GameDataRecord(gameID, gameToUpdate.whiteUsername(),
+                    gameToUpdate.blackUsername(), gameToUpdate.gameName(), updatedGame);
+
+            gameDataMap.put(gameID, newGame);
+
         }
     }
 
@@ -84,7 +98,7 @@ public class GameDAO implements GameDAOInterface {
         }
 
         if (playerColor == ChessGame.TeamColor.BLACK || playerColor == ChessGame.TeamColor.WHITE) {
-            updateGame(gameID, username, playerColor);
+            updateGamePlayer(gameID, username, playerColor, gameToJoin.game());
         } else {
             throw new ResponseException(400, "Error: bad request");
         }

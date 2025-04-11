@@ -229,8 +229,9 @@ public class DAOTests {
     @Test
     void positiveUpdateGame() {
         int gameID = testSQLGame.createGame("testingCreateGame");
+        ChessGame testGame = new ChessGame();
 
-        testSQLGame.updateGame(gameID, "testUserName", ChessGame.TeamColor.WHITE);
+        testSQLGame.updateGamePlayer(gameID, "testUserName", ChessGame.TeamColor.WHITE, testGame);
 
         String white = testSQLGame.getGame(gameID).whiteUsername();
         assertEquals("testUserName", white);
@@ -240,8 +241,9 @@ public class DAOTests {
     @Test
     void negativeUpdateGame() {
         int gameID = testSQLGame.createGame("testingCreateGame");
+        ChessGame testGame = new ChessGame();
 
-        ResponseException ex = assertThrows(ResponseException.class, () -> testSQLGame.updateGame(gameID, null, ChessGame.TeamColor.BLACK));
+        ResponseException ex = assertThrows(ResponseException.class, () -> testSQLGame.updateGamePlayer(gameID, null, ChessGame.TeamColor.BLACK, testGame));
         assertEquals("Error: bad request", ex.getMessage());
     }
 

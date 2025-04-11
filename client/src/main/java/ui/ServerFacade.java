@@ -111,6 +111,12 @@ public class ServerFacade {
         setGame(result.gameData().game());
     }
 
+    public void makeMove(MoveRequest moveRequest, String authToken) {
+        var path = "/game/move";
+        MoveResult moveResult = this.makeRequest("POST", path, moveRequest, authToken, MoveResult.class);
+        setGame(moveResult.game());
+    }
+
     public void clear() {
         var path = "/db";
         ClearRequest clearRequest = new ClearRequest();

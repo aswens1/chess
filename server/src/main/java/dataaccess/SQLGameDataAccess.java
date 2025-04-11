@@ -117,7 +117,7 @@ public class SQLGameDataAccess implements GameDAOInterface{
     }
 
     @Override
-    public void updateGame(Integer id, String username, ChessGame.TeamColor playerColour) {
+    public void updateGamePlayer(Integer id, String username, ChessGame.TeamColor playerColour, ChessGame game) {
         if (username == null) {
             throw new ResponseException(400, "Error: bad request");
         }
@@ -147,13 +147,35 @@ public class SQLGameDataAccess implements GameDAOInterface{
     }
 
     @Override
+    public void updateGameState(Integer gameID, String username, ChessGame.TeamColor playerColour, ChessGame game) {
+        if (gameID == null) {
+            throw new ResponseException(400, "Error: invalid gameID");
+        }
+
+        try (var conn = DatabaseManager.getConnection()) {
+            String sql = "UPDATE gamedata SET chess_game=? WHERE gameID=?";
+
+            var ps = conn.prepareStatement(sql);
+            ps.setString(1, new Gson().toJson(game));
+            ps.setInt(2, gameID);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new ResponseException(500, "GameData Database Error: " + e.getMessage());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public ChessGame joinGame(ChessGame.TeamColor playerColor, Integer gameID, String username) {
         if (gameID == null) {
             throw new ResponseException(400, "Error: invalid gameID");
         }
 
         try (var conn = DatabaseManager.getConnection()) {
-            String sql = "SELECT white_user, black_user FROM gamedata WHERE gameID=?";
+            String sql = "SELECT white_user, black_user, chess_game FROM gamedata WHERE gameID=?";
 
             var ps = conn.prepareStatement(sql);
             ps.setInt(1, gameID);
@@ -163,6 +185,7 @@ public class SQLGameDataAccess implements GameDAOInterface{
             if (rs.next()){
                 String white = rs.getString("white_user");
                 String black = rs.getString("black_user");
+                ChessGame game =  new Gson().fromJson(rs.getString("chess_game"), ChessGame.class);
 
 
                 if (playerColor == ChessGame.TeamColor.BLACK && black != null) {
@@ -172,7 +195,7 @@ public class SQLGameDataAccess implements GameDAOInterface{
                 }
 
                 if (playerColor == ChessGame.TeamColor.BLACK || playerColor == ChessGame.TeamColor.WHITE) {
-                    updateGame(gameID, username, playerColor);
+                    updateGamePlayer(gameID, username, playerColor, game);
                 } else {
                     throw new ResponseException(400, "Error: bad request");
                 }

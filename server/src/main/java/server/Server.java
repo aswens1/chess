@@ -56,6 +56,8 @@ public class Server {
 
         Spark.put("/game", gameHandler::joinGame);
 
+        Spark.post("/game/move", gameHandler::makeMove);
+
         Spark.delete("/db", clearHandler::clearAllDatabases);
 
         Spark.exception(ResponseException.class, this::responseExHandler);
