@@ -55,6 +55,16 @@ public class GamePlayClient implements ChessClient{
 
     public String leave() {
         gs.stateLeaveGame();
+
+        UserGameCommand leaveUGC = new UserGameCommand(UserGameCommand.CommandType.LEAVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername());
+        if (wsf != null) {
+            try {
+                wsf.sendCommand(leaveUGC);
+            } catch (Exception exception) {
+                System.out.println("Error sending leave command: " + exception.getMessage());
+            }
+        }
+
         return SET_TEXT_COLOR_BLUE + "Leaving" + RESET_TEXT_COLOR + " the game.";
     }
 

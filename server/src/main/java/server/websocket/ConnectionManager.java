@@ -28,6 +28,8 @@ public class ConnectionManager {
     }
 
     public void broadcast(Integer gameID, String excludeUser, Notifications notification) throws IOException {
+        System.out.println("Broadcasting to gameID " + gameID + ": " + notification);
+
         if (!connections.containsKey(gameID)) {
             return;
         }

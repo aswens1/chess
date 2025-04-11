@@ -4,7 +4,6 @@ import chess.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
-import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -40,19 +39,19 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         System.out.println("Received WebSocket message: " + message);
-        System.out.println("First char: " + message.charAt(0));
+//        System.out.println("First char: " + message.charAt(0));
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
 
         AuthDataRecord auth = authDataAccess.getAuthData(command.authToken());
         GameDataRecord gameData = sqlGameDataAccess.getGame(command.gameID());
 
-        System.out.println("gameData.game(): " + gameData.game());
-        System.out.println("class: " + gameData.game().getClass().getName());
+//        System.out.println("gameData.game(): " + gameData.game());
+//        System.out.println("class: " + gameData.game().getClass().getName());
 
         switch (command.commandType()) {
             case CONNECT -> connect(session, command, gameData.game());
             case MAKE_MOVE -> make_move();
-            case LEAVE -> leave();
+            case LEAVE -> leave(session, command);
             case RESIGN -> resign(session, command);
         }
     }
@@ -84,7 +83,21 @@ public class WebSocketHandler {
 
     }
 
-    private void leave() {
+    private void leave(Session session, UserGameCommand UGC) throws IOException {
+
+        try {
+
+            String message = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has left the game";
+            Notifications leaveMessage = new Notifications(message, null);
+            connections.broadcast(UGC.gameID(), UGC.username(), leaveMessage);
+
+        } catch (Exception exception) {
+
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null);
+            error.setMessage("Resignation error: " + exception.getMessage());
+            session.getRemote().sendString(serializer.toJson(error));
+
+        }
 
     }
 
