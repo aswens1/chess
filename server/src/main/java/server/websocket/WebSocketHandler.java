@@ -40,6 +40,7 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
 //        System.out.println("Received WebSocket message: " + message);
 //        System.out.println("First char: " + message.charAt(0));
+//        System.out.println("Incoming message: " + message);
         UserGameCommand command = serializer.fromJson(message, UserGameCommand.class);
 
         AuthDataRecord auth = authDataAccess.getAuthData(command.authToken());
@@ -56,6 +57,8 @@ public class WebSocketHandler {
 
 //        System.out.println("gameData.game(): " + gameData.game());
 //        System.out.println("class: " + gameData.game().getClass().getName());
+
+//        System.out.println("Parsed command type: " + command.commandType());
 
         switch (command.commandType()) {
             case CONNECT -> connect(session, command, auth, gameData);
@@ -97,8 +100,10 @@ public class WebSocketHandler {
             session.getRemote().sendString(serializer.toJson(load));
 
             String joinMessage = SET_TEXT_COLOR_BLUE + username + RESET_TEXT_COLOR + " has joined the game.";
-            Notifications notification = new Notifications(joinMessage, null, null);
 
+//            System.out.println("Join message to be broadcasted: " + joinMessage);
+
+            Notifications notification = new Notifications(joinMessage, null, null);
             connections.broadcast(gameID, username, notification);
 
         } catch (Exception exception) {
