@@ -57,8 +57,10 @@ public class PostClient implements ChessClient {
 
     public String logout() {
         try {
-            sf.logoutUser(new LogoutRequest(sf.returnAuth()));
             String tempUserName = sf.getUsername();
+
+            sf.logoutUser(new LogoutRequest(sf.returnAuth()));
+//            String tempUserName = sf.getUsername();
             sf.setUsername(null);
             sf.setAuth(null);
             state.stateLogOut();

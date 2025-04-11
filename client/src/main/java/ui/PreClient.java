@@ -79,6 +79,7 @@ public class PreClient implements ChessClient {
         }
 
         LoginResult login = sf.loginUser(new LoginRequest(username, password));
+        sf.setUsername(username);
         state.stateLogIn();
         return SET_TEXT_COLOR_BLUE + login.username() + RESET_TEXT_COLOR + " is now logged in!";
     }
