@@ -39,7 +39,7 @@ public class WebSocketFacade extends Endpoint {
                     try {
                         notificationHandler.notify(message);
                     } catch (Exception exception) {
-                        ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null);
+                        ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
                         notificationHandler.notify(error.toString());
                     }
                 }

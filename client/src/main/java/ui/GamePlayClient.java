@@ -4,6 +4,7 @@ import chess.*;
 import exception.ResponseException;
 import websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -99,8 +100,50 @@ public class GamePlayClient implements ChessClient{
         return SET_TEXT_COLOR_BLUE + "You have resigned. " + RESET_TEXT_COLOR + "Returning to game selection.";
     }
 
-    public String highlight(String... params) {
-        return null;
+    public String highlight(String... params) throws ResponseException {
+
+        if (params.length == 0 || params[0] == null || params[0].length() != 2) {
+            return "Invalid position. Example position: " + SET_TEXT_COLOR_BLUE + "a1" + RESET_TEXT_COLOR;
+        }
+
+        String highlightString = params[0];
+
+        char columnChar = highlightString.charAt(0);
+        int row = Character.getNumericValue(highlightString.charAt(1));
+
+        ChessPosition convertedPosition = convertToChessPosition(columnChar, row, sf.getTeamColor());
+
+        ChessGame currentGame = sf.getGame();
+        ChessBoard currentBoard = currentGame.getBoard();
+
+        GameBoardDrawing.drawBoard(sf.getTeamColor(), currentBoard, convertedPosition, currentGame);
+
+//        System.out.println(convertedPosition);
+
+        return "";
+    }
+
+    private ChessPosition convertToChessPosition(char columnChar, int row, ChessGame.TeamColor pov) throws ResponseException {
+
+        columnChar = Character.toLowerCase(columnChar);
+        int col = columnChar - 'a' + 1;
+
+        if (col < 1 || col > 8) {
+            throw new ResponseException(401, "Invalid position. Example position: " + SET_TEXT_COLOR_BLUE + "a1" + RESET_TEXT_COLOR);
+        }
+
+        if (row < 1 || row > 8) {
+            String error =  "Invalid row number. Example position: " + SET_TEXT_COLOR_BLUE + "a1" + RESET_TEXT_COLOR;
+            throw new ResponseException(401, error);
+        }
+
+
+//        if (pov == ChessGame.TeamColor.BLACK) {
+//            col = 9 - col;
+//            row = 9 - row;
+//        }
+
+        return new ChessPosition(row, col);
     }
 
 

@@ -34,7 +34,7 @@ public class Repl {
                 case LOAD_GAME -> {
                     ChessGame currentGame = msg.getGame();
                     ChessBoard currentBoard = currentGame.getBoard();
-                    ChessGame.TeamColor teamColor = currentGame.getTeamTurn();
+                    ChessGame.TeamColor teamColor = msg.getPov();
 
                     GameBoardDrawing.drawBoard(teamColor, currentBoard, null, currentGame);
                 }

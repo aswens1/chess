@@ -92,7 +92,7 @@ public class GameBoardDrawing {
 
             out.print(SET_TEXT_COLOR_BLACK);
 
-            if (currentPos == highlightPosition) {
+            if (currentPos.equals(highlightPosition)) {
                 out.print(SET_BG_COLOR_YELLOW + pieceToPrint);
             } else if (highLightPiece) {
                 out.print(isDark ? SET_BG_COLOR_DARK_GREEN + pieceToPrint : SET_BG_COLOR_GREEN + pieceToPrint);
@@ -106,7 +106,7 @@ public class GameBoardDrawing {
     private static boolean highlight(Collection<ChessMove> validMoves, ChessPosition currentPosition) {
         if (validMoves != null) {
             for (ChessMove move : validMoves) {
-                if (move.getEndPosition() == currentPosition) {
+                if (move.getEndPosition().equals(currentPosition)) {
                     return true;
                 }
             }

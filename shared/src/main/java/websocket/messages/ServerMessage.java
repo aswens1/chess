@@ -14,6 +14,7 @@ public class ServerMessage {
     ServerMessageType serverMessageType;
     ChessGame game;
     String message;
+    ChessGame.TeamColor pov;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -21,13 +22,18 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type, ChessGame game) {
+    public ServerMessage(ServerMessageType type, ChessGame game, ChessGame.TeamColor pov) {
         this.serverMessageType = type;
         this.game = game;
+        this.pov = pov;
     }
 
     public ServerMessageType getServerMessageType() {
         return this.serverMessageType;
+    }
+
+    public ChessGame.TeamColor getPov() {
+        return this.pov;
     }
 
     public ChessGame getGame() {
