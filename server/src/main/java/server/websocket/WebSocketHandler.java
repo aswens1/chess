@@ -37,79 +37,105 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, String message) throws Exception {
 //        System.out.println("Received WebSocket message: " + message);
 //        System.out.println("First char: " + message.charAt(0));
 //        System.out.println("Incoming message: " + message);
         UserGameCommand command = serializer.fromJson(message, UserGameCommand.class);
 
-        AuthDataRecord auth = authDataAccess.getAuthData(command.authToken());
-        GameDataRecord gameData = sqlGameDataAccess.getGame(command.gameID());
+//        if (command.gameID() == null) {
+//            sendError(session, "Invalid gameID");
+//            return;
+//        }
 
-        if (auth == null) {
-            sendError(session, "Invalid authentication token.");
-            return;
-        }
-        if (gameData == null) {
-            sendError(session, "Game not found with ID: " + command.gameID());
-            return;
-        }
+//        System.out.println("gameID type: " + command.gameID().getClass().getName());
+//        System.out.println("gameID value: " + command.gameID());
+
+        try {
+            AuthDataRecord auth = authDataAccess.getAuthData(command.authToken());
+            if (auth == null) {
+                String errorMessage = "Error: AuthData is null.";
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+                error.setErrorMessage(errorMessage);
+                session.getRemote().sendString(serializer.toJson(error));
+                return;
+            }
+
+//            System.out.println("Fetching game data for gameID: " + command.gameID());
+            GameDataRecord gameData = sqlGameDataAccess.getGame(command.gameID());
+            if (gameData == null) {
+                String errorMessage = "Error: GameData is null.";
+                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+                error.setErrorMessage(errorMessage);
+                session.getRemote().sendString(serializer.toJson(error));
+                return;
+            }
+//            System.out.println("gameData: " + gameData);
 
 //        System.out.println("gameData.game(): " + gameData.game());
 //        System.out.println("class: " + gameData.game().getClass().getName());
 
 //        System.out.println("Parsed command type: " + command.commandType());
 
-        switch (command.commandType()) {
-            case CONNECT -> connect(session, command, auth, gameData);
-            case MAKE_MOVE -> make_move(session, command);
-            case LEAVE -> leave(session, command);
-            case RESIGN -> resign(session, command);
+            switch (command.commandType()) {
+                case CONNECT -> connect(session, command, auth, gameData);
+                case MAKE_MOVE -> make_move(session, command);
+                case LEAVE -> leave(session, command);
+                case RESIGN -> resign(session, command);
+            };
+        } catch (DataAccessException | NullPointerException e) {
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setErrorMessage("Error processing command: " + e.getMessage());
+            session.getRemote().sendString(serializer.toJson(error));
         }
     }
 
-
-
-    private void connect(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData) throws IOException{
-
-        ChessGame game = gameData.game();
-        String blackUser = gameData.blackUsername();
-        String whiteUser = gameData.whiteUsername();
-
-        String username = "";
-        if (UGC.username() == null) {
-            username = authData.username();
-        }
-        ChessGame.TeamColor pov;
-        if (UGC.playerColor() == null) {
-            pov = getTeamColor(username, blackUser, whiteUser);
-        } else {
-            if (UGC.playerColor().equals("WHITE")) {
-                pov = ChessGame.TeamColor.WHITE;
-            } else {
-                pov = ChessGame.TeamColor.BLACK;
-            }
-        }
-
-        int gameID = UGC.gameID();
-
-        connections.add(UGC.gameID(), username, session);
-
+    private void connect(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData) throws Exception {
         try {
-            ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, pov);
-            session.getRemote().sendString(serializer.toJson(load));
+            ChessGame game = gameData.game();
+            String blackUser = gameData.blackUsername();
+            String whiteUser = gameData.whiteUsername();
 
-            String joinMessage = SET_TEXT_COLOR_BLUE + username + RESET_TEXT_COLOR + " has joined the game.";
+            String username = "";
+            if (UGC.username() == null) {
+                username = authData.username();
+            }
+            ChessGame.TeamColor pov;
+            if (UGC.playerColor() == null) {
+                pov = getTeamColor(username, blackUser, whiteUser);
+            } else {
+                if (UGC.playerColor().equals("WHITE")) {
+                    pov = ChessGame.TeamColor.WHITE;
+                } else {
+                    pov = ChessGame.TeamColor.BLACK;
+                }
+            }
 
-//            System.out.println("Join message to be broadcasted: " + joinMessage);
+            int gameID = UGC.gameID();
 
-            Notifications notification = new Notifications(joinMessage, null, null);
-            connections.broadcast(gameID, username, notification);
+            connections.add(UGC.gameID(), username, session);
 
+            try {
+                ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, pov);
+                session.getRemote().sendString(serializer.toJson(load));
+
+                String joinMessage = SET_TEXT_COLOR_BLUE + username + RESET_TEXT_COLOR + " has joined the game.";
+
+    //            System.out.println("Join message to be broadcasted: " + joinMessage);
+
+                Notifications notification = new Notifications(joinMessage, null, null);
+                connections.broadcast(gameID, username, notification);
+
+            } catch (Exception exception) {
+                ServerMessage errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+                errorMessage.setErrorMessage("Connect error: Unable to connect.");
+                session.getRemote().sendString(serializer.toJson(errorMessage));
+            }
         } catch (Exception exception) {
-            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
-            error.setMessage(SET_TEXT_COLOR_BLUE + "Failed to connect: " + RESET_TEXT_COLOR + exception.getMessage());
-            session.getRemote().sendString(serializer.toJson(error));
+            ServerMessage errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            errorMessage.setErrorMessage("Connect error: " + exception.getMessage());
+            String json = serializer.toJson(errorMessage);
+            session.getRemote().sendString(json);
         }
     }
 
@@ -154,7 +180,7 @@ public class WebSocketHandler {
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
-            error.setMessage("Move error: " + exception.getMessage());
+            error.setErrorMessage("Move error: invalid move.");
             session.getRemote().sendString(serializer.toJson(error));
         }
 
@@ -173,7 +199,7 @@ public class WebSocketHandler {
         } catch (Exception exception) {
 
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
-            error.setMessage("Resignation error: " + exception.getMessage());
+            error.setErrorMessage("Leave error: Unable to connect.");
             session.getRemote().sendString(serializer.toJson(error));
 
         }
@@ -193,15 +219,9 @@ public class WebSocketHandler {
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
-            error.setMessage("Resignation error: " + exception.getMessage());
+            error.setErrorMessage("Resign error: Unable to resign.");
             session.getRemote().sendString(serializer.toJson(error));
         }
-    }
-
-    private void sendError(Session session, String msg) throws IOException {
-        ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
-        error.setMessage(SET_TEXT_COLOR_BLUE + "Command Error: " + RESET_TEXT_COLOR + msg);
-        session.getRemote().sendString(serializer.toJson(error));
     }
 
 }

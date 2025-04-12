@@ -25,6 +25,7 @@ public class Repl {
     private final NotificationHandler notificationHandler = new NotificationHandler() {
         @Override
         public void notify(String message) {
+            System.out.println("Raw WebSocket message: " + message);
             Gson serializer = new Gson();
             ServerMessage msg = serializer.fromJson(message, ServerMessage.class);
 
@@ -43,9 +44,11 @@ public class Repl {
 
                     GameBoardDrawing.drawBoard(teamColor, currentBoard, null, currentGame);
                 }
-                case NOTIFICATION -> {
-                }
+//                case NOTIFICATION -> {
+//                }
                 case ERROR -> {
+                    String errorMessage = msg.getMessage();
+                    System.out.println(SET_TEXT_COLOR_BLUE + "Error: " + RESET_TEXT_COLOR + errorMessage);
                 }
             }
 

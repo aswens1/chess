@@ -13,7 +13,7 @@ import java.util.Objects;
 public class ServerMessage {
     ServerMessageType serverMessageType;
     ChessGame game;
-    String message;
+    String errorMessage;
     ChessGame.TeamColor pov;
 
     public enum ServerMessageType {
@@ -41,27 +41,29 @@ public class ServerMessage {
     }
 
     public String getMessage() {
-        return this.message;
+        return this.errorMessage;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+//    public void setMessage(String message) {
+//        this.message = message;
+//    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ServerMessage)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         ServerMessage that = (ServerMessage) o;
-        return getServerMessageType() == that.getServerMessageType();
+        return serverMessageType == that.serverMessageType && Objects.equals(game, that.game) && Objects.equals(errorMessage, that.errorMessage) && pov == that.pov;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getServerMessageType());
+        return Objects.hash(serverMessageType, game, errorMessage, pov);
     }
+
 }
