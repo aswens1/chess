@@ -179,6 +179,14 @@ public class WebSocketHandler {
             return;
         }
 
+        if (pov != game.getTeamTurn()) {
+            String errorMessage = "Error: It's not your turn.";
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setErrorMessage(errorMessage);
+            session.getRemote().sendString(serializer.toJson(error));
+            return;
+        }
+
         try {
             GameDataRecord updatedGameData = sqlGameDataAccess.getGame(UGC.gameID());
             ChessGame updatedGame = updatedGameData.game();
