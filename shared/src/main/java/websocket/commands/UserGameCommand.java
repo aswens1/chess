@@ -12,7 +12,7 @@ import java.util.Objects;
  * methods.
  */
 public record UserGameCommand(websocket.commands.UserGameCommand.CommandType commandType, String authToken,
-                              Integer gameID, String playerColor, String username, String ogPos, String newPos) {
+                              Integer gameID, String playerColor, String username, String ogPos, String newPos, ChessMove move) {
 
     public enum CommandType {
         CONNECT,

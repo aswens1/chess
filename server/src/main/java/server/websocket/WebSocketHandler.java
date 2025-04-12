@@ -12,6 +12,7 @@ import websocket.commands.*;
 import websocket.messages.*;
 
 import java.io.IOException;
+import java.util.Collection;
 
 @WebSocket
 public class WebSocketHandler {
@@ -79,10 +80,10 @@ public class WebSocketHandler {
 
             switch (command.commandType()) {
                 case CONNECT -> connect(session, command, auth, gameData);
-                case MAKE_MOVE -> make_move(session, command, auth, gameData);
+                case MAKE_MOVE -> make_move(session, command, auth, gameData, command.move());
                 case LEAVE -> leave(session, command);
                 case RESIGN -> resign(session, command);
-            };
+            }
         } catch (DataAccessException | NullPointerException e) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
             error.setErrorMessage("Error processing command: " + e.getMessage());
@@ -156,7 +157,7 @@ public class WebSocketHandler {
         return pov;
     }
 
-    private void make_move(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData) throws IOException {
+    private void make_move(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData, ChessMove move) throws IOException {
 
         String blackUser = gameData.blackUsername();
         String whiteUser = gameData.whiteUsername();
@@ -166,6 +167,17 @@ public class WebSocketHandler {
 
         String start = UGC.ogPos();
         String end = UGC.newPos();
+
+        ChessGame game = gameData.game();
+
+        Collection<ChessMove> legalMoves = game.validMoves(move.getStartPosition());
+        if (!legalMoves.contains(move)) {
+            String errorMessage = "Error: Illegal move.";
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setErrorMessage(errorMessage);
+            session.getRemote().sendString(serializer.toJson(error));
+            return;
+        }
 
         try {
             GameDataRecord updatedGameData = sqlGameDataAccess.getGame(UGC.gameID());

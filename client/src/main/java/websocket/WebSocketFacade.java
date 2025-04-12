@@ -54,7 +54,7 @@ public class WebSocketFacade extends Endpoint {
     public void connectingToGame(String authToken, Integer gameID, String pov, String username) throws IOException {
         try {
             UserGameCommand UGC = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, pov,
-                    username, null, null);
+                    username, null, null, null);
 //            System.out.println("Sending command: " + UGC);
             this.session.getBasicRemote().sendText(new Gson().toJson(UGC));
         } catch (IOException exception) {
