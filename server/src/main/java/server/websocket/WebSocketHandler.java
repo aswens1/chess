@@ -79,7 +79,7 @@ public class WebSocketHandler {
 
             switch (command.commandType()) {
                 case CONNECT -> connect(session, command, auth, gameData);
-                case MAKE_MOVE -> make_move(session, command);
+                case MAKE_MOVE -> make_move(session, command, auth, gameData);
                 case LEAVE -> leave(session, command);
                 case RESIGN -> resign(session, command);
             };
@@ -96,20 +96,8 @@ public class WebSocketHandler {
             String blackUser = gameData.blackUsername();
             String whiteUser = gameData.whiteUsername();
 
-            String username = "";
-            if (UGC.username() == null) {
-                username = authData.username();
-            }
-            ChessGame.TeamColor pov;
-            if (UGC.playerColor() == null) {
-                pov = getTeamColor(username, blackUser, whiteUser);
-            } else {
-                if (UGC.playerColor().equals("WHITE")) {
-                    pov = ChessGame.TeamColor.WHITE;
-                } else {
-                    pov = ChessGame.TeamColor.BLACK;
-                }
-            }
+            String username = getUser(UGC, authData.username());
+            ChessGame.TeamColor pov = getPlayerColor(UGC, username, blackUser, whiteUser);
 
             int gameID = UGC.gameID();
 
@@ -139,26 +127,42 @@ public class WebSocketHandler {
         }
     }
 
-    private static ChessGame.TeamColor getTeamColor(String username, String blackUser, String whiteUser) {
-        ChessGame.TeamColor pov = null;
-        if (username != null) {
-           if (blackUser.equals(username)) {
-               pov = ChessGame.TeamColor.BLACK;
-           } else if (whiteUser.equals(username)) {
-               pov = ChessGame.TeamColor.WHITE;
-           }
+    private String getUser(UserGameCommand UGC, String username) {
+        String newUser = "";
+        if (UGC.username() == null) {
+            newUser = username;
         }
+        return newUser;
+    }
+
+    private static ChessGame.TeamColor getPlayerColor(UserGameCommand UGC, String username, String blackUser, String whiteUser) {
+        ChessGame.TeamColor pov = null;
+        if (UGC.username() == null) {
+            if (username != null) {
+                if (blackUser.equals(username)) {
+                    pov = ChessGame.TeamColor.BLACK;
+                } else if (whiteUser.equals(username)) {
+                    pov = ChessGame.TeamColor.WHITE;
+                }
+            }
+        } else {
+            if (UGC.playerColor().equals("WHITE")) {
+                pov = ChessGame.TeamColor.WHITE;
+            } else if (UGC.playerColor().equals("BLACK")) {
+                pov = ChessGame.TeamColor.BLACK;
+            }
+        }
+
         return pov;
     }
 
-    private void make_move(Session session, UserGameCommand UGC) throws IOException {
+    private void make_move(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData) throws IOException {
 
-        ChessGame.TeamColor pov;
-        if (UGC.playerColor().equals("WHITE")) {
-            pov = ChessGame.TeamColor.WHITE;
-        } else {
-            pov = ChessGame.TeamColor.BLACK;
-        }
+        String blackUser = gameData.blackUsername();
+        String whiteUser = gameData.whiteUsername();
+
+        String username = getUser(UGC, authData.username());
+        ChessGame.TeamColor pov = getPlayerColor(UGC, username, blackUser, whiteUser);
 
         String start = UGC.ogPos();
         String end = UGC.newPos();
@@ -167,23 +171,27 @@ public class WebSocketHandler {
             GameDataRecord updatedGameData = sqlGameDataAccess.getGame(UGC.gameID());
             ChessGame updatedGame = updatedGameData.game();
 
-            System.out.println(updatedGame.getBoard().toString());
+//            System.out.println(updatedGame.getBoard().toString());
 
             ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, updatedGame, pov);
             session.getRemote().sendString(serializer.toJson(load));
+
+            for (Session sesh : connections.getSession(UGC.gameID(), username)) {
+                ServerMessage loadToOthers = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, updatedGame, pov);
+                sesh.getRemote().sendString(serializer.toJson(loadToOthers));
+            }
 
             String moveMess = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR +" moved the piece at " +
                     SET_TEXT_COLOR_BLUE + start + RESET_TEXT_COLOR + " to " + SET_TEXT_COLOR_BLUE + end +
                     RESET_TEXT_COLOR + ".";
             Notifications notifications = new Notifications(moveMess, null, null);
-            connections.broadcast(UGC.gameID(), UGC.username(), notifications);
+            connections.broadcast(UGC.gameID(), username, notifications);
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
             error.setErrorMessage("Move error: invalid move.");
             session.getRemote().sendString(serializer.toJson(error));
         }
-
     }
 
     private void leave(Session session, UserGameCommand UGC) throws IOException {

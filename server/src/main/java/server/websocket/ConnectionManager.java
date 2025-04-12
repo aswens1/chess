@@ -55,4 +55,20 @@ public class ConnectionManager {
             connections.remove(gameID);
         }
     }
+
+    public ArrayList<Session> getSession(int gameID, String excludeUser) {
+        ArrayList<Session> sessions = new ArrayList<>();
+
+        if (!connections.containsKey(gameID)) {
+            return sessions;
+        }
+
+        for (var c : connections.get(gameID)) {
+            if (!c.username.equals(excludeUser) && c.session.isOpen()) {
+                sessions.add(c.session);
+            }
+        }
+        return sessions;
+    }
+
 }

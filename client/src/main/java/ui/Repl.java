@@ -25,7 +25,7 @@ public class Repl {
     private final NotificationHandler notificationHandler = new NotificationHandler() {
         @Override
         public void notify(String message) {
-            System.out.println("Raw WebSocket message: " + message);
+//            System.out.println("Raw WebSocket message: " + message);
             Gson serializer = new Gson();
             ServerMessage msg = serializer.fromJson(message, ServerMessage.class);
 
