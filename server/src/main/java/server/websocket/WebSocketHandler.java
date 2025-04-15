@@ -279,7 +279,7 @@ public class WebSocketHandler {
 
             String message = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has resigned the game.";
             ServerMessage resignMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
-            resignMessage.setNotificationMessage(message);
+            resignMessage.setMessage(message);
             connections.broadcast(gameID, UGC.username(), resignMessage);
             connections.remove(gameID, UGC.username());
 
