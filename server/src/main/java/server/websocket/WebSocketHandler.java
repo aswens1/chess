@@ -28,6 +28,8 @@ public class WebSocketHandler {
     private final SQLAuthDataAccess authDataAccess = new SQLAuthDataAccess();
     private final SQLGameDataAccess sqlGameDataAccess = new SQLGameDataAccess();
 
+    private boolean resigned = false;
+
     public WebSocketHandler() {
         System.out.println("websockethandler instantiated");
     }
@@ -81,8 +83,8 @@ public class WebSocketHandler {
             switch (command.commandType()) {
                 case CONNECT -> connect(session, command, auth, gameData);
                 case MAKE_MOVE -> make_move(session, command, auth, gameData, command.move());
-                case LEAVE -> leave(session, command);
-                case RESIGN -> resign(session, command);
+                case LEAVE -> leave(session, command, auth, gameData);
+                case RESIGN -> resign(session, command, auth, gameData);
             }
         } catch (DataAccessException | NullPointerException e) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
@@ -110,10 +112,9 @@ public class WebSocketHandler {
 
                 String joinMessage = SET_TEXT_COLOR_BLUE + username + RESET_TEXT_COLOR + " has joined the game.";
 
-    //            System.out.println("Join message to be broadcasted: " + joinMessage);
-
-                Notifications notification = new Notifications(joinMessage, null, null);
-                connections.broadcast(gameID, username, notification);
+                ServerMessage connectNotification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
+                connectNotification.setMessage(joinMessage);
+                connections.broadcast(gameID, username, connectNotification);
 
             } catch (Exception exception) {
                 ServerMessage errorMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
@@ -187,6 +188,14 @@ public class WebSocketHandler {
             return;
         }
 
+        if (resigned) {
+            String errorMessage = "Error: You can't make moves after resigning. Please enter return to return to game selection.";
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setErrorMessage(errorMessage);
+            session.getRemote().sendString(serializer.toJson(error));
+            return;
+        }
+
         try {
             GameDataRecord updatedGameData = sqlGameDataAccess.getGame(UGC.gameID());
             ChessGame updatedGame = updatedGameData.game();
@@ -204,7 +213,8 @@ public class WebSocketHandler {
             String moveMess = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR +" moved the piece at " +
                     SET_TEXT_COLOR_BLUE + start + RESET_TEXT_COLOR + " to " + SET_TEXT_COLOR_BLUE + end +
                     RESET_TEXT_COLOR + ".";
-            Notifications notifications = new Notifications(moveMess, null, null);
+            ServerMessage notifications = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
+            notifications.setNotificationMessage(moveMess);
             connections.broadcast(UGC.gameID(), username, notifications);
 
         } catch (Exception exception) {
@@ -214,15 +224,22 @@ public class WebSocketHandler {
         }
     }
 
-    private void leave(Session session, UserGameCommand UGC) throws IOException {
+    private void leave(Session session, UserGameCommand UGC, AuthDataRecord auth, GameDataRecord gameData) throws IOException {
+
+        String username = getUser(UGC, auth.username());
+        ChessGame.TeamColor pov = getPlayerColor(UGC, username, gameData.blackUsername(), gameData.whiteUsername());
+        ChessGame game = gameData.game();
+
 
         try {
 
-            String message = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has left the game";
-            Notifications leaveMessage = new Notifications(message, null, null);
-            connections.broadcast(UGC.gameID(), UGC.username(), leaveMessage);
+            String message = SET_TEXT_COLOR_BLUE + username + RESET_TEXT_COLOR + " has left the game";
+            ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
+//            leaveMessage.setNotifications(new Notifications(message, null, null));
+            leaveMessage.setNotificationMessage(message);
 
-            connections.remove(UGC.gameID(), UGC.username());
+            connections.broadcast(UGC.gameID(), username, leaveMessage);
+            connections.remove(UGC.gameID(), username);
 
         } catch (Exception exception) {
 
@@ -234,16 +251,39 @@ public class WebSocketHandler {
 
     }
 
-    private void resign(Session session, UserGameCommand UGC) throws IOException {
+    private void resign(Session session, UserGameCommand UGC, AuthDataRecord auth, GameDataRecord gameData) throws IOException {
 
         int gameID = UGC.gameID();
+
+        String username = auth.username();
+        String whiteUser = gameData.whiteUsername();
+        String blackUser = gameData.blackUsername();
+
+        if (!username.equals(whiteUser) && !username.equals(blackUser)) {
+            String errorMessage = "Observers cannot resign. Please enter return to return to game selection.";
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setErrorMessage(errorMessage);
+            session.getRemote().sendString(serializer.toJson(error));
+            return;
+        }
+
+        if (resigned) {
+            String errorMessage = "Game over. Please enter return to return to game selection.";
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setErrorMessage(errorMessage);
+            session.getRemote().sendString(serializer.toJson(error));
+            return;
+        }
 
         try {
 
             String message = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has resigned the game.";
-            Notifications resignMessage = new Notifications(message, null, null);
+            ServerMessage resignMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
+            resignMessage.setNotificationMessage(message);
             connections.broadcast(gameID, UGC.username(), resignMessage);
             connections.remove(gameID, UGC.username());
+
+            resigned = true;
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);

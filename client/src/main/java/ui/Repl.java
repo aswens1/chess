@@ -44,10 +44,12 @@ public class Repl {
 
                     GameBoardDrawing.drawBoard(teamColor, currentBoard, null, currentGame);
                 }
-//                case NOTIFICATION -> {
-//                }
+                case NOTIFICATION -> {
+                    String serializedMessage = msg.getMessage();
+                    System.out.println(serializedMessage);
+                }
                 case ERROR -> {
-                    String errorMessage = msg.getMessage();
+                    String errorMessage = msg.getErrorMessage();
                     System.out.println(SET_TEXT_COLOR_BLUE + "Error: " + RESET_TEXT_COLOR + errorMessage);
                 }
             }

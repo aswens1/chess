@@ -39,6 +39,7 @@ public class GamePlayClient implements ChessClient{
                 case "move" -> move(params);
                 case "resign" -> resign();
                 case "highlight" -> highlight(params);
+                case "return" -> returnToGameSelection();
                 case "help" -> displayHelp();
                 default -> "Invalid command. Use command " + SET_TEXT_COLOR_BLUE + "'help'" + RESET_TEXT_COLOR + " for a list of possible commands.";
             };
@@ -46,6 +47,11 @@ public class GamePlayClient implements ChessClient{
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
+    }
+
+    public String returnToGameSelection() {
+        gs.stateLeaveGame();
+        return "Returning to " + SET_TEXT_COLOR_BLUE + "game selection" + RESET_TEXT_COLOR + ".";
     }
 
     public String redraw() {
@@ -58,7 +64,7 @@ public class GamePlayClient implements ChessClient{
     public String leave() {
         gs.stateLeaveGame();
 
-        UserGameCommand leaveUGC = new UserGameCommand(UserGameCommand.CommandType.LEAVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null);
+        UserGameCommand leaveUGC = new UserGameCommand(UserGameCommand.CommandType.LEAVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null, null);
         if (wsf != null) {
             try {
                 wsf.sendCommand(leaveUGC);
@@ -127,7 +133,7 @@ public class GamePlayClient implements ChessClient{
 
         gs.setGame(sf.getGame());
 
-        UserGameCommand moveUGC = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), oldString, newString);
+        UserGameCommand moveUGC = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), oldString, newString, null);
 
         if (wsf != null) {
             try {
@@ -157,7 +163,7 @@ public class GamePlayClient implements ChessClient{
 
         String authToken = sf.returnAuth();
         if (authToken != null) {
-            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null);
+            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null, null);
 
             if (wsf != null) {
                 try {
@@ -218,6 +224,7 @@ public class GamePlayClient implements ChessClient{
                 SET_TEXT_COLOR_BLUE + "move <old position> <new position>" + RESET_TEXT_COLOR + " -> move a piece",
                 SET_TEXT_COLOR_BLUE + "resign" + RESET_TEXT_COLOR + " -> forfeit the game",
                 SET_TEXT_COLOR_BLUE + "highlight <piece position>" + RESET_TEXT_COLOR + " -> highlight all possible moves",
+                SET_TEXT_COLOR_BLUE + "return" + RESET_TEXT_COLOR + " -> return to game selection",
                 SET_TEXT_COLOR_BLUE + "help" + RESET_TEXT_COLOR + " -> list possible commands"
         };
         return String.join("\n", helpCommands);

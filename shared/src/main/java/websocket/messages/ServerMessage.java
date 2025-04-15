@@ -15,6 +15,9 @@ public class ServerMessage {
     ChessGame game;
     String errorMessage;
     ChessGame.TeamColor pov;
+    String notificationMessage;
+    Notifications notifications;
+    String message;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -40,17 +43,37 @@ public class ServerMessage {
         return this.game;
     }
 
-    public String getMessage() {
-        return this.errorMessage;
+    public String getNotificationMessage() {
+        return this.notificationMessage;
     }
 
-//    public void setMessage(String message) {
-//        this.message = message;
-//    }
+    public void setNotificationMessage(String message) {
+        this.notificationMessage = message;
+    }
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
+
+    public String getErrorMessage() {
+        return this.errorMessage;
+    }
+
+    public String getMessage() {
+        return this.message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+//    public Notifications getNotifications() {
+//        return notifications;
+//    }
+//
+//    public void setNotifications(Notifications notifications) {
+//        this.notifications = notifications;
+//    }
 
     @Override
     public boolean equals(Object o) {

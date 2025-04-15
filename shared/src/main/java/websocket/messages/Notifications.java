@@ -8,8 +8,6 @@ public class Notifications {
     private final ChessGame chessGame;
     private final ChessGame.TeamColor pov;
 
-    private final ServerMessage.ServerMessageType serverMessageType = ServerMessage.ServerMessageType.NOTIFICATION;
-
 
     public Notifications(String message, ChessGame chessGame, ChessGame.TeamColor pov) {
         this.message = message;

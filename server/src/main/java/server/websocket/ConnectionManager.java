@@ -3,6 +3,7 @@ package server.websocket;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.Notifications;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ public class ConnectionManager {
         }
     }
 
-    public void broadcast(Integer gameID, String excludeUser, Notifications notification) throws IOException {
+    public void broadcast(Integer gameID, String excludeUser, ServerMessage notification) throws IOException {
 //        System.out.println("Broadcasting to gameID " + gameID + ": " + notification);
 
         if (!connections.containsKey(gameID)) {
@@ -44,6 +45,7 @@ public class ConnectionManager {
             if (c.session.isOpen()) {
                 if (!c.username.equals(excludeUser)) {
                     c.send(notifJSON);
+                    System.out.println("Sending " + notification.getNotificationMessage() + " to " + c.username);
                 }
             } else {
                 removeList.add(c);
@@ -71,4 +73,11 @@ public class ConnectionManager {
         return sessions;
     }
 
+    @Override
+    public String toString() {
+        return "ConnectionManager{" +
+                "connections=" + connections +
+                ", gson=" + gson +
+                '}';
+    }
 }
