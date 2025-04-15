@@ -214,7 +214,7 @@ public class WebSocketHandler {
                     SET_TEXT_COLOR_BLUE + start + RESET_TEXT_COLOR + " to " + SET_TEXT_COLOR_BLUE + end +
                     RESET_TEXT_COLOR + ".";
             ServerMessage notifications = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
-            notifications.setNotificationMessage(moveMess);
+            notifications.setMessage(moveMess);
             connections.broadcast(UGC.gameID(), username, notifications);
 
         } catch (Exception exception) {
