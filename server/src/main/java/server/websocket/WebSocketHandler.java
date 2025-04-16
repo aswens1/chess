@@ -162,7 +162,7 @@ public class WebSocketHandler {
         return pov;
     }
 
-    private void make_move(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData, ChessMove move) throws IOException {
+    private void make_move(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData, ChessMove move) throws IOException, InvalidMoveException {
 
         String blackUser = gameData.blackUsername();
         String whiteUser = gameData.whiteUsername();
@@ -208,18 +208,20 @@ public class WebSocketHandler {
             return;
         }
 
+        game.makeMove(move);
+        sqlGameDataAccess.updateGameState(UGC.gameID(), username, pov, game);
+
+
         try {
             GameDataRecord updatedGameData = sqlGameDataAccess.getGame(UGC.gameID());
             ChessGame updatedGame = updatedGameData.game();
 
-            boolean isCheckmate = game.isInCheckmate(game.getTeamTurn());
-            boolean isStalemate = game.isInStalemate(game.getTeamTurn());
+            boolean isCheckmate = updatedGame.isInCheckmate(game.getTeamTurn());
+            boolean isStalemate = updatedGame.isInStalemate(game.getTeamTurn());
 
             if (isCheckmate || isStalemate) {
                 connections.addGameOver(UGC.gameID());
             }
-
-//            System.out.println(updatedGame.getBoard().toString());
 
             ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, updatedGame, pov);
             session.getRemote().sendString(serializer.toJson(load));

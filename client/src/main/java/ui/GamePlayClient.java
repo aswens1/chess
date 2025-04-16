@@ -130,9 +130,9 @@ public class GamePlayClient implements ChessClient{
         }
 
         MoveRequest moveRequest = new MoveRequest(sf.getGameID(), move, sf.getUsername(), sf.getTeamColor());
-        sf.makeMove(moveRequest, sf.returnAuth());
+//        sf.makeMove(moveRequest, sf.returnAuth());
 
-        gs.setGame(sf.getGame());
+//        gs.setGame(sf.getGame());
 
         UserGameCommand moveUGC = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), oldString, newString, null);
 
@@ -143,6 +143,8 @@ public class GamePlayClient implements ChessClient{
                 System.out.println("Error sending move command: " + exception.getMessage());
             }
         }
+
+        gs.setGame(sf.getGame());
 
         return RESET_TEXT_COLOR + "Piece at " + SET_TEXT_COLOR_BLUE + oldString + RESET_TEXT_COLOR + " moved to "
                 + SET_TEXT_COLOR_BLUE + newString + RESET_TEXT_COLOR + ".";
