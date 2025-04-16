@@ -2,7 +2,6 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.messages.Notifications;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ public class ConnectionManager {
     }
 
     public void remove(int gameID, String username) {
-        if (connections.contains(gameID)) {
+        if (connections.containsKey(gameID)) {
             connections.get(gameID).removeIf(c -> c.username.equals(username));
             if (connections.get(gameID).isEmpty()) {
                 connections.remove(gameID);
@@ -38,13 +37,13 @@ public class ConnectionManager {
             return;
         }
 
-        var notifJSON = gson.toJson(notification);
+        var notifyJSON = gson.toJson(notification);
 
         var removeList = new ArrayList<Connection>();
         for (var c : connections.get(gameID)) {
             if (c.session.isOpen()) {
                 if (!c.username.equals(excludeUser)) {
-                    c.send(notifJSON);
+                    c.send(notifyJSON);
                     System.out.println("Sending " + notification.getNotificationMessage() + " to " + c.username);
                 }
             } else {

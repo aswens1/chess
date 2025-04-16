@@ -139,6 +139,12 @@ public class WebSocketHandler {
 
     private static ChessGame.TeamColor getPlayerColor(UserGameCommand UGC, String username, String blackUser, String whiteUser) {
         ChessGame.TeamColor pov = null;
+
+        if (whiteUser == null && !username.equals(blackUser)) {
+            pov = ChessGame.TeamColor.WHITE;
+            return pov;
+        }
+
         if (UGC.username() == null) {
             if (username != null) {
                 if (blackUser.equals(username)) {
@@ -230,16 +236,19 @@ public class WebSocketHandler {
         ChessGame.TeamColor pov = getPlayerColor(UGC, username, gameData.blackUsername(), gameData.whiteUsername());
         ChessGame game = gameData.game();
 
+        sqlGameDataAccess.updateGamePlayer(UGC.gameID(), null, pov, game);
 
         try {
 
+            connections.remove(UGC.gameID(), username);
+
+
             String message = SET_TEXT_COLOR_BLUE + username + RESET_TEXT_COLOR + " has left the game";
             ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
-//            leaveMessage.setNotifications(new Notifications(message, null, null));
-            leaveMessage.setNotificationMessage(message);
+            leaveMessage.setMessage(message);
 
             connections.broadcast(UGC.gameID(), username, leaveMessage);
-            connections.remove(UGC.gameID(), username);
+//            connections.remove(UGC.gameID(), username);
 
         } catch (Exception exception) {
 
@@ -277,11 +286,14 @@ public class WebSocketHandler {
 
         try {
 
+            connections.remove(gameID, UGC.username());
+
+
             String message = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has resigned the game.";
             ServerMessage resignMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
             resignMessage.setMessage(message);
             connections.broadcast(gameID, UGC.username(), resignMessage);
-            connections.remove(gameID, UGC.username());
+//            connections.remove(gameID, UGC.username());
 
             resigned = true;
 

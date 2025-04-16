@@ -73,6 +73,7 @@ public class GamePlayClient implements ChessClient{
             }
         }
 
+
         return SET_TEXT_COLOR_BLUE + "Leaving" + RESET_TEXT_COLOR + " the game.";
     }
 

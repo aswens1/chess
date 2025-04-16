@@ -118,7 +118,7 @@ public class SQLGameDataAccess implements GameDAOInterface{
 
     @Override
     public void updateGamePlayer(Integer id, String username, ChessGame.TeamColor playerColour, ChessGame game) {
-        if (username == null) {
+        if (playerColour == null) {
             throw new ResponseException(400, "Error: bad request");
         }
 
@@ -134,6 +134,13 @@ public class SQLGameDataAccess implements GameDAOInterface{
             }
 
             var ps = conn.prepareStatement(sql);
+
+            if (username == null) {
+                ps.setNull(1, java.sql.Types.VARCHAR);
+            } else {
+                ps.setString(1, username);
+            }
+
             ps.setString(1, username);
             ps.setInt(2, id);
 
