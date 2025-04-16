@@ -1,4 +1,4 @@
-package records;
+package gameRecords;
 
 public record ClearResult() {
 }

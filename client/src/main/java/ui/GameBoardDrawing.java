@@ -55,7 +55,9 @@ public class GameBoardDrawing {
         out.print(RESET_BG_COLOR);
     }
 
-    public static void printSquares(PrintStream out, ChessGame.TeamColor pov, int row, ChessBoard board, Collection<ChessMove> validMoves, ChessPosition highlightPosition) {
+    public static void printSquares(PrintStream out, ChessGame.TeamColor pov, int row,
+                                    ChessBoard board, Collection<ChessMove> validMoves,
+                                    ChessPosition highlightPosition) {
 
         if (pov == ChessGame.TeamColor.BLACK) {
             for (int i = 1; i <= 8; i++) {
@@ -70,7 +72,8 @@ public class GameBoardDrawing {
         }
     }
 
-    public static void printRowBackground(PrintStream out, int row, ChessBoard board, ChessGame.TeamColor pov, Collection<ChessMove> validMoves, ChessPosition highlightPosition) {
+    public static void printRowBackground(PrintStream out, int row, ChessBoard board, ChessGame.TeamColor pov,
+                                          Collection<ChessMove> validMoves, ChessPosition highlightPosition) {
 
         for (int i = 1; i <= BOARD_SIZE_IN_SQUARES; i++) {
 
@@ -132,7 +135,8 @@ public class GameBoardDrawing {
         }
     }
 
-    public static void eachRow(PrintStream out, int row, int i, ChessBoard board, ChessGame.TeamColor pov, Collection<ChessMove> validMoves, ChessPosition highlightPosition) {
+    public static void eachRow(PrintStream out, int row, int i, ChessBoard board, ChessGame.TeamColor pov,
+                               Collection<ChessMove> validMoves, ChessPosition highlightPosition) {
         int adjustForBlackPOV = ((pov == ChessGame.TeamColor.BLACK) ? (BOARD_SIZE_IN_SQUARES - row + 1) : row);
         printNumbers(out, i);
         printRowBackground(out, adjustForBlackPOV, board, pov, validMoves, highlightPosition);

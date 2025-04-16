@@ -243,7 +243,8 @@ public class DAOTests {
         int gameID = testSQLGame.createGame("testingCreateGame");
         ChessGame testGame = new ChessGame();
 
-        ResponseException ex = assertThrows(ResponseException.class, () -> testSQLGame.updateGamePlayer(gameID, null, ChessGame.TeamColor.BLACK, testGame));
+        ResponseException ex = assertThrows(ResponseException.class, () ->
+                testSQLGame.updateGamePlayer(gameID, null, ChessGame.TeamColor.BLACK, testGame));
         assertEquals("Error: bad request", ex.getMessage());
     }
 

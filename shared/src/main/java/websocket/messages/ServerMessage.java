@@ -67,7 +67,8 @@ public class ServerMessage {
             return false;
         }
         ServerMessage that = (ServerMessage) o;
-        return serverMessageType == that.serverMessageType && Objects.equals(game, that.game) && Objects.equals(errorMessage, that.errorMessage) && pov == that.pov;
+        return serverMessageType == that.serverMessageType && Objects.equals(game, that.game)
+                && Objects.equals(errorMessage, that.errorMessage) && pov == that.pov;
     }
 
     @Override

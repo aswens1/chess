@@ -1,3 +1,3 @@
-package records;
+package gameRecords;
 
 public record ClearRequest() {}

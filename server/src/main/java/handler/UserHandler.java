@@ -3,9 +3,9 @@ package handler;
 import com.google.gson.Gson;
 import exception.ErrorMessage;
 import exception.ResponseException;
-import records.*;
 import service.*;
 import spark.*;
+import userRecords.*;
 
 public class UserHandler {
     UserService userService;

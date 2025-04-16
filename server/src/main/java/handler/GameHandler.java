@@ -2,12 +2,10 @@ package handler;
 
 import com.google.gson.Gson;
 import dataaccess.SQLAuthDataAccess;
-import dataaccess.SQLGameDataAccess;
 import model.AuthDataRecord;
 import exception.ErrorMessage;
 import exception.ResponseException;
-import model.GameDataRecord;
-import records.*;
+import gameRecords.*;
 import service.*;
 import spark.Request;
 import spark.Response;

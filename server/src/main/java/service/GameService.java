@@ -5,7 +5,7 @@ import chess.ChessMove;
 import chess.InvalidMoveException;
 import dataaccess.*;
 import model.GameDataRecord;
-import records.*;
+import gameRecords.*;
 
 public class GameService {
 

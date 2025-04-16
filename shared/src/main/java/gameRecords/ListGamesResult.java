@@ -1,4 +1,4 @@
-package records;
+package gameRecords;
 
 import model.CondensedGameData;
 

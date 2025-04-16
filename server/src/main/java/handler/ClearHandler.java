@@ -1,7 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
-import records.ClearResult;
+import gameRecords.ClearResult;
 import service.ClearService;
 import spark.Request;
 import spark.Response;

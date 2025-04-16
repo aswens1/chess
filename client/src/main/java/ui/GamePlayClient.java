@@ -2,7 +2,7 @@ package ui;
 
 import chess.*;
 import exception.ResponseException;
-import records.MoveRequest;
+import gameRecords.MoveRequest;
 import websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
 
@@ -63,7 +63,8 @@ public class GamePlayClient implements ChessClient{
     public String leave() {
         gs.stateLeaveGame();
 
-        UserGameCommand leaveUGC = new UserGameCommand(UserGameCommand.CommandType.LEAVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null, null);
+        UserGameCommand leaveUGC = new UserGameCommand(UserGameCommand.CommandType.LEAVE, sf.returnAuth(),
+                sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null, null);
         if (wsf != null) {
             try {
                 wsf.sendCommand(leaveUGC);
@@ -130,7 +131,8 @@ public class GamePlayClient implements ChessClient{
 
         MoveRequest moveRequest = new MoveRequest(sf.getGameID(), move, sf.getUsername(), sf.getTeamColor());
 
-        UserGameCommand moveUGC = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), oldString, newString, null);
+        UserGameCommand moveUGC = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, sf.returnAuth(),
+                sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), oldString, newString, null);
 
         if (wsf != null) {
             try {
@@ -162,7 +164,9 @@ public class GamePlayClient implements ChessClient{
 
         String authToken = sf.returnAuth();
         if (authToken != null) {
-            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), null, null, null);
+            UserGameCommand resignUGC = new UserGameCommand(UserGameCommand.CommandType.RESIGN,
+                    authToken, sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(),
+                    null, null, null);
 
             if (wsf != null) {
                 try {

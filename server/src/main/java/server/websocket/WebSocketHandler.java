@@ -63,7 +63,7 @@ public class WebSocketHandler {
 
             switch (command.commandType()) {
                 case CONNECT -> connect(session, command, auth, gameData);
-                case MAKE_MOVE -> make_move(session, command, auth, gameData, command.move());
+                case MAKE_MOVE -> makeMove(session, command, auth, gameData, command.move());
                 case LEAVE -> leave(session, command, auth, gameData);
                 case RESIGN -> resign(session, command, auth, gameData);
             }
@@ -74,18 +74,18 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData) throws Exception {
+    private void connect(Session session, UserGameCommand userGameCommand, AuthDataRecord authData, GameDataRecord gameData) throws Exception {
         try {
             ChessGame game = gameData.game();
             String blackUser = gameData.blackUsername();
             String whiteUser = gameData.whiteUsername();
 
-            String username = getUser(UGC, authData.username());
-            ChessGame.TeamColor pov = getPlayerColor(UGC, username, blackUser, whiteUser);
+            String username = getUser(userGameCommand, authData.username());
+            ChessGame.TeamColor pov = getPlayerColor(userGameCommand, username, blackUser, whiteUser);
 
-            int gameID = UGC.gameID();
+            int gameID = userGameCommand.gameID();
 
-            connections.add(UGC.gameID(), username, session);
+            connections.add(userGameCommand.gameID(), username, session);
 
             try {
                 ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game, pov);
@@ -110,15 +110,15 @@ public class WebSocketHandler {
         }
     }
 
-    private String getUser(UserGameCommand UGC, String username) {
+    private String getUser(UserGameCommand userGameCommand, String username) {
         String newUser = "";
-        if (UGC.username() == null) {
+        if (userGameCommand.username() == null) {
             newUser = username;
         }
         return newUser;
     }
 
-    private static ChessGame.TeamColor getPlayerColor(UserGameCommand UGC, String username, String blackUser, String whiteUser) {
+    private static ChessGame.TeamColor getPlayerColor(UserGameCommand userGameCommand, String username, String blackUser, String whiteUser) {
         ChessGame.TeamColor pov = null;
 
         if (whiteUser == null && !username.equals(blackUser)) {
@@ -126,7 +126,7 @@ public class WebSocketHandler {
             return pov;
         }
 
-        if (UGC.username() == null) {
+        if (userGameCommand.username() == null) {
             if (username != null) {
                 if (blackUser.equals(username)) {
                     pov = ChessGame.TeamColor.BLACK;
@@ -135,9 +135,9 @@ public class WebSocketHandler {
                 }
             }
         } else {
-            if (UGC.playerColor().equals("WHITE")) {
+            if (userGameCommand.playerColor().equals("WHITE")) {
                 pov = ChessGame.TeamColor.WHITE;
-            } else if (UGC.playerColor().equals("BLACK")) {
+            } else if (userGameCommand.playerColor().equals("BLACK")) {
                 pov = ChessGame.TeamColor.BLACK;
             }
         }
@@ -145,16 +145,17 @@ public class WebSocketHandler {
         return pov;
     }
 
-    private void make_move(Session session, UserGameCommand UGC, AuthDataRecord authData, GameDataRecord gameData, ChessMove move) throws IOException, InvalidMoveException {
+    private void makeMove(Session session, UserGameCommand userGameCommand, AuthDataRecord authData,
+                          GameDataRecord gameData, ChessMove move) throws IOException, InvalidMoveException {
 
         String blackUser = gameData.blackUsername();
         String whiteUser = gameData.whiteUsername();
 
-        String username = getUser(UGC, authData.username());
-        ChessGame.TeamColor pov = getPlayerColor(UGC, username, blackUser, whiteUser);
+        String username = getUser(userGameCommand, authData.username());
+        ChessGame.TeamColor pov = getPlayerColor(userGameCommand, username, blackUser, whiteUser);
 
-        String start = UGC.ogPos();
-        String end = UGC.newPos();
+        String start = userGameCommand.ogPos();
+        String end = userGameCommand.newPos();
 
         ChessGame game = gameData.game();
 
@@ -175,7 +176,7 @@ public class WebSocketHandler {
             return;
         }
 
-        if (connections.playerResigned(UGC.gameID(), username)) {
+        if (connections.playerResigned(userGameCommand.gameID(), username)) {
             String errorMessage = "Error: You can't make moves after resigning. Please enter return to return to game selection.";
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
             error.setErrorMessage(errorMessage);
@@ -183,7 +184,7 @@ public class WebSocketHandler {
             return;
         }
 
-        if (connections.isGameOver(UGC.gameID())) {
+        if (connections.isGameOver(userGameCommand.gameID())) {
             String errorMessage = "Error: Game over. Please enter return to return to game selection.";
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
             error.setErrorMessage(errorMessage);
@@ -192,34 +193,34 @@ public class WebSocketHandler {
         }
 
         game.makeMove(move);
-        sqlGameDataAccess.updateGameState(UGC.gameID(), username, pov, game);
+        sqlGameDataAccess.updateGameState(userGameCommand.gameID(), username, pov, game);
 
 
         try {
-            GameDataRecord updatedGameData = sqlGameDataAccess.getGame(UGC.gameID());
+            GameDataRecord updatedGameData = sqlGameDataAccess.getGame(userGameCommand.gameID());
             ChessGame updatedGame = updatedGameData.game();
 
             boolean isCheckmate = updatedGame.isInCheckmate(game.getTeamTurn());
             boolean isStalemate = updatedGame.isInStalemate(game.getTeamTurn());
 
             if (isCheckmate || isStalemate) {
-                connections.addGameOver(UGC.gameID());
+                connections.addGameOver(userGameCommand.gameID());
             }
 
             ServerMessage load = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, updatedGame, pov);
             session.getRemote().sendString(serializer.toJson(load));
 
-            for (Session sesh : connections.getSession(UGC.gameID(), username)) {
+            for (Session sesh : connections.getSession(userGameCommand.gameID(), username)) {
                 ServerMessage loadToOthers = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, updatedGame, pov);
                 sesh.getRemote().sendString(serializer.toJson(loadToOthers));
             }
 
-            String moveMess = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR +" moved the piece at " +
+            String moveMess = SET_TEXT_COLOR_BLUE + userGameCommand.username() + RESET_TEXT_COLOR +" moved the piece at " +
                     SET_TEXT_COLOR_BLUE + start + RESET_TEXT_COLOR + " to " + SET_TEXT_COLOR_BLUE + end +
                     RESET_TEXT_COLOR + ".";
             ServerMessage notifications = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
             notifications.setMessage(moveMess);
-            connections.broadcast(UGC.gameID(), username, notifications);
+            connections.broadcast(userGameCommand.gameID(), username, notifications);
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
@@ -228,26 +229,26 @@ public class WebSocketHandler {
         }
     }
 
-    private void leave(Session session, UserGameCommand UGC, AuthDataRecord auth, GameDataRecord gameData) throws IOException {
+    private void leave(Session session, UserGameCommand userGameCommand, AuthDataRecord auth, GameDataRecord gameData) throws IOException {
 
-        String username = getUser(UGC, auth.username());
-        ChessGame.TeamColor pov = getPlayerColor(UGC, username, gameData.blackUsername(), gameData.whiteUsername());
+        String username = getUser(userGameCommand, auth.username());
+        ChessGame.TeamColor pov = getPlayerColor(userGameCommand, username, gameData.blackUsername(), gameData.whiteUsername());
         ChessGame game = gameData.game();
 
-        sqlGameDataAccess.updateGamePlayer(UGC.gameID(), null, pov, game);
+        sqlGameDataAccess.updateGamePlayer(userGameCommand.gameID(), null, pov, game);
 
-        connections.clearResign(UGC.gameID());
+        connections.clearResign(userGameCommand.gameID());
 
         try {
 
-            connections.remove(UGC.gameID(), username);
+            connections.remove(userGameCommand.gameID(), username);
 
 
             String message = SET_TEXT_COLOR_BLUE + username + RESET_TEXT_COLOR + " has left the game";
             ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
             leaveMessage.setMessage(message);
 
-            connections.broadcast(UGC.gameID(), username, leaveMessage);
+            connections.broadcast(userGameCommand.gameID(), username, leaveMessage);
 
         } catch (Exception exception) {
 
@@ -259,9 +260,9 @@ public class WebSocketHandler {
 
     }
 
-    private void resign(Session session, UserGameCommand UGC, AuthDataRecord auth, GameDataRecord gameData) throws IOException {
+    private void resign(Session session, UserGameCommand userGameCommand, AuthDataRecord auth, GameDataRecord gameData) throws IOException {
 
-        int gameID = UGC.gameID();
+        int gameID = userGameCommand.gameID();
 
         String username = auth.username();
         String whiteUser = gameData.whiteUsername();
@@ -293,13 +294,13 @@ public class WebSocketHandler {
 
         try {
             connections.resign(gameID, username);
-            connections.remove(gameID, UGC.username());
+            connections.remove(gameID, userGameCommand.username());
             connections.addGameOver(gameID);
 
-            String message = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has resigned the game.";
+            String message = SET_TEXT_COLOR_BLUE + userGameCommand.username() + RESET_TEXT_COLOR + " has resigned the game.";
             ServerMessage resignMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
             resignMessage.setMessage(message);
-            connections.broadcast(gameID, UGC.username(), resignMessage);
+            connections.broadcast(gameID, userGameCommand.username(), resignMessage);
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);

@@ -1,10 +1,10 @@
 package ui;
 
 import exception.ResponseException;
-import records.LoginRequest;
-import records.LoginResult;
-import records.RegisterRequest;
-import records.RegisterResult;
+import userRecords.LoginRequest;
+import userRecords.LoginResult;
+import userRecords.RegisterRequest;
+import userRecords.RegisterResult;
 import java.util.Arrays;
 
 

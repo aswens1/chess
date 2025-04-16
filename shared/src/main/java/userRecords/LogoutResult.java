@@ -1,3 +1,3 @@
-package records;
+package userRecords;
 
 public record LogoutResult() {}
