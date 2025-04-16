@@ -6,7 +6,6 @@ import java.util.Objects;
 
 /**
  * Represents a Message the server can send through a WebSocket
- * 
  * Note: You can add to this class, but you should not alter the existing
  * methods.
  */
@@ -16,7 +15,6 @@ public class ServerMessage {
     String errorMessage;
     ChessGame.TeamColor pov;
     String notificationMessage;
-    Notifications notifications;
     String message;
 
     public enum ServerMessageType {
@@ -47,10 +45,6 @@ public class ServerMessage {
         return this.notificationMessage;
     }
 
-    public void setNotificationMessage(String message) {
-        this.notificationMessage = message;
-    }
-
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
@@ -66,14 +60,6 @@ public class ServerMessage {
     public void setMessage(String message) {
         this.message = message;
     }
-
-//    public Notifications getNotifications() {
-//        return notifications;
-//    }
-//
-//    public void setNotifications(Notifications notifications) {
-//        this.notifications = notifications;
-//    }
 
     @Override
     public boolean equals(Object o) {

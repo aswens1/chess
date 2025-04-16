@@ -23,7 +23,6 @@ public class ServerFacade {
     private ChessGame.TeamColor teamColor;
 
     private final String serverURL;
-//    private final int serverPort;
 
     private final HashMap<Integer, CondensedGameData> gameMap = new HashMap<>();
 
@@ -109,12 +108,6 @@ public class ServerFacade {
         GetGameResult result = this.makeRequest("GET", path, null, authToken, GetGameResult.class);
         setTeamColor(ChessGame.TeamColor.WHITE);
         setGame(result.gameData().game());
-    }
-
-    public void makeMove(MoveRequest moveRequest, String authToken) {
-        var path = "/game/move";
-        MoveResult moveResult = this.makeRequest("POST", path, moveRequest, authToken, MoveResult.class);
-        setGame(moveResult.game());
     }
 
     public void clear() {

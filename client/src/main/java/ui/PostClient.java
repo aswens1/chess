@@ -5,7 +5,6 @@ import exception.ResponseException;
 import model.*;
 import records.*;
 import websocket.WebSocketFacade;
-import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ public class PostClient implements ChessClient {
     private final ServerFacade sf;
     private final GameState gs;
     private final WebSocketFacade wsf;
-    private GamePlayClient gamePlayClient;
 
 
     public PostClient(ServerFacade sf, State state, GameState gs, WebSocketFacade wsf) {

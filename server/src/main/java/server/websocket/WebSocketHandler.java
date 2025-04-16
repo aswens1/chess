@@ -39,18 +39,8 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-//        System.out.println("Received WebSocket message: " + message);
-//        System.out.println("First char: " + message.charAt(0));
-//        System.out.println("Incoming message: " + message);
+
         UserGameCommand command = serializer.fromJson(message, UserGameCommand.class);
-
-//        if (command.gameID() == null) {
-//            sendError(session, "Invalid gameID");
-//            return;
-//        }
-
-//        System.out.println("gameID type: " + command.gameID().getClass().getName());
-//        System.out.println("gameID value: " + command.gameID());
 
         try {
             AuthDataRecord auth = authDataAccess.getAuthData(command.authToken());
@@ -62,7 +52,6 @@ public class WebSocketHandler {
                 return;
             }
 
-//            System.out.println("Fetching game data for gameID: " + command.gameID());
             GameDataRecord gameData = sqlGameDataAccess.getGame(command.gameID());
             if (gameData == null) {
                 String errorMessage = "Error: GameData is null.";
@@ -71,12 +60,6 @@ public class WebSocketHandler {
                 session.getRemote().sendString(serializer.toJson(error));
                 return;
             }
-//            System.out.println("gameData: " + gameData);
-
-//        System.out.println("gameData.game(): " + gameData.game());
-//        System.out.println("class: " + gameData.game().getClass().getName());
-
-//        System.out.println("Parsed command type: " + command.commandType());
 
             switch (command.commandType()) {
                 case CONNECT -> connect(session, command, auth, gameData);
@@ -265,7 +248,6 @@ public class WebSocketHandler {
             leaveMessage.setMessage(message);
 
             connections.broadcast(UGC.gameID(), username, leaveMessage);
-//            connections.remove(UGC.gameID(), username);
 
         } catch (Exception exception) {
 
@@ -318,9 +300,6 @@ public class WebSocketHandler {
             ServerMessage resignMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
             resignMessage.setMessage(message);
             connections.broadcast(gameID, UGC.username(), resignMessage);
-//            connections.remove(gameID, UGC.username());
-
-//            connections.resign(gameID, username);
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);

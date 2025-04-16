@@ -66,15 +66,11 @@ public class ChessGame {
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> legalMoves = new ArrayList<>();
 
-//        System.out.println("Raw moves before legality check: " + moves);
-
         for (ChessMove move : moves) {
             if (testMove(move)) {
                 legalMoves.add(move);
             }
         }
-
-//        System.out.println("Final legal moves: " + legalMoves);
 
         return legalMoves;
     }
@@ -96,7 +92,6 @@ public class ChessGame {
         board.addPiece(start, startPiece);
         board.addPiece(end, endPiece);
 
-//        System.out.println("Testing move: " + start + " -> " + end + " | Legal? " + legal);
         return legal;
     }
 
@@ -247,7 +242,5 @@ public class ChessGame {
         return (piece.getTeamColor() == TeamColor.WHITE && endPos.getRow() == 8) ||
                 (piece.getTeamColor() == TeamColor.BLACK && endPos.getRow() == 1);
     }
-
-
 
 }

@@ -5,7 +5,6 @@ import exception.ResponseException;
 import records.MoveRequest;
 import websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -130,9 +129,6 @@ public class GamePlayClient implements ChessClient{
         }
 
         MoveRequest moveRequest = new MoveRequest(sf.getGameID(), move, sf.getUsername(), sf.getTeamColor());
-//        sf.makeMove(moveRequest, sf.returnAuth());
-
-//        gs.setGame(sf.getGame());
 
         UserGameCommand moveUGC = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, sf.returnAuth(), sf.getGameID(), sf.getTeamColor().toString(), sf.getUsername(), oldString, newString, null);
 

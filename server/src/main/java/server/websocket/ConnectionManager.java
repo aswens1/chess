@@ -36,7 +36,6 @@ public class ConnectionManager {
     }
 
     public void broadcast(Integer gameID, String excludeUser, ServerMessage notification) throws IOException {
-//        System.out.println("Broadcasting to gameID " + gameID + ": " + notification);
 
         if (!connections.containsKey(gameID)) {
             return;
@@ -49,7 +48,6 @@ public class ConnectionManager {
             if (c.session.isOpen()) {
                 if (!c.username.equals(excludeUser)) {
                     c.send(notifyJSON);
-                    System.out.println("Sending " + notification.getNotificationMessage() + " to " + c.username);
                 }
             } else {
                 removeList.add(c);
@@ -85,10 +83,6 @@ public class ConnectionManager {
         return resignedPlayers.getOrDefault(gameID, Set.of()).contains(username);
     }
 
-    public void resetResign(int gameID, String username) {
-        resignedPlayers.getOrDefault(gameID, Set.of()).remove(username);
-    }
-
     public void clearResign(int gameID) {
         resignedPlayers.remove(gameID);
     }
@@ -99,10 +93,6 @@ public class ConnectionManager {
 
     public void addGameOver(int gameID) {
         gameOver.add(gameID);
-    }
-
-    public ArrayList<Integer> getGameOverList() {
-        return gameOver;
     }
 
     @Override
