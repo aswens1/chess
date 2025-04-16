@@ -5,7 +5,7 @@ import exception.ErrorMessage;
 import exception.ResponseException;
 import service.*;
 import spark.*;
-import userRecords.*;
+import userrecords.*;
 
 public class UserHandler {
     UserService userService;

@@ -1,4 +1,4 @@
-package gameRecords;
+package gamerecords;
 
 import chess.ChessGame;
 import chess.ChessMove;

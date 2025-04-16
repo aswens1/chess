@@ -4,10 +4,10 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.CondensedGameData;
 import org.junit.jupiter.api.*;
-import gameRecords.*;
+import gamerecords.*;
 import server.*;
 import ui.ServerFacade;
-import userRecords.*;
+import userrecords.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

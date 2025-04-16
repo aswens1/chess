@@ -6,7 +6,7 @@ import exception.ResponseException;
 import model.AuthDataRecord;
 import model.UserRecord;
 import org.mindrot.jbcrypt.BCrypt;
-import userRecords.*;
+import userrecords.*;
 
 public class UserService {
 

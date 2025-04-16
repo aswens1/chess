@@ -4,8 +4,8 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.*;
-import gameRecords.*;
-import userRecords.*;
+import gamerecords.*;
+import userrecords.*;
 
 import java.io.IOException;
 import java.io.InputStream;

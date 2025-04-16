@@ -5,10 +5,10 @@ import exception.ResponseException;
 import model.*;
 import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
-import gameRecords.JoinGameRequest;
-import userRecords.LoginRequest;
-import userRecords.LoginResult;
-import userRecords.RegisterRequest;
+import gamerecords.JoinGameRequest;
+import userrecords.LoginRequest;
+import userrecords.LoginResult;
+import userrecords.RegisterRequest;
 
 import java.util.List;
 

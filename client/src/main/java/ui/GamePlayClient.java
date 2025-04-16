@@ -2,7 +2,7 @@ package ui;
 
 import chess.*;
 import exception.ResponseException;
-import gameRecords.MoveRequest;
+import gamerecords.MoveRequest;
 import websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
 

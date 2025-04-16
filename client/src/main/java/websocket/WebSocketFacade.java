@@ -44,18 +44,18 @@ public class WebSocketFacade extends Endpoint {
 
     public void connectingToGame(String authToken, Integer gameID, String pov, String username) throws IOException {
         try {
-            UserGameCommand UGC = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, pov,
+            UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, pov,
                     username, null, null, null);
-            this.session.getBasicRemote().sendText(new Gson().toJson(UGC));
+            this.session.getBasicRemote().sendText(new Gson().toJson(userGameCommand));
         } catch (IOException exception) {
             throw new ResponseException(500, exception.getMessage());
         }
     }
 
 
-    public void sendCommand(UserGameCommand UGC) {
+    public void sendCommand(UserGameCommand userGameCommand) {
         if (session != null && session.isOpen()) {
-            String json = new Gson().toJson(UGC);
+            String json = new Gson().toJson(userGameCommand);
             session.getAsyncRemote().sendText(json);
         } else {
             System.out.println("Session is closed, cannot send message.");

@@ -1,4 +1,4 @@
-package gameRecords;
+package gamerecords;
 
 import model.GameDataRecord;
 

@@ -5,7 +5,7 @@ import dataaccess.SQLAuthDataAccess;
 import model.AuthDataRecord;
 import exception.ErrorMessage;
 import exception.ResponseException;
-import gameRecords.*;
+import gamerecords.*;
 import service.*;
 import spark.Request;
 import spark.Response;

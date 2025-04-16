@@ -3,8 +3,8 @@ package ui;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
-import gameRecords.*;
-import userRecords.LogoutRequest;
+import gamerecords.*;
+import userrecords.LogoutRequest;
 import websocket.WebSocketFacade;
 
 import java.io.IOException;

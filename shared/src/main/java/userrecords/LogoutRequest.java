@@ -1,3 +1,3 @@
-package userRecords;
+package userrecords;
 
 public record LogoutRequest(String authToken) {}
