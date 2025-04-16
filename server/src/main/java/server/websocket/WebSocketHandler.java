@@ -28,8 +28,6 @@ public class WebSocketHandler {
     private final SQLAuthDataAccess authDataAccess = new SQLAuthDataAccess();
     private final SQLGameDataAccess sqlGameDataAccess = new SQLGameDataAccess();
 
-    private boolean resigned = false;
-
     public WebSocketHandler() {
         System.out.println("websockethandler instantiated");
     }
@@ -194,7 +192,7 @@ public class WebSocketHandler {
             return;
         }
 
-        if (resigned) {
+        if (connections.playerResigned(UGC.gameID(), username)) {
             String errorMessage = "Error: You can't make moves after resigning. Please enter return to return to game selection.";
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
             error.setErrorMessage(errorMessage);
@@ -238,6 +236,8 @@ public class WebSocketHandler {
 
         sqlGameDataAccess.updateGamePlayer(UGC.gameID(), null, pov, game);
 
+        connections.clearResign(UGC.gameID());
+
         try {
 
             connections.remove(UGC.gameID(), username);
@@ -276,7 +276,7 @@ public class WebSocketHandler {
             return;
         }
 
-        if (resigned) {
+        if (connections.playerResigned(gameID, username)) {
             String errorMessage = "Game over. Please enter return to return to game selection.";
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
             error.setErrorMessage(errorMessage);
@@ -295,7 +295,7 @@ public class WebSocketHandler {
             connections.broadcast(gameID, UGC.username(), resignMessage);
 //            connections.remove(gameID, UGC.username());
 
-            resigned = true;
+            connections.resign(gameID, username);
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);

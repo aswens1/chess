@@ -6,10 +6,13 @@ import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
     public final ConcurrentHashMap<Integer, ArrayList<Connection>> connections = new ConcurrentHashMap<>();
+    public final Map<Integer, Set<String>> resignedPlayers = new ConcurrentHashMap<>();
 
     Gson gson = new Gson();
 
@@ -70,6 +73,22 @@ public class ConnectionManager {
             }
         }
         return sessions;
+    }
+
+    public void resign(int gameID, String username) {
+        resignedPlayers.computeIfAbsent(gameID, k -> ConcurrentHashMap.newKeySet()).add(username);
+    }
+
+    public boolean playerResigned(int gameID, String username) {
+        return resignedPlayers.getOrDefault(gameID, Set.of()).contains(username);
+    }
+
+    public void resetResign(int gameID, String username) {
+        resignedPlayers.getOrDefault(gameID, Set.of()).remove(username);
+    }
+
+    public void clearResign(int gameID) {
+        resignedPlayers.remove(gameID);
     }
 
     @Override
