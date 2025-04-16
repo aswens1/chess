@@ -200,9 +200,24 @@ public class WebSocketHandler {
             return;
         }
 
+        if (connections.isGameOver(UGC.gameID())) {
+            String errorMessage = "Error: Game over. Please enter return to return to game selection.";
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setErrorMessage(errorMessage);
+            session.getRemote().sendString(serializer.toJson(error));
+            return;
+        }
+
         try {
             GameDataRecord updatedGameData = sqlGameDataAccess.getGame(UGC.gameID());
             ChessGame updatedGame = updatedGameData.game();
+
+            boolean isCheckmate = game.isInCheckmate(game.getTeamTurn());
+            boolean isStalemate = game.isInStalemate(game.getTeamTurn());
+
+            if (isCheckmate || isStalemate) {
+                connections.addGameOver(UGC.gameID());
+            }
 
 //            System.out.println(updatedGame.getBoard().toString());
 
@@ -284,10 +299,18 @@ public class WebSocketHandler {
             return;
         }
 
+        if (connections.isGameOver(gameID)) {
+            String errorMessage = "The game is already over. Please enter return to return to game selection.";
+            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);
+            error.setErrorMessage(errorMessage);
+            session.getRemote().sendString(serializer.toJson(error));
+            return;
+        }
+
         try {
-
+            connections.resign(gameID, username);
             connections.remove(gameID, UGC.username());
-
+            connections.addGameOver(gameID);
 
             String message = SET_TEXT_COLOR_BLUE + UGC.username() + RESET_TEXT_COLOR + " has resigned the game.";
             ServerMessage resignMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, null, null);
@@ -295,7 +318,7 @@ public class WebSocketHandler {
             connections.broadcast(gameID, UGC.username(), resignMessage);
 //            connections.remove(gameID, UGC.username());
 
-            connections.resign(gameID, username);
+//            connections.resign(gameID, username);
 
         } catch (Exception exception) {
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, null, null);

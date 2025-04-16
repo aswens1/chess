@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     public final ConcurrentHashMap<Integer, ArrayList<Connection>> connections = new ConcurrentHashMap<>();
     public final Map<Integer, Set<String>> resignedPlayers = new ConcurrentHashMap<>();
+    public final ArrayList<Integer> gameOver = new ArrayList<>();
+
 
     Gson gson = new Gson();
 
@@ -89,6 +91,18 @@ public class ConnectionManager {
 
     public void clearResign(int gameID) {
         resignedPlayers.remove(gameID);
+    }
+
+    public boolean isGameOver(int gameID) {
+        return gameOver.contains(gameID);
+    }
+
+    public void addGameOver(int gameID) {
+        gameOver.add(gameID);
+    }
+
+    public ArrayList<Integer> getGameOverList() {
+        return gameOver;
     }
 
     @Override
